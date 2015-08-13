@@ -1,0 +1,45 @@
+<resources>
+
+    <!--
+        Base application theme for API 14+. This theme completely replaces
+        AppBaseTheme from BOTH res/values/styles.xml and
+        res/values-v11/styles.xml on API 14+ devices.
+    -->
+    <style name="AppBaseTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- API 14 theme customizations can go here. -->
+    </style>
+    
+    <style name="Theme.Custom" parent="@style/Theme.AppCompat">
+        <item name="android:actionBarItemBackground">@drawable/selectable_background_custom</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu.Custom</item>
+        <item name="android:dropDownListViewStyle">@style/DropDownListView.Custom</item>
+        <item name="android:actionBarTabStyle">@style/ActionBarTabStyle.Custom</item>
+        <item name="android:actionDropDownStyle">@style/DropDownNav.Custom</item>
+        <item name="android:actionBarStyle">@style/ActionBar.Transparent.Custom</item>
+        <item name="android:actionModeBackground">@drawable/cab_background_top_custom</item>
+        <item name="android:actionModeSplitBackground">@drawable/cab_background_bottom_custom</item>
+        <item name="android:actionModeCloseButtonStyle">@style/ActionButton.CloseMode.Custom</item>
+        
+        
+    </style>
+
+    <style name="ActionBar.Solid.Custom" parent="@style/Widget.AppCompat.ActionBar.Solid">
+        <item name="android:background">@drawable/ab_solid_custom</item>
+        <item name="android:backgroundStacked">@drawable/ab_stacked_solid_custom</item>
+        <item name="android:backgroundSplit">@drawable/ab_bottom_solid_custom</item>
+        <item name="android:progressBarStyle">@style/ProgressBar.Custom</item>
+    </style>
+
+    <style name="ActionBar.Transparent.Custom" parent="@style/Widget.AppCompat.ActionBar">
+        <item name="android:background">@drawable/ab_transparent_custom</item>
+        <item name="android:progressBarStyle">@style/ProgressBar.Custom</item>
+    </style>
+    
+    <!-- this style is only referenced in a Light.DarkActionBar based theme -->
+    <style name="Theme.Custom.Widget" parent="@style/Theme.AppCompat">
+        <item name="android:popupMenuStyle">@style/PopupMenu.Custom</item>
+        <item name="android:dropDownListViewStyle">@style/DropDownListView.Custom</item>
+    </style>
+    
+
+</resources>

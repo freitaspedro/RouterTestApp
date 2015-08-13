@@ -1,0 +1,69 @@
+<resources>
+
+    <!--
+        Base application theme for API 11+. This theme completely replaces
+        AppBaseTheme from res/values/styles.xml on API 11+ devices.
+    -->
+    <style name="AppBaseTheme" parent="Theme.AppCompat.Light">
+        <!-- API 11 theme customizations can go here. -->
+    </style>
+    
+    <style name="Theme.Custom" parent="@style/Theme.AppCompat">
+        <item name="actionBarItemBackground">@drawable/selectable_background_custom</item>
+        <item name="popupMenuStyle">@style/PopupMenu.Custom</item>
+        <item name="dropDownListViewStyle">@style/DropDownListView.Custom</item>
+        <item name="actionBarTabStyle">@style/ActionBarTabStyle.Custom</item>
+        <item name="actionDropDownStyle">@style/DropDownNav.Custom</item>
+        <item name="actionBarStyle">@style/ActionBar.Transparent.Custom</item>
+        <item name="actionModeBackground">@drawable/cab_background_top_custom</item>
+        <item name="actionModeSplitBackground">@drawable/cab_background_bottom_custom</item>
+        <item name="actionModeCloseButtonStyle">@style/ActionButton.CloseMode.Custom</item>
+
+        
+    </style>
+
+    <style name="ActionBar.Solid.Custom" parent="@style/Widget.AppCompat.ActionBar.Solid">
+        <item name="background">@drawable/ab_solid_custom</item>
+        <item name="backgroundStacked">@drawable/ab_stacked_solid_custom</item>
+        <item name="backgroundSplit">@drawable/ab_bottom_solid_custom</item>
+        <item name="progressBarStyle">@style/ProgressBar.Custom</item>
+    </style>
+
+    <style name="ActionBar.Transparent.Custom" parent="@style/Widget.AppCompat.ActionBar">
+        <item name="background">@drawable/ab_transparent_custom</item>
+        <item name="progressBarStyle">@style/ProgressBar.Custom</item>
+    </style>
+	
+    <style name="PopupMenu.Custom" parent="@style/Widget.AppCompat.PopupMenu">	
+        <item name="android:popupBackground">@drawable/menu_dropdown_panel_custom</item>	
+    </style>
+	
+    <style name="DropDownListView.Custom" parent="@style/Widget.AppCompat.ListView.DropDown">
+        <item name="android:listSelector">@drawable/selectable_background_custom</item>
+    </style>
+
+    <style name="ActionBarTabStyle.Custom" parent="@style/Widget.AppCompat.ActionBar.TabView">
+        <item name="android:background">@drawable/tab_indicator_ab_custom</item>
+    </style>
+	
+    <style name="DropDownNav.Custom" parent="@style/Widget.AppCompat.Spinner.DropDown.ActionBar">
+        <item name="android:background">@drawable/spinner_background_ab_custom</item>
+        <item name="android:popupBackground">@drawable/menu_dropdown_panel_custom</item>
+        <item name="android:dropDownSelector">@drawable/selectable_background_custom</item>
+    </style>
+    
+    <style name="ProgressBar.Custom" parent="@style/Widget.AppCompat.ProgressBar.Horizontal">
+        <item name="android:progressDrawable">@drawable/progress_horizontal_custom</item>
+    </style>
+    
+    <style name="ActionButton.CloseMode.Custom" parent="@style/Widget.AppCompat.ActionButton.CloseMode">
+        <item name="android:background">@drawable/btn_cab_done_custom</item>
+    </style>
+    
+    <!-- this style is only referenced in a Light.DarkActionBar based theme -->
+    <style name="Theme.Custom.Widget" parent="@style/Theme.AppCompat">
+        <item name="popupMenuStyle">@style/PopupMenu.Custom</item>
+        <item name="dropDownListViewStyle">@style/DropDownListView.Custom</item>
+    </style>    
+
+</resources>

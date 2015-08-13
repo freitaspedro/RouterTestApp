@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
+    
+    
+    <string name="app_name">Router Test</string>
+    
+    <string name="title_activity_about">Sobre</string>
+	<string name="title_activity_result">Resultados</string>
+	<string name="details">Detalhes</string>
+    
+    <string name="action_about">Sobre</string>
+    <string name="action_exit">Sair</string>
+    
+    <string name="info_ip"></string>
+    <string name="info_gateway"></string>
+    <string name="info_operadora"></string>
+    <string name="info_data"></string>
+   
+    <string name="app_version">Versão 1.0</string>
+    <string name="text_about">O Router Test foi projetado como um trabalho de conlusão do curso de Bacharelado em Ciência da Computação pela Universidade Federal Fluminense-UFF.</string>
+    <string name="comments"><a href="mailto:pfreitas@id.uff.br">Enviar comentários</a></string>
+    
+    <string name="start_test">TESTAR</string>
+</resources>
