@@ -1,6 +1,5 @@
 package br.pedrofreitas.myroutertestapp;
 
-import java.net.URL;
 import java.util.ArrayList;
 
 import android.app.AlertDialog;
@@ -26,6 +25,7 @@ import br.pedrofreitas.myroutertestapp.dao.Initialize;
 import br.pedrofreitas.myroutertestapp.dao.ParamsDao;
 import br.pedrofreitas.myroutertestapp.dao.PostGetDao;
 import br.pedrofreitas.myroutertestapp.dao.UsuarioDao;
+import br.pedrofreitas.myroutertestapp.manager.Ataque;
 import br.pedrofreitas.myroutertestapp.manager.Dado;
 import br.pedrofreitas.myroutertestapp.manager.Login;
 import br.pedrofreitas.myroutertestapp.util.AsyncTaskCompleteListener;
@@ -43,10 +43,10 @@ public class MainActivity<T> extends ActionBarActivity implements AsyncTaskCompl
 	
 	private SharedPreferences mShared;
 	private String TAG_APP = "app";
-	private String TAG_ATAQUE_TEMPORARIO_ID = "id_temporario";
-	private long mAtaqueTemporario;
-	private String TAG_PRIMEIRA_VEZ = "primeiraVez";
-	private boolean mPrimeiraVez;
+	private String TAG_CREATE_TABLES = "isCreated";
+	private boolean mIsCreated;
+	private String TAG_INSERT_TABLES = "isInserted";
+	private boolean mIsInserted;
 
 	private GeneralDao mGeneralDao;
 	private DadoDao mDadoDao;
@@ -55,7 +55,6 @@ public class MainActivity<T> extends ActionBarActivity implements AsyncTaskCompl
 	private ParamsDao mParamsDao;
 	private UsuarioDao mUsuarioDao;
 
-	private Dado mDadoTemp;
 	private Dado mDado;
 	
 	private ArrayList<Login> mListLogin;
@@ -69,10 +68,7 @@ public class MainActivity<T> extends ActionBarActivity implements AsyncTaskCompl
 	
 	private AsyncTask<Void, String, Void> getAtaqueTask; 	
 	private AsyncTask<Void, String, Object> getInfoTask; 
-	private AsyncTask<Void, String, Void> doAtaqueTask; 	
-	
-	private URL urlSalvaBanco;
-	private String urlInsereDado = "http://pedrofreitas.ddns.net/insereinfo.php?";
+	private AsyncTask<Void, String, Integer> doAtaqueTask; 	
 	
 	
 	@Override
@@ -80,31 +76,33 @@ public class MainActivity<T> extends ActionBarActivity implements AsyncTaskCompl
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);        
 
-		mShared = getSharedPreferences(TAG_APP, 0);		
-		mPrimeiraVez = mShared.getBoolean(TAG_PRIMEIRA_VEZ, true);
-		
-		mAtaqueTemporario = mShared.getLong(TAG_ATAQUE_TEMPORARIO_ID, -1); 
+		mShared = getSharedPreferences(TAG_APP, MODE_PRIVATE);		
+		mIsCreated = mShared.getBoolean(TAG_CREATE_TABLES, false);
 		
 		//Cria o banco e as tabelas na memoria
-		if(mPrimeiraVez) {			
-			new Initialize(MainActivity.this).execute();			
+		if(!mIsCreated) {			
+			new Initialize(MainActivity.this, mShared).start();			
 		}
 	}
 	
 	@Override
 	protected void onStart() {
 		super.onStart();
-		setContentView(R.layout.activity_main);  		
+		setContentView(R.layout.activity_main);  	
+		
+		mShared = getSharedPreferences(TAG_APP, MODE_PRIVATE);		
+		mIsInserted = mShared.getBoolean(TAG_INSERT_TABLES, false);
+		
+
+		/*****PARA TESTE RETIRAR*******/
+		mIsInserted = true;
+		/******************************/
 		
 		if(NetworkUtil.isWiFiConnected(this)) {
 			mWifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);					
 			getInfoTask = new GetInfo(MainActivity.this, mWifiManager, mListLogin);
 			
-			/**PARA TESTE RETIRAR**/
-			mPrimeiraVez= false;
-			/**********************/
-			
-			if(mPrimeiraVez) {
+			if(!mIsInserted) {
 				//Preenche as tabelas da memoria com os dados do servidor
 				getAtaqueTask = new GetAtaque(MainActivity.this, mShared, getInfoTask);
 				getAtaqueTask.execute();				
@@ -163,18 +161,14 @@ public class MainActivity<T> extends ActionBarActivity implements AsyncTaskCompl
         	mOperadora.setText(textOperadora);
         	        	
         	mData  = (TextView) findViewById(R.id.textView4);
-        	CharSequence textData = (mDado.getData() != null) ? "Data atual: " + formatData(mDado.getData()) : "Data atual: Não identificada";
+        	CharSequence textData = (mDado.getData() != null) ? "Data atual: " + mDado.getData() : "Data atual: Não identificada";
         	mData.setText(textData);
     	}		
 		
 		mListLogin = (ArrayList<Login>) obj.getList();
-		Log.i("LISTA_LOGIN", "tamanho: " + mListLogin.size());
+		Log.i("LISTA_LOGIN", "tamanho " + mListLogin.size());
 	} 
 	
-	private String formatData(String data) {
-		return data.split("-")[2] + "/" + data.split("-")[1] + "/" + data.split("-")[0];
-	}
-
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
@@ -196,48 +190,35 @@ public class MainActivity<T> extends ActionBarActivity implements AsyncTaskCompl
         }
     }
     
-    public void startTest(View view) {			
-    	it = new Intent(MainActivity.this, Result.class); 
+    public void startTest(View view) {   	
 //		new AtaqueDao(this).getAll(); 		
     	
-//		new PostGetDao(this).getPostEGetWithIdAtaque(1);
-		
-//		new ParamsDao(this).getParamsWithIdComando(1);
-		
-//		new UsuarioDao(this).getLoginPorOperadora("oi");
+//		new PostGetDao(this).getAll();
     	
-		if(NetworkUtil.isWiFiConnected(this)) {    		
-			startActivity(it);
-//	    	doAtaqueTask = new StartAtaque(MainActivity.this, mDado, mListLogin, it, mShared);
-//	    	doAtaqueTask.execute();	        	
-	    	
-	    	/* MOVER ESSA PARTE PARA RESULT
-			if(mAtaqueTemporario != -1) {
-				mDadoTemp = mDatabaseDao.getDadoWithId(mAtaqueTemporario);
-				Log.i("SALVA", mDadoTemp.toString());
-				try {
-					urlSalvaBanco = new URL (urlInsereDado + "ip=" + mDadoTemp.getIp() + "&gateway=" + mDadoTemp.getGateway() + "&operadora=" + mDadoTemp.getData() + "&data=" + mDadoTemp.getData() + "&nome_roteador=" + mDadoTemp.getNome_roteador() + "&modelo_roteador=" + mDadoTemp.getModelo_roteador() + "&reboot_ataque" + mDadoTemp.getReboot_ataque() + "&dns_ataque=" + mDadoTemp.getDns_ataque() + "&acesso_remoto_ataque=" + mDadoTemp.getAcesso_remoto_ataque() + "&login=" + mDadoTemp.getLogin() + "&senha=" + mDadoTemp.getSenha());
-					URLConnection connectionSalva = (URLConnection) urlSalvaBanco.openConnection();
-				} catch (MalformedURLException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				
-				SharedPreferences.Editor editor = mShared.edit();
-				editor.putLong(TAG_ATAQUE_TEMPORARIO_ID, -1);
-				editor.commit();
-				this.stopSelf();				
-			}
-			else {
-			}
-	    	 */   	
+//		new ParamsDao(this).getAll();
+    	
+//		new UsuarioDao(this).getLoginPorOperadora("oi");
+//		new UsuarioDao(this).getLoginPorOperadora("gvt");
+//		new UsuarioDao(this).getLoginPorOperadora("net");
+    	
+    	it = new Intent(MainActivity.this, Result.class); 
+    	
+		if(NetworkUtil.isWiFiConnected(this)) {			
+			mAtaqueDao = new AtaqueDao(MainActivity.this);
+			ArrayList<Ataque> mListAtaque = mAtaqueDao.getAtaquesWithOperadoraETipo(mDado.getOperadora(), "login"); 
+			
+			Log.i("LISTA_ATAQUE_LOGIN", "tamanho " + mListAtaque.size());			
+			int mCountAtaques = 0;
+			
+	    	doAtaqueTask = new StartAtaque(MainActivity.this, mDado, mListLogin, mListAtaque, mCountAtaques, it);
+	    	doAtaqueTask.execute();	     
+			
+//			startActivity(it);
     	}
     	else {        	
 			showDialog(ALERT_DIALOG1);			
     	}  
     	
-//    	startActivity(it);
     }
     
     @Override

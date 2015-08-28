@@ -1,6 +1,8 @@
 package br.pedrofreitas.myroutertestapp.dao;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.util.Log;
 import br.pedrofreitas.myroutertestapp.manager.Ataque;
 import br.pedrofreitas.myroutertestapp.manager.Login;
 import br.pedrofreitas.myroutertestapp.manager.Params;
@@ -9,6 +11,9 @@ import br.pedrofreitas.myroutertestapp.manager.PostGet;
 public class Initialize {
 	
 	private Context mContext;
+
+	private SharedPreferences mShared;
+	private String TAG_CREATE_TABLES = "isCreated";
 	
 	private GeneralDao mGeneralDao;
 	private DadoDao mDadoDao;
@@ -17,148 +22,33 @@ public class Initialize {
 	private ParamsDao mParamsDao;
 	private UsuarioDao mUsuarioDao;
 	
-	public Initialize(Context mContext) {
+	
+	public Initialize(Context mContext, SharedPreferences mShared) {
 		this.mContext = mContext;
+		this.mShared = mShared;
 	}
 	
-	public void execute() {
+	public void start() {
 		mGeneralDao = new GeneralDao(mContext);
 		mDadoDao = new DadoDao(mContext);
 		mAtaqueDao = new AtaqueDao(mContext);
 		mPostGetDao = new PostGetDao(mContext);
 		mParamsDao = new ParamsDao(mContext);         
 		mUsuarioDao = new UsuarioDao(mContext);		
-		/* Para teste! COMENTAR!! */
+
+		SharedPreferences.Editor editor = mShared.edit();
+		editor.putBoolean(TAG_CREATE_TABLES, true);
+		editor.commit();
+
+		Log.i("CREATE_TABLES", "Tabelas criadas com sucesso");
+		
+		/*****PARA TESTE COMENTAR******/
 		insertAll();
 		selectAll();
-		/********************/
+		/******************************/
 	}
 
-	public void insertAll() {
-//		Oi ZyXEL AMG1202-T10B
-		mAtaqueDao.insert(new Ataque(1, "reboot", null, "oi", 0, 0, 1, null, null, 0));			
-		mPostGetDao.insert(new PostGet(1, 1, 1, "post", "/cgi-bin/SavingAuthorize.asp"));														
-			mParamsDao.insert(new Params(1, 1, "LoginPassword", "admin"));
-			mParamsDao.insert(new Params(2, 1, "LoginUsername", "admin"));
-		mPostGetDao.insert(new PostGet(2, 1, 2, "post", "/cgi-bin/RebootSucc.asp"));
-			mParamsDao.insert(new Params(3, 2, "LoginPassword", "admin"));
-			mParamsDao.insert(new Params(4, 2, "LoginUsername", "admin"));
-			
-//		Oi technicolor TD5136v2	
-		mAtaqueDao.insert(new Ataque(2, "reboot", null, "oi", 0, 0, 1, null, null, 0));			
-		mPostGetDao.insert(new PostGet(3, 2, 1, "post", "/login.cgi"));
-			mParamsDao.insert(new Params(5, 3, "isSubmit", "1"));
-			mParamsDao.insert(new Params(6, 3, "username", "admin"));
-			mParamsDao.insert(new Params(7, 3, "password", "admin"));
-		mPostGetDao.insert(new PostGet(4, 2, 2, "post", "/reboot.cgi"));
-			mParamsDao.insert(new Params(8, 4, "submitValue", "redirect"));
-		mPostGetDao.insert(new PostGet(5, 2, 3, "post", "/reboot.cgi"));
-			mParamsDao.insert(new Params(9, 5, "submitValue", "apply"));			
-	
-//		GVT D-Link DSL-2640B	
-		mAtaqueDao.insert(new Ataque(3, "reboot", "/rebootinfo.cgi", "gvt", 0, 0, 0, null, null, 0));			
-	
-//		NET Cisco DPC3925
-		mAtaqueDao.insert(new Ataque(4, "reboot", null, "net", 0, 0, 1, null, null, 0));			
-		mPostGetDao.insert(new PostGet(6, 4, 1, "post", "/goform/Docsis_system"));														
-			mParamsDao.insert(new Params(10, 6, "username_login", ""));
-			mParamsDao.insert(new Params(11, 6, "password_login", ""));
-			mParamsDao.insert(new Params(12, 6, "LanguageSelect", "en"));
-			mParamsDao.insert(new Params(13, 6, "Language_Submit", "0"));
-			mParamsDao.insert(new Params(14, 6, "login", "0"));
-		mPostGetDao.insert(new PostGet(7, 4, 2, "post", "/goform/Devicerestart"));
-			mParamsDao.insert(new Params(15, 7, "devicerestrat_Password_check", ""));
-			mParamsDao.insert(new Params(16, 7, "mtenRestore", "Device Restart"));
-			mParamsDao.insert(new Params(17, 7, "devicerestart", "1"));
-			mParamsDao.insert(new Params(18, 7, "devicerestrat_getUsercheck", "true"));
-		
-//		Oi ZyXEL AMG1202-T10B	
-		mAtaqueDao.insert(new Ataque(5, "dns", null, "oi", 0, 0, 1, null, null, 0));			 
-		mPostGetDao.insert(new PostGet(8, 5, 1, "post", "/cgi-bin/SavingAuthorize.asp"));
-			mParamsDao.insert(new Params(19, 8, "LoginPassword", "admin"));
-			mParamsDao.insert(new Params(20, 8, "LoginUsername", "admin"));
-		mPostGetDao.insert(new PostGet(9, 5, 2, "post", "/cgi-bin/LAN_DHCPSetup.asp"));
-			mParamsDao.insert(new Params(21, 9, "IPAliasExist", "Yes"));
-			mParamsDao.insert(new Params(22, 9, "IPAlias1Addr", "192.168.2.1"));
-			mParamsDao.insert(new Params(23, 9, "IPAlias1SubnetMask", "255.255.255.0"));
-			mParamsDao.insert(new Params(24, 9, "DNSdefaultValue1", "168.95.1.1"));
-			mParamsDao.insert(new Params(25, 9, "DNSdefaultValue2", "168.95.1.2"));
-			mParamsDao.insert(new Params(26, 9, "DHCP_Mode", "1"));
-			mParamsDao.insert(new Params(27, 9, "sysPoolStartingAddr", "192.168.1.33"));
-			mParamsDao.insert(new Params(28, 9, "ipAddrMain", "192.168.1.1"));
-			mParamsDao.insert(new Params(29, 9, "subnetMask", "255.255.255.0"));
-			mParamsDao.insert(new Params(30, 9, "sysPoolCount", "32"));
-			mParamsDao.insert(new Params(31, 9, "DNSproxyType", "1"));
-			mParamsDao.insert(new Params(32, 9, "DHCPPriDNSAddr", "8.8.8.8"));
-			mParamsDao.insert(new Params(33, 9, "DHCPSecDNSAddr", "8.8.4.4"));
-			mParamsDao.insert(new Params(34, 9, "DNSproxy", "Yes"));
-			mParamsDao.insert(new Params(35, 9, "LAN_DHCPFlag", "1"));
-		mPostGetDao.insert(new PostGet(10, 5, 3, "post", "/cgi-bin/RebootSucc.asp"));
-			mParamsDao.insert(new Params(36, 10, "LoginPassword", "admin"));
-			mParamsDao.insert(new Params(37, 10, "LoginUsername", "admin"));	
-				
-//		Oi technicolor TD5136v2	
-		mAtaqueDao.insert(new Ataque(6, "dns", null, "oi", 0, 0, 1, null, null, 0));			
-		mPostGetDao.insert(new PostGet(11, 6, 1, "post", "/login.cgi"));
-			mParamsDao.insert(new Params(38, 11, "isSubmit", "1"));
-			mParamsDao.insert(new Params(39, 11, "username", "admin"));
-			mParamsDao.insert(new Params(40, 11, "password", "admin"));
-		mPostGetDao.insert(new PostGet(12, 6, 2, "post", "/wancfg.cgi?tAction=apply&idx=0&natEnable=1&defaultRoute=1&icmpReply=0&proxyArp=0&dnsEnable=1&dns1=8.8.8.8&dns2=8.8.4.4&PPP_ConnectionTrigger_value=0&dnsOveride=0&state=1&ipVer=0&ipMode=1&srvName=WAN1&wanIpAddr=0.0.0.0&wanSubnet=0.0.0.0&wanMode=1&wanMac=&unnumberMode=0&Profile_Name=PVC0&pvcId=0&DSL_Enable=1&DSL_AutoPVCEnabled=1&DSL_VPI=0&DSL_VCI=33&DSL_LinkType=0&DSL_Encapsulation=1&DSL_ATMQoS=0&DSL_ATMPeakCellRate=6000&DSL_ATMMaxmumBurstSize=0&DSL_ATMSustainableCellRate=0&DSL_EnableVlan=0&DSL_DefaultVlanID=-1&DSL_DefaultPriority=-1&bridgeType=2&igmpEnabled=0&mode=1&PPP_Enable=1&PPP_IPversion=0&PPP_IPMode=1&PPP_IPAddress=0.0.0.0&PPP_Name=WAN1&PPP_NATEnabled=1&PPP_UserName=B0C287467712@oivelox&PPP_UserPassword=B0C287467712&PPP_ConfirmPassword=B0C287467712&PPP_MaxMRUSize=1492&PPP_DNSEnabled=1&PPP_DNSOverrideAllowed=0&PPP_DNSServer1=8.8.8.8&PPP_DNSServer2=8.8.4.4&PPP_PPPoEServiceName=&PPP_MACAddress1=B0&PPP_MACAddress2=C2&PPP_MACAddress3=87&PPP_MACAddress4=46&PPP_MACAddress5=77&PPP_MACAddress6=12&PPP_PPPoEACName=&PPP_LCP_Interval=10&PPP_DefaultRoute=0&IP_Enable=1&IP_IPversion=0&IP_Name=WAN1&IP_ConnectionType=2&IP_NATEnabled=1&IP_AddressingType=1&IP_ExternalIPAddress=0.0.0.0&IP_SubNetMask=0.0.0.0&IP_DefaultGateway=0.0.0.0&IP_DNSEnabled=0&IP_DNSOverrideAllowed=0&IP_MaxMTUSize=1492&IP_MACAddress1=B0&IP_MACAddress2=C2&IP_MACAddress3=87&IP_MACAddress4=46&IP_MACAddress5=77&IP_MACAddress6=12&IP_Option_125=0&IP_Option_60_Vendor_ID=&IP_Option_61_IAID=&IP_Option_61_DUID=&IP_DefaultRoute=0"));
-		mPostGetDao.insert(new PostGet(13, 6, 3, "post", "/reboot.cgi"));
-			mParamsDao.insert(new Params(41, 13, "submitValue", "redirect"));					
-
-//		GVT D-Link DSL-2640B	
-		mAtaqueDao.insert(new Ataque(7, "dns", null, "gvt", 0, 0, 1, null, null, 0));			
-		mPostGetDao.insert(new PostGet(14, 7, 1, "post", "/dnscfg.cgi?dnsPrimary=8.8.8.8&dnsSecondary=8.8.4.4&dnsIfc=&dnsRefresh=1"));
-		mPostGetDao.insert(new PostGet(15, 7, 2, "post", "/dnscfg.cgi?dnsRefresh=0"));
-		mPostGetDao.insert(new PostGet(16, 7, 3, "post", "/rebootinfo.cgi"));	
-			
-//		NET Cisco DPC3925
-		mAtaqueDao.insert(new Ataque(8, "dns", null, "net", 0, 0, 1, null, null, 0));					
-		mPostGetDao.insert(new PostGet(17, 8, 1, "post", "/goform/Docsis_system"));														
-			mParamsDao.insert(new Params(42, 17, "username_login", ""));
-			mParamsDao.insert(new Params(43, 17, "password_login", ""));
-			mParamsDao.insert(new Params(44, 17, "LanguageSelect", "en"));
-			mParamsDao.insert(new Params(45, 17, "Language_Submit", "0"));
-			mParamsDao.insert(new Params(46, 17, "login", "0"));
-		mPostGetDao.insert(new PostGet(18, 8, 2, "post", "/goform/LanSetup"));
-			mParamsDao.insert(new Params(47, 18, "CiscoLocalIpAddressIP2", "0"));
-			mParamsDao.insert(new Params(48, 18, "CiscoLocalIpAddressIP3", "1"));
-			mParamsDao.insert(new Params(49, 18, "CiscoLocalNetmaskIP3", "0"));		
-			mParamsDao.insert(new Params(50, 18, "CiscoIsLocalIPSettingByGUI", "1"));
-			mParamsDao.insert(new Params(51, 18, "CiscoIsDefaultIP", "1"));
-			mParamsDao.insert(new Params(52, 18, "CiscoDhcpServer", "1"));
-			mParamsDao.insert(new Params(53, 18, "CiscoStartingLocalAddressIP2", "0"));
-			mParamsDao.insert(new Params(54, 18, "CiscoStartingLocalAddressIP3", "10"));
-			mParamsDao.insert(new Params(55, 18, "CiscoNumberOfCpes", "119"));
-			mParamsDao.insert(new Params(56, 18, "CiscoLeaseTime", "60"));
-			mParamsDao.insert(new Params(57, 18, "CiscoPrimaryDnsIpAddressIP0", "8"));
-			mParamsDao.insert(new Params(58, 18, "CiscoPrimaryDnsIpAddressIP1", "8"));
-			mParamsDao.insert(new Params(59, 18, "CiscoPrimaryDnsIpAddressIP2", "8"));
-			mParamsDao.insert(new Params(60, 18, "CiscoPrimaryDnsIpAddressIP3", "8"));
-			mParamsDao.insert(new Params(61, 18, "CiscoSecondaryDnsIpAddressIP0", "8"));
-			mParamsDao.insert(new Params(62, 18, "CiscoSecondaryDnsIpAddressIP1", "8"));
-			mParamsDao.insert(new Params(63, 18, "CiscoSecondaryDnsIpAddressIP2", "4"));
-			mParamsDao.insert(new Params(64, 18, "CiscoSecondaryDnsIpAddressIP3", "4"));
-			mParamsDao.insert(new Params(65, 18, "CiscoTertiaryDnsIpAddressIP0", "0"));
-			mParamsDao.insert(new Params(66, 18, "CiscoTertiaryDnsIpAddressIP1", "0"));
-			mParamsDao.insert(new Params(67, 18, "CiscoTertiaryDnsIpAddressIP2", "0"));
-			mParamsDao.insert(new Params(68, 18, "CiscoTertiaryDnsIpAddressIP3", "0"));
-			mParamsDao.insert(new Params(69, 18, "CiscoTimeZone", "25"));
-			mParamsDao.insert(new Params(70, 18, "DaylightSavingMinutes", "0"));
-			mParamsDao.insert(new Params(71, 18, "h_DaylightSavingEnable", "disable"));
-			mParamsDao.insert(new Params(72, 18, "NewNtpTimeServer", ""));
-			mParamsDao.insert(new Params(73, 18, "addNtpServer", "0"));
-			mParamsDao.insert(new Params(74, 18, "removeNtpServer", "0"));
-			mParamsDao.insert(new Params(75, 18, "TimeSntpEnable", "1"));
-			mParamsDao.insert(new Params(76, 18, "save", "Save Settings"));
-			mParamsDao.insert(new Params(77, 18, "CiscoApplyRgSetupAction", "1"));
-		mPostGetDao.insert(new PostGet(19, 8, 3, "post", "/goform/Devicerestart"));
-			mParamsDao.insert(new Params(78, 19, "devicerestrat_Password_check", ""));
-			mParamsDao.insert(new Params(79, 19, "mtenRestore", "Device Restart"));
-			mParamsDao.insert(new Params(80, 19, "devicerestart", "1"));
-			mParamsDao.insert(new Params(81, 19, "devicerestrat_getUsercheck", "true"));		
-	
+	public void insertAll() {	
 		mUsuarioDao.insert(new Login(1, "admin", "admin", "oi"));
 		mUsuarioDao.insert(new Login(2, "", "", "net"));
 		mUsuarioDao.insert(new Login(3, "admin", "", "oi"));
@@ -180,40 +70,112 @@ public class Initialize {
 		mUsuarioDao.insert(new Login(19, "", "root", "oi"));
 		mUsuarioDao.insert(new Login(20, "admin", "password", "net"));
 		mUsuarioDao.insert(new Login(21, "", "1234", "oi"));
+	
+		/*******************************************************Start Login*******************************************************/
+//		GVT D-Link DSL-2640B	
+		mAtaqueDao.insert(new Ataque(1, "login", null, "gvt", 1, 0, 0, null, null, 0, "D-Link DSL-2640B"));
+			mPostGetDao.insert(new PostGet(1, 1, 1, "get", "", "DSL Router", 1));
+			mPostGetDao.insert(new PostGet(2, 1, 2, "get", "/logo.html", "logoBody", 1));
+			mPostGetDao.insert(new PostGet(3, 1, 3, "get", "/menu.html", "mainMenuBody", 1));
+			mPostGetDao.insert(new PostGet(4, 1, 4, "get", "/info.html", "DSL-2640B", 1));
+			
+//		Oi technicolor TD5136v2	
+		mAtaqueDao.insert(new Ataque(2, "login", null, "oi", -1, 0, -1, null, null, 0, "technicolor TD5136v2"));
+			mPostGetDao.insert(new PostGet(5, 2, 1, "post", "/login.cgi", "/index.cgi", 1));		
+				mParamsDao.insert(new Params(1, 5, "isSubmit", "1"));
+				mParamsDao.insert(new Params(2, 5, "username", "insereUsuario"));
+				mParamsDao.insert(new Params(3, 5, "password", "insereSenha"));			
+			mPostGetDao.insert(new PostGet(6, 2, 2, "get", "/index.cgi", "/login.cgi", 0));
+			mPostGetDao.insert(new PostGet(7, 2, 3, "get", "/top.cgi", "Logout", 0));	
+			mPostGetDao.insert(new PostGet(8, 2, 4, "get", "/code.cgi", "SETUP WIZARD", 0));	
+			mPostGetDao.insert(new PostGet(9, 2, 5, "get", "/status_summary.cgi?pageAct=summary", "/login.cgi", 0));	
+	
+//		Oi ZyXEL AMG1202-T10B
+		mAtaqueDao.insert(new Ataque(3, "login", null, "oi", -1, 0, -1, null, null, 0, "ZyXEL AMG1202-T10B"));			
+			mPostGetDao.insert(new PostGet(10, 3, 1, "post", "/cgi-bin/SavingAuthorize.asp", "/MakeSession.asp", 1));												
+				mParamsDao.insert(new Params(4, 10, "LoginPassword", "insereSenha"));
+				mParamsDao.insert(new Params(5, 10, "LoginUsername", "insereUsuario"));
+			mPostGetDao.insert(new PostGet(11, 3, 2, "get", "/MakeSession.asp", "", 0));	
+			mPostGetDao.insert(new PostGet(12, 3, 3, "get", "/cgi-bin/Jump2Host.asp", "", 0));
+			mPostGetDao.insert(new PostGet(13, 3, 4, "get", "/cgi-bin/rpSys.asp", "", 0));		
+			mPostGetDao.insert(new PostGet(14, 3, 5, "get", "/cgi-bin/top.asp", "", 0));		
+			mPostGetDao.insert(new PostGet(15, 3, 6, "get", "/cgi-bin/path.asp", "", 0));		
+			mPostGetDao.insert(new PostGet(16, 3, 7, "get", "/cgi-bin/home.asp", "", 0));		
+			mPostGetDao.insert(new PostGet(17, 3, 8, "get", "/cgi-bin/rpPanel.asp", "", 0));		
+			mPostGetDao.insert(new PostGet(18, 3, 9, "get", "/cgi-bin/buttom.asp", "", 0));		
+			mPostGetDao.insert(new PostGet(19, 3, 10, "get", "/cgi-bin/path.asp", "", 0));
+			
+//		NET Cisco DPC3925
+		mAtaqueDao.insert(new Ataque(4, "login", null, "net", -1, 0, -1, null, null, 0, "Cisco DPC3925"));			
+			mPostGetDao.insert(new PostGet(20, 4, 1, "post", "/goform/Docsis_system", "Setup", 1));														
+				mParamsDao.insert(new Params(6, 20, "username_login", "insereUsuario"));
+				mParamsDao.insert(new Params(7, 20, "password_login", "insereSenha"));
+				mParamsDao.insert(new Params(8, 20, "LanguageSelect", "en"));
+				mParamsDao.insert(new Params(9, 20, "Language_Submit", "0"));
+				mParamsDao.insert(new Params(10, 20, "login", "Log In"));
+			mPostGetDao.insert(new PostGet(21, 4, 2, "get", "/Quick_setup.asp", "Setup", 0));
+			
+		/********************************************************End Login********************************************************/
+			
+			
+		/******************************************************Start Reboot*******************************************************/	
+//		GVT D-Link DSL-2640B
+		mAtaqueDao.insert(new Ataque(5, "reboot", null, "gvt", -1, 0, -1, null, null, 0, "D-Link DSL-2640B"));
+			mPostGetDao.insert(new PostGet(22, 5, 1, "get", "", "DSL Router", 1));
+			mPostGetDao.insert(new PostGet(23, 5, 2, "get", "/logo.html", "logoBody", 1));
+			mPostGetDao.insert(new PostGet(24, 5, 3, "get", "/menu.html", "mainMenuBody", 1));
+			mPostGetDao.insert(new PostGet(25, 5, 4, "get", "/info.html", "DSL-2640B", 1));
+			mPostGetDao.insert(new PostGet(26, 5, 5, "get", "/backupsettings.html", "", 1));
+			mPostGetDao.insert(new PostGet(27, 5, 6, "get", "/resetrouter.html", "", 1));
+			mPostGetDao.insert(new PostGet(28, 5, 7, "get", "/rebootinfo.cgi", "The DSL Router is rebooting", 1));
+			
+
+//		Oi technicolor TD5136v2	
+		mAtaqueDao.insert(new Ataque(6, "reboot", null, "oi", -1, 0, -1, null, null, 0, "technicolor TD5136v2"));
+			mPostGetDao.insert(new PostGet(29, 6, 1, "post", "/login.cgi", "/index.cgi", 1));		
+				mParamsDao.insert(new Params(11, 29, "isSubmit", "1"));
+				mParamsDao.insert(new Params(12, 29, "username", "insereUsuario"));
+				mParamsDao.insert(new Params(13, 29, "password", "insereSenha"));			
+			mPostGetDao.insert(new PostGet(30, 6, 2, "get", "/index.cgi", "/login.cgi", 0));
+			mPostGetDao.insert(new PostGet(31, 6, 3, "get", "/top.cgi", "Logout", 0));	
+			mPostGetDao.insert(new PostGet(32, 6, 4, "get", "/code.cgi", "SETUP WIZARD", 0));	
+			mPostGetDao.insert(new PostGet(33, 6, 5, "get", "/status_summary.cgi?pageAct=summary", "/login.cgi", 0));	
+			mPostGetDao.insert(new PostGet(34, 6, 6, "get", "/reboot.cgi", "", 0));	
+			mPostGetDao.insert(new PostGet(35, 6, 7, "post", "/reboot.cgi", "", 0));
+				mParamsDao.insert(new Params(14, 35, "submitValue", "redirect"));						
+			mPostGetDao.insert(new PostGet(36, 6, 8, "post", "/reboot.cgi", "", 0));	
+				mParamsDao.insert(new Params(15, 36, "submitValue", "apply"));	
+		
+			
+		/*******************************************************End Reboot********************************************************/	
+		
+		
+		/********************************************************Start DNS********************************************************/	
+		/*********************************************************End DNS*********************************************************/
+
+			
+		/****************************************************Start Acesso Remoto**************************************************/	
+		/*****************************************************End Acesso Remoto***************************************************/
+				
+
+		/******************************************************Start Tarefa 1*****************************************************/	
+		/*******************************************************End Terefa 1******************************************************/
+		
+			
+		/******************************************************Start Tarefa 2*****************************************************/	
+		/*******************************************************End Terefa 2******************************************************/
+			
+
+		Log.i("INSERT_TABLES", "Tabelas preenchidas com sucesso");
 		
 	}
 	
 	public void selectAll() {
 		mAtaqueDao.getAll();
 		
-		mPostGetDao.getPostEGetWithIdAtaque(1);
-		mPostGetDao.getPostEGetWithIdAtaque(2);
-		mPostGetDao.getPostEGetWithIdAtaque(3);
-		mPostGetDao.getPostEGetWithIdAtaque(4);
-		mPostGetDao.getPostEGetWithIdAtaque(5);
-		mPostGetDao.getPostEGetWithIdAtaque(6);
-		mPostGetDao.getPostEGetWithIdAtaque(7);
-		mPostGetDao.getPostEGetWithIdAtaque(8);
+		mPostGetDao.getAll();
 		
-		mParamsDao.getParamsWithIdComando(1);
-		mParamsDao.getParamsWithIdComando(2);
-		mParamsDao.getParamsWithIdComando(3);
-		mParamsDao.getParamsWithIdComando(4);
-		mParamsDao.getParamsWithIdComando(5);
-		mParamsDao.getParamsWithIdComando(6);
-		mParamsDao.getParamsWithIdComando(7);
-		mParamsDao.getParamsWithIdComando(8);
-		mParamsDao.getParamsWithIdComando(9);
-		mParamsDao.getParamsWithIdComando(10);
-		mParamsDao.getParamsWithIdComando(11);
-		mParamsDao.getParamsWithIdComando(12);
-		mParamsDao.getParamsWithIdComando(13);
-		mParamsDao.getParamsWithIdComando(14);
-		mParamsDao.getParamsWithIdComando(15);
-		mParamsDao.getParamsWithIdComando(16);
-		mParamsDao.getParamsWithIdComando(17);
-		mParamsDao.getParamsWithIdComando(18);
-		mParamsDao.getParamsWithIdComando(19);	
+		mParamsDao.getAll();
 		
 		mUsuarioDao.getLoginPorOperadora("oi");
 		mUsuarioDao.getLoginPorOperadora("gvt");

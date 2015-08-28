@@ -48,7 +48,7 @@ public class Login {
 	}
 	
 	public String getLoginESenha(){
-		return this.usuario+":"+this.senha;
+		return this.usuario + ":" + this.senha;
 	}
 	
 }

@@ -36,10 +36,16 @@ public class NetworkUtil {
        String status = null;
        if (conn == NetworkUtil.TYPE_WIFI) {
            status = "Wifi enabled";
-       } else if (conn == NetworkUtil.TYPE_MOBILE) {
-           status = "Mobile data enabled";
-       } else if (conn == NetworkUtil.TYPE_NOT_CONNECTED) {
-           status = "Not connected to Internet";
+       } 
+       else {
+    	   if (conn == NetworkUtil.TYPE_MOBILE) {
+    		   status = "Mobile data enabled";
+    	   } 
+    	   else { 
+    		   if (conn == NetworkUtil.TYPE_NOT_CONNECTED) {
+    			   status = "Not connected to Internet";
+    		   }
+    	   }
        }
        return status;
    }
@@ -47,21 +53,26 @@ public class NetworkUtil {
    public static boolean existInternet(Context ctx) {
 		ConnectivityManager cm = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo ni = cm.getActiveNetworkInfo();
-		if(ni == null)
+		if(ni == null) {
 			return false;
-		if(!ni.isConnected())
+		}
+		if(!ni.isConnected()) {
 			return false;
-		if(!ni.isAvailable())
+		}
+		if(!ni.isAvailable()) {
 			return false;
-		else
+		}
+		else {
 			return true;
+		}
    }
    
    public static boolean isWiFiConnected(Context ctx) {		
 		ConnectivityManager cm = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo ni = null;
-		if(cm != null)		
+		if(cm != null) {	
 			ni = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+		}
 		return ni == null ? false : ni.isConnected();
 	}
 

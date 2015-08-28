@@ -44,6 +44,22 @@ public class ParamsDao {
 		return list;
 	}		
 	
+	public ArrayList<Params> getAll() {
+		ArrayList<Params> list = new ArrayList<Params>();
+		Cursor c = db.query(true, "params", colunas, null, null, null, null, null, null);
+		if(c.moveToFirst()){
+			int idxId = c.getColumnIndex(colunas[0]);
+			int idxId_comando = c.getColumnIndex(colunas[1]);
+			int idxNome = c.getColumnIndex(colunas[2]);
+			int idxValor = c.getColumnIndex(colunas[3]);
+			do {
+				list.add(new Params(c.getLong(idxId), c.getLong(idxId_comando), c.getString(idxNome), c.getString(idxValor)));
+			} while(c.moveToNext());
+		}
+		c.close();
+		return list;
+	}		
+	
 	public void close(){
 		db.close();
 	}

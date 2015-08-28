@@ -14,8 +14,7 @@ public class Dado implements Serializable {
 	private String gateway;
 	private String operadora;
 	private String data;
-	private String nome_roteador;
-	private String modelo_roteador;
+	private String fabricante_modelo;
 	private long reboot_ataque;
 	private long dns_ataque;
 	private long acesso_remoto_ataque;
@@ -23,8 +22,8 @@ public class Dado implements Serializable {
 	private String senha;
 	
 	
-	public Dado(long id, String ip,String gateway, String operadora, String data, String nome_roteador,
-			String modelo_roteador, long reboot_ataque, long dns_ataque,
+	public Dado(long id, String ip,String gateway, String operadora, String data, String fabricante_modelo,
+			long reboot_ataque, long dns_ataque,
 			long acesso_remoto_ataque, String login, String senha) {
 		super();
 		this.id = id;
@@ -32,8 +31,7 @@ public class Dado implements Serializable {
 		this.gateway = gateway;
 		this.operadora = operadora;
 		this.data = data;
-		this.nome_roteador = nome_roteador;
-		this.modelo_roteador = modelo_roteador;
+		this.fabricante_modelo = fabricante_modelo;
 		this.reboot_ataque = reboot_ataque;
 		this.dns_ataque = dns_ataque;
 		this.acesso_remoto_ataque = acesso_remoto_ataque;
@@ -92,20 +90,12 @@ public class Dado implements Serializable {
 		this.data = data;
 	}
 	
-	public String getNome_roteador() {
-		return nome_roteador;
+	public String getFabricante_modelo() {
+		return fabricante_modelo;
 	}
 	
-	public void setNome_roteador(String nome_roteador) {
-		this.nome_roteador = nome_roteador;
-	}
-	
-	public String getModelo_roteador() {
-		return modelo_roteador;
-	}
-	
-	public void setModelo_roteador(String modelo_roteador) {
-		this.modelo_roteador = modelo_roteador;
+	public void setFabricante_modelo(String fabricante_modelo) {
+		this.fabricante_modelo = fabricante_modelo;
 	}
 	
 	public long getReboot_ataque() {
@@ -151,9 +141,8 @@ public class Dado implements Serializable {
 	@Override
 	public String toString() {
 		return "Dado [id=" + id + ", ip=" + ip + ", operadora=" + operadora
-				+ ", data=" + data + ", nome_roteador=" + nome_roteador
-				+ ", modelo_roteador=" + modelo_roteador + ", reboot_ataque="
-				+ reboot_ataque + ", dns_ataque=" + dns_ataque
+				+ ", data=" + data + ", fabricante_modelo=" + fabricante_modelo
+				+ ", reboot_ataque=" + reboot_ataque + ", dns_ataque=" + dns_ataque
 				+ ", acesso_remoto_ataque=" + acesso_remoto_ataque + ", login="
 				+ login + ", senha=" + senha + "]";
 	}
