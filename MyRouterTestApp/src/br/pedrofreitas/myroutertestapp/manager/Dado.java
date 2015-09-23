@@ -15,16 +15,18 @@ public class Dado implements Serializable {
 	private String operadora;
 	private String data;
 	private String fabricante_modelo;
-	private long reboot_ataque;
-	private long dns_ataque;
-	private long acesso_remoto_ataque;
+	private int reboot_ataque;
+	private int dns_ataque;
+	private int acesso_remoto_ataque;
+	private int filtro_mac_ataque;
+	private int abrir_rede_ataque;
 	private String login;
 	private String senha;
 	
 	
 	public Dado(long id, String ip,String gateway, String operadora, String data, String fabricante_modelo,
-			long reboot_ataque, long dns_ataque,
-			long acesso_remoto_ataque, String login, String senha) {
+			int reboot_ataque, int dns_ataque,
+			int acesso_remoto_ataque, int filtro_mac_ataque, int abrir_rede_ataque, String login, String senha) {
 		super();
 		this.id = id;
 		this.ip = ip;
@@ -35,6 +37,8 @@ public class Dado implements Serializable {
 		this.reboot_ataque = reboot_ataque;
 		this.dns_ataque = dns_ataque;
 		this.acesso_remoto_ataque = acesso_remoto_ataque;
+		this.filtro_mac_ataque = filtro_mac_ataque;
+		this.abrir_rede_ataque = abrir_rede_ataque;
 		this.login = login;
 		this.senha = senha;
 	}
@@ -98,30 +102,46 @@ public class Dado implements Serializable {
 		this.fabricante_modelo = fabricante_modelo;
 	}
 	
-	public long getReboot_ataque() {
+	public int getReboot_ataque() {
 		return reboot_ataque;
 	}
 	
-	public void setReboot_ataque(long reboot_ataque) {
+	public void setReboot_ataque(int reboot_ataque) {
 		this.reboot_ataque = reboot_ataque;
 	}
 	
-	public long getDns_ataque() {
+	public int getDns_ataque() {
 		return dns_ataque;
 	}
 	
-	public void setDns_ataque(long dns_ataque) {
+	public void setDns_ataque(int dns_ataque) {
 		this.dns_ataque = dns_ataque;
 	}
 	
-	public long getAcesso_remoto_ataque() {
+	public int getAcesso_remoto_ataque() {
 		return acesso_remoto_ataque;
 	}
 	
-	public void setAcesso_remoto_ataque(long acesso_remoto_ataque) {
+	public void setAcesso_remoto_ataque(int acesso_remoto_ataque) {
 		this.acesso_remoto_ataque = acesso_remoto_ataque;
 	}
+	
+	public int getFiltro_mac_ataque() {
+		return filtro_mac_ataque;
+	}
+	
+	public void setFiltro_mac_ataque(int filtro_mac_ataque) {
+		this.filtro_mac_ataque = filtro_mac_ataque;
+	}
 
+	public int getAbrir_rede_ataque() {
+		return abrir_rede_ataque;
+	}
+	
+	public void setAbrir_rede_ataque(int abrir_rede_ataque) {
+		this.abrir_rede_ataque = abrir_rede_ataque;
+	}
+	
 	public String getLogin() {
 		return login;
 	}
@@ -140,11 +160,19 @@ public class Dado implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Dado [id=" + id + ", ip=" + ip + ", operadora=" + operadora
-				+ ", data=" + data + ", fabricante_modelo=" + fabricante_modelo
-				+ ", reboot_ataque=" + reboot_ataque + ", dns_ataque=" + dns_ataque
-				+ ", acesso_remoto_ataque=" + acesso_remoto_ataque + ", login="
-				+ login + ", senha=" + senha + "]";
+		return "Dado [id=" + id +
+					", ip=" + ip +
+					", gateway=" + gateway +
+					", operadora=" + operadora +
+					", data=" + data +
+					", fabricante_modelo=" + fabricante_modelo +
+					", reboot_ataque=" + reboot_ataque +
+					", dns_ataque=" + dns_ataque +
+					", acesso_remoto_ataque=" + acesso_remoto_ataque +					
+					", filtro_mac_ataque=" + filtro_mac_ataque +
+					", abrir_rede_ataque=" + abrir_rede_ataque +
+					", login=" + login +
+					", senha=" + senha + "]";
 	}
 	
 }

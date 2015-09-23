@@ -26,21 +26,21 @@ public class Constants {
 	public static final String ACESSO_5 = "ACESSO_5";
 	public static final String ACESSO_6 = "ACESSO_6";
 	
-	public static final String X = "X";
-	public static final String X_1 = "X_1";
-	public static final String X_2 = "X_2";
-	public static final String X_3 = "X_3";
-	public static final String X_4 = "X_4";
-	public static final String X_5 = "X_5";
-	public static final String X_6 = "X_6";
+	public static final String FILTROMAC = "FILTRO MAC";
+	public static final String FILTROMAC_1 = "FILTROMAC_1";
+	public static final String FILTROMAC_2 = "FILTROMAC_2";
+	public static final String FILTROMAC_3 = "FILTROMAC_3";
+	public static final String FILTROMAC_4 = "FILTROMAC_4";
+	public static final String FILTROMAC_5 = "FILTROMAC_5";
+	public static final String FILTROMAC_6 = "FILTROMAC_6";
 	
-	public static final String Y = "Y";
-	public static final String Y_1 = "Y_1";
-	public static final String Y_2 = "Y_2";
-	public static final String Y_3 = "Y_3";
-	public static final String Y_4 = "Y_4";
-	public static final String Y_5 = "Y_5";
-	public static final String Y_6 = "Y_6";
+	public static final String ABRIRREDE = "ABRIR REDE";
+	public static final String ABRIRREDE_1 = "ABRIRREDE_1";
+	public static final String ABRIRREDE_2 = "ABRIRREDE_2";
+	public static final String ABRIRREDE_3 = "ABRIRREDE_3";
+	public static final String ABRIRREDE_4 = "ABRIRREDE_4";
+	public static final String ABRIRREDE_5 = "ABRIRREDE_5";
+	public static final String ABRIRREDE_6 = "ABRIRREDE_6";
 	
 	
 }

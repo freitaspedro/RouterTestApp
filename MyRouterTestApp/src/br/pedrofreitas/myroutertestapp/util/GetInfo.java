@@ -84,8 +84,9 @@ public class GetInfo extends AsyncTask<Void, String, Object> {
 		
 //		android.os.Debug.waitForDebugger();	
 		//Get gateway
+		DhcpInfo mDhcpInfo = new DhcpInfo();
 		try {
-			 DhcpInfo mDhcpInfo = mWifiManager.getDhcpInfo();
+			mDhcpInfo = mWifiManager.getDhcpInfo();
 			
 			mGateway = intToIp(mDhcpInfo.gateway);				
 			Log.i("GATEWAY", mGateway);
@@ -130,63 +131,67 @@ public class GetInfo extends AsyncTask<Void, String, Object> {
 					Log.e("ERR2_IP", "IOException", e);
 				}
 			}			
-			//Get operadora				
-			URL url = null;
-			try {
-				url = new URL ("http://lacnic.net/cgi-bin/lacnic/whois?lg=PT&query=" + mIp);
-			} catch (MalformedURLException e) {
-				Log.e("ERR_OPERADORA", "MalformedURLException", e);
+		}
+
+		
+		//Get operadora				
+		URL url = null;
+		try {
+			url = new URL("http://lacnic.net/cgi-bin/lacnic/whois?lg=PT&query=" + mIp);
+		} catch (MalformedURLException e) {
+			Log.e("ERR_OPERADORA", "MalformedURLException", e);
+		}
+		
+		InputStream content = null;
+		BufferedReader inn = null;
+		try {
+			URLConnection connection = url.openConnection();
+			
+			content = connection.getInputStream();
+			inn = new BufferedReader(new InputStreamReader(content));
+			String line;
+			
+			while ((line = inn.readLine()) != null) {
+				if(line.contains("Global Village Telecom")) {
+					mOperadora = TAG_GVT;
+				}
+				
+				if (line.contains("Telemar")) {
+					mOperadora = TAG_OI_VELOX;
+				}
+					
+				if (line.contains("NET Servi�os de Comunica��o S.A.")) {
+					mOperadora = TAG_NET;
+				}					
+			}			
+			if(mOperadora != null) {
+				Log.i("OPERADORA", mOperadora);
+			} else {
+				Log.e("OPERADORA", "Nao identificada");
 			}
 			
-			InputStream content = null;
-			BufferedReader inn = null;
-			try {
-				URLConnection connection = url.openConnection();
-				
-				content = connection.getInputStream();
-				inn = new BufferedReader(new InputStreamReader(content));
-				String line;
-				
-				while ((line = inn.readLine()) != null) {
-					if(line.contains("Global Village Telecom")) {
-						mOperadora = TAG_GVT;
-					}
-					
-					if (line.contains("Telemar")) {
-						mOperadora = TAG_OI_VELOX;
-					}
-						
-					if (line.contains("NET Servi�os de Comunica��o S.A.")) {
-						mOperadora = TAG_NET;
-					}					
-				}			
-				if(mOperadora != null) {
-					Log.i("OPERADORA", mOperadora);
-				} else {
-					Log.e("OPERADORA", "Nao identificada");
-				}
-				
-			} catch (MalformedURLException e) {
-				Log.e("ERR_OPERADORA", "MalformedURLException", e);
-			} catch (IOException e) {
-				Log.e("ERR1_OPERADORA", "IOException", e);
-			} finally {
-				if (inn != null) {
-					try {
-						inn.close();
-					} catch (IOException e) {
-						Log.e("ERR2_OPERADORA", "IOException", e);
-					}
-				}
-				if (content != null) {
-					try {
-						content.close();
-					} catch (IOException e) {
-						Log.e("ERR3_OPERADORA", "IOException", e);
-					}
+		} catch (MalformedURLException e) {
+			Log.e("ERR_OPERADORA", "MalformedURLException", e);
+		} catch (IOException e) {
+			Log.e("ERR1_OPERADORA", "IOException", e);
+		} finally {
+			if (inn != null) {
+				try {
+					inn.close();
+				} catch (IOException e) {
+					Log.e("ERR2_OPERADORA", "IOException", e);
 				}
 			}
-		}		
+			if (content != null) {
+				try {
+					content.close();
+				} catch (IOException e) {
+					Log.e("ERR3_OPERADORA", "IOException", e);
+				}
+			}
+		}
+
+		
 		
 		lotaListaUsuarios();		
 		Dado mDado = new Dado(mIp, mOperadora, mGateway, mData);

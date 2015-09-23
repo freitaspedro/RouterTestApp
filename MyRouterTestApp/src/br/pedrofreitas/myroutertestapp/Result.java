@@ -27,8 +27,8 @@ public class Result extends ActionBarActivity
         finalResult.put("Reboot", Constants.REBOOT);
         finalResult.put("DNS", null);
         finalResult.put("Acesso Remoto", Constants.ACESSO);
-        finalResult.put("X", Constants.X);
-        finalResult.put("Y", null);
+        finalResult.put("Filtor MAC", Constants.FILTROMAC);
+        finalResult.put("Abrir Rede", Constants.ABRIRREDE);
                 
         mInfo = new Info(finalResult);        
         

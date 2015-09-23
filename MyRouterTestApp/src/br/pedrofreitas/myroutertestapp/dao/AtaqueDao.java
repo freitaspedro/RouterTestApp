@@ -12,8 +12,7 @@ public class AtaqueDao {
 	
 	private SQLiteDatabase db;
 	
-	private static final String[] colunas = {"id", "tipo", "comando", "operadora", "usa_login", "usa_chave_de_sessao", "usa_post_ou_get", "caminho_get_chave", 
-		"forma_da_chave", "tamanho_da_chave", "fabricante_modelo"};
+	private static final String[] colunas = {"id", "tipo", "operadora", "usa_cookie", "fabricante_modelo"};
 	
 	public AtaqueDao(Context ctx) {
 		db = ctx.openOrCreateDatabase("bancoProjetoFinal", Context.MODE_PRIVATE, null);
@@ -24,16 +23,10 @@ public class AtaqueDao {
 		
 		values.put(colunas[0], ataq.getId());
 		values.put(colunas[1], ataq.getTipo());
-		values.put(colunas[2], ataq.getComando());
-		values.put(colunas[3], ataq.getOperadora());
-		values.put(colunas[4], ataq.getUsa_login());
-		values.put(colunas[5], ataq.getUsa_chave_de_sessao());
-		values.put(colunas[6], ataq.getUsa_post_ou_get());
-		values.put(colunas[7], ataq.getCaminho_get_chave());
-		values.put(colunas[8], ataq.getForma_da_chave());
-		values.put(colunas[9], ataq.getTamanho_da_chave());
-		values.put(colunas[10], ataq.getFabricante_modelo());
-		
+		values.put(colunas[2], ataq.getOperadora());
+		values.put(colunas[3], ataq.getUsa_cookie());
+		values.put(colunas[4], ataq.getFabricante_modelo());
+	
 		db.insert("ataque", null, values);
 	}
 	
@@ -44,18 +37,12 @@ public class AtaqueDao {
 			c.moveToFirst();
 			int idxId = c.getColumnIndex(colunas[0]);
 			int idxTipo = c.getColumnIndex(colunas[1]);
-			int idxComando = c.getColumnIndex(colunas[2]);
-			int idxOperadora = c.getColumnIndex(colunas[3]);
-			int idxUsa_Login = c.getColumnIndex(colunas[4]);
-			int idxUsa_Chave = c.getColumnIndex(colunas[5]);
-			int idxUsa_post_ou_get = c.getColumnIndex(colunas[6]);
-			int idxCaminho_Chave = c.getColumnIndex(colunas[7]);
-			int idxForma_Chave = c.getColumnIndex(colunas[8]);
-			int idxTamanho_Chave = c.getColumnIndex(colunas[9]);
-			int idxFabricante_modelo = c.getColumnIndex(colunas[10]);
+			int idxOperadora = c.getColumnIndex(colunas[2]);
+			int idxUsa_Cookie = c.getColumnIndex(colunas[3]);
+			int idxFabricante_modelo = c.getColumnIndex(colunas[4]);
 			
-			atq = new Ataque(c.getLong(idxId), c.getString(idxTipo), c.getString(idxComando), c.getString(idxOperadora), c.getInt(idxUsa_Login), c.getInt(idxUsa_Chave), 
-					c.getInt(idxUsa_post_ou_get), c.getString(idxCaminho_Chave), c.getString(idxForma_Chave), c.getInt(idxTamanho_Chave), c.getString(idxFabricante_modelo));
+			atq = new Ataque(c.getLong(idxId), c.getString(idxTipo), c.getString(idxOperadora), c.getInt(idxUsa_Cookie), 
+					 c.getString(idxFabricante_modelo));
 		}
 		c.close();
 		return atq;
@@ -73,18 +60,12 @@ public class AtaqueDao {
 		if(c.moveToFirst()){
 			int idxId = c.getColumnIndex(colunas[0]);
 			int idxTipo = c.getColumnIndex(colunas[1]);
-			int idxComando = c.getColumnIndex(colunas[2]);
-			int idxOperadora = c.getColumnIndex(colunas[3]);
-			int idxUsa_Login = c.getColumnIndex(colunas[4]);
-			int idxUsa_Chave = c.getColumnIndex(colunas[5]);
-			int idxUsa_post_ou_get = c.getColumnIndex(colunas[6]);
-			int idxCaminho_Chave = c.getColumnIndex(colunas[7]);
-			int idxForma_Chave = c.getColumnIndex(colunas[8]);
-			int idxTamanho_Chave = c.getColumnIndex(colunas[9]);
-			int idxFabricante_modelo = c.getColumnIndex(colunas[10]);
+			int idxOperadora = c.getColumnIndex(colunas[2]);
+			int idxUsa_Cookie = c.getColumnIndex(colunas[3]);
+			int idxFabricante_modelo = c.getColumnIndex(colunas[4]);
 			do {
-				list.add(new Ataque(c.getLong(idxId), c.getString(idxTipo), c.getString(idxComando), c.getString(idxOperadora), c.getInt(idxUsa_Login), c.getInt(idxUsa_Chave), 
-						c.getInt(idxUsa_post_ou_get), c.getString(idxCaminho_Chave), c.getString(idxForma_Chave), c.getInt(idxTamanho_Chave), c.getString(idxFabricante_modelo)));
+				list.add(new Ataque(c.getLong(idxId), c.getString(idxTipo), c.getString(idxOperadora), c.getInt(idxUsa_Cookie), 
+						 c.getString(idxFabricante_modelo)));
 			} while(c.moveToNext());
 		}
 		c.close();
@@ -102,18 +83,12 @@ public class AtaqueDao {
 		if(c.moveToFirst()){
 			int idxId = c.getColumnIndex(colunas[0]);
 			int idxTipo = c.getColumnIndex(colunas[1]);
-			int idxComando = c.getColumnIndex(colunas[2]);
-			int idxOperadora = c.getColumnIndex(colunas[3]);
-			int idxUsa_Login = c.getColumnIndex(colunas[4]);
-			int idxUsa_Chave = c.getColumnIndex(colunas[5]);
-			int idxUsa_post_ou_get = c.getColumnIndex(colunas[6]);
-			int idxCaminho_Chave = c.getColumnIndex(colunas[7]);
-			int idxForma_Chave = c.getColumnIndex(colunas[8]);
-			int idxTamanho_Chave = c.getColumnIndex(colunas[9]);
-			int idxFabricante_modelo = c.getColumnIndex(colunas[10]);
+			int idxOperadora = c.getColumnIndex(colunas[2]);
+			int idxUsa_Cookie = c.getColumnIndex(colunas[3]);
+			int idxFabricante_modelo = c.getColumnIndex(colunas[4]);
 			do {
-				list.add(new Ataque(c.getLong(idxId), c.getString(idxTipo), c.getString(idxComando), c.getString(idxOperadora), c.getInt(idxUsa_Login), c.getInt(idxUsa_Chave), 
-						c.getInt(idxUsa_post_ou_get), c.getString(idxCaminho_Chave), c.getString(idxForma_Chave), c.getInt(idxTamanho_Chave), c.getString(idxFabricante_modelo)));
+				list.add(new Ataque(c.getLong(idxId), c.getString(idxTipo), c.getString(idxOperadora), c.getInt(idxUsa_Cookie), 
+						 c.getString(idxFabricante_modelo)));
 			} while(c.moveToNext());
 		}
 		c.close();
@@ -127,18 +102,12 @@ public class AtaqueDao {
 		if(c.moveToFirst()) {
 			int idxId = c.getColumnIndex(colunas[0]);
 			int idxTipo = c.getColumnIndex(colunas[1]);
-			int idxComando = c.getColumnIndex(colunas[2]);
-			int idxOperadora = c.getColumnIndex(colunas[3]);
-			int idxUsa_Login = c.getColumnIndex(colunas[4]);
-			int idxUsa_Chave = c.getColumnIndex(colunas[5]);
-			int idxUsa_post_ou_get = c.getColumnIndex(colunas[6]);
-			int idxCaminho_Chave = c.getColumnIndex(colunas[7]);
-			int idxForma_Chave = c.getColumnIndex(colunas[8]);
-			int idxTamanho_Chave = c.getColumnIndex(colunas[9]);
-			int idxFabricante_modelo = c.getColumnIndex(colunas[10]);
+			int idxOperadora = c.getColumnIndex(colunas[2]);
+			int idxUsa_Cookie = c.getColumnIndex(colunas[3]);
+			int idxFabricante_modelo = c.getColumnIndex(colunas[4]);
 			do {
-				list.add(new Ataque(c.getLong(idxId), c.getString(idxTipo), c.getString(idxComando), c.getString(idxOperadora), c.getInt(idxUsa_Login), c.getInt(idxUsa_Chave), 
-						c.getInt(idxUsa_post_ou_get), c.getString(idxCaminho_Chave), c.getString(idxForma_Chave), c.getInt(idxTamanho_Chave), c.getString(idxFabricante_modelo)));
+				list.add(new Ataque(c.getLong(idxId), c.getString(idxTipo), c.getString(idxOperadora), c.getInt(idxUsa_Cookie), 
+						 c.getString(idxFabricante_modelo)));
 			} while(c.moveToNext());
 		}
 		c.close();

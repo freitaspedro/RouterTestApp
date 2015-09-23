@@ -11,8 +11,8 @@ import android.database.sqlite.SQLiteDatabase;
 public class DadoDao {
 
 	private SQLiteDatabase db;
-	private static final String[] colunas = {"id", "ip", "gateway", "operadora", "data", "fabricante_modelo", 
-		 "reboot_ataque", "dns_ataque", "acesso_remoto_ataque", "login", "senha"};
+	private static final String[] colunas = {"id", "ip", "gateway", "operadora", "data", "fabricante_modelo", "reboot_ataque", 
+								"dns_ataque", "acesso_remoto_ataque", "filtro_mac_ataque", "abrir_rede_ataque", "login", "senha"};
 	
 	public DadoDao(Context ctx) {
 		db = ctx.openOrCreateDatabase("bancoProjetoFinal", Context.MODE_PRIVATE, null);
@@ -30,6 +30,8 @@ public class DadoDao {
 		values.put("reboot_ataque", dado.getReboot_ataque());
 		values.put("dns_ataque", dado.getDns_ataque());
 		values.put("acesso_remoto_ataque", dado.getAcesso_remoto_ataque());
+		values.put("filtro_mac_ataque", dado.getFiltro_mac_ataque());
+		values.put("abrir_rede_ataque", dado.getAbrir_rede_ataque());
 		values.put("login", dado.getLogin());
 		values.put("senha", dado.getSenha());
 		
@@ -51,6 +53,8 @@ public class DadoDao {
 		values.put("reboot_ataque", dado.getReboot_ataque());
 		values.put("dns_ataque", dado.getDns_ataque());
 		values.put("acesso_remoto_ataque", dado.getAcesso_remoto_ataque());
+		values.put("filtro_mac_ataque", dado.getFiltro_mac_ataque());
+		values.put("abrir_rede_ataque", dado.getAbrir_rede_ataque());
 		values.put("login", dado.getLogin());
 		values.put("senha", dado.getSenha());
 		
@@ -72,10 +76,12 @@ public class DadoDao {
 			int idxReboot = c.getColumnIndex(colunas[6]);
 			int idxDns = c.getColumnIndex(colunas[7]);
 			int idxAcesso = c.getColumnIndex(colunas[8]);
-			int idxLogin = c.getColumnIndex(colunas[9]);
-			int idxSenha = c.getColumnIndex(colunas[10]);
+			int idxFiltro = c.getColumnIndex(colunas[9]);
+			int idxAbrir_rede = c.getColumnIndex(colunas[10]);
+			int idxLogin = c.getColumnIndex(colunas[11]);
+			int idxSenha = c.getColumnIndex(colunas[12]);
 			dado = new Dado(c.getLong(idxId), c.getString(idxIp), c.getString(idxGateway), c.getString(idxOperadora), c.getString(idxData), c.getString(idxFabricante_modelo), 
-					c.getLong(idxReboot), c.getLong(idxDns), c.getLong(idxAcesso), c.getString(idxLogin), c.getString(idxSenha));
+					c.getInt(idxReboot), c.getInt(idxDns), c.getInt(idxAcesso), c.getInt(idxFiltro), c.getInt(idxAbrir_rede), c.getString(idxLogin), c.getString(idxSenha));
 		}
 		c.close();
 		return dado;
@@ -94,11 +100,13 @@ public class DadoDao {
 			int idxReboot = c.getColumnIndex(colunas[6]);
 			int idxDns = c.getColumnIndex(colunas[7]);
 			int idxAcesso = c.getColumnIndex(colunas[8]);
-			int idxLogin = c.getColumnIndex(colunas[9]);
-			int idxSenha = c.getColumnIndex(colunas[10]);
+			int idxFiltro = c.getColumnIndex(colunas[9]);
+			int idxAbrir_rede = c.getColumnIndex(colunas[10]);
+			int idxLogin = c.getColumnIndex(colunas[11]);
+			int idxSenha = c.getColumnIndex(colunas[12]);
 			do {
 				list.add(new Dado(c.getLong(idxId), c.getString(idxIp), c.getString(idxGateway), c.getString(idxOperadora), c.getString(idxData), c.getString(idxFabricante_modelo), 
-						c.getLong(idxReboot), c.getLong(idxDns), c.getLong(idxAcesso), c.getString(idxLogin), c.getString(idxSenha)));
+						c.getInt(idxReboot), c.getInt(idxDns), c.getInt(idxAcesso), c.getInt(idxFiltro), c.getInt(idxAbrir_rede), c.getString(idxLogin), c.getString(idxSenha)));
 			} while(c.moveToNext());
 		}
 		c.close();

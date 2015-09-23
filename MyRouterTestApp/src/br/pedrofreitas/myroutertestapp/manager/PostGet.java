@@ -80,8 +80,13 @@ public class PostGet {
 	
 	@Override
 	public String toString() {
-		return "PostGet [id=" + id + ", id_ataque=" + id_ataque + ", ordem="
-				+ ordem + ", tipo=" + tipo + ", comando=" + comando + ", token=" + token + ", usa_login=" + usa_login + "]";
+		return "PostGet [id=" + id +
+				        ", id_ataque=" + id_ataque +
+				        ", ordem=" + ordem +
+				        ", tipo=" + tipo +
+				        ", comando=" + comando +
+				        ", token=" + token +
+				        ", usa_login=" + usa_login + "]";
 	}
 	
 }

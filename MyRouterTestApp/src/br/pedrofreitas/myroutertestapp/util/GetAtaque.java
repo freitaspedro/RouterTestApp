@@ -40,8 +40,7 @@ public class GetAtaque extends AsyncTask<Void, String, Void> {
 	private boolean flag_erro_download_params = true;
 	private boolean flag_erro_download_usuario = true;
 	
-	private final String[] colunasAtaque = {"id", "tipo", "comando", "operadora", "usa_login", "usa_chave_de_sessao", "usa_post_ou_get", "caminho_get_chave", "forma_da_chave",
-			"tamanho_da_chave", "fabricante_modelo"};
+	private final String[] colunasAtaque = {"id", "tipo", "operadora", "usa_cookie", "fabricante_modelo"};
 	private final String[] colunasPostGet = {"id", "id_ataque", "ordem", "tipo", "comando", "token", "usa_login"};
 	private final String[] colunasParams = {"id", "id_comando", "nome", "valor"};
 	private final String[] colunasLogin = {"id", "usuario", "senha", "operadora"};
@@ -85,9 +84,7 @@ public class GetAtaque extends AsyncTask<Void, String, Void> {
 					mObjJsonAtaque = mVetJsonAtaque.getJSONObject(i);
 					
 					mAtaqueDao.insert(new Ataque(mObjJsonAtaque.getLong(colunasAtaque[0]), mObjJsonAtaque.getString(colunasAtaque[1]), 
-							mObjJsonAtaque.getString(colunasAtaque[2]), mObjJsonAtaque.getString(colunasAtaque[3]), mObjJsonAtaque.getInt(colunasAtaque[4]), 
-							mObjJsonAtaque.getInt(colunasAtaque[5]), mObjJsonAtaque.getInt(colunasAtaque[6]), mObjJsonAtaque.getString(colunasAtaque[7]), 
-							mObjJsonAtaque.getString(colunasAtaque[8]), mObjJsonAtaque.getInt(colunasAtaque[9]), mObjJsonAtaque.getString(colunasAtaque[10])));					
+							mObjJsonAtaque.getString(colunasAtaque[2]), mObjJsonAtaque.getInt(colunasAtaque[3]), mObjJsonAtaque.getString(colunasAtaque[4])));					
 				}
 				flag_erro_download_ataque = false;
 			} catch(JSONException e) {

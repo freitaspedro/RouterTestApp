@@ -49,8 +49,10 @@ public class Params {
 	
 	@Override
 	public String toString() {
-		return "Parametros [id=" + id + ", id_comando=" + id_comando
-				+ ", nome=" + nome + ", valor=" + valor + "]";
+		return "Parametros [id=" + id +
+				           ", id_comando=" + id_comando	+
+				           ", nome=" + nome +
+				           ", valor=" + valor + "]";
 	}
 
 }
