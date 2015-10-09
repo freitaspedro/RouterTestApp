@@ -19,7 +19,17 @@
         android:minWidth="131dp"
         android:onClick="startTest"
         android:text="@string/start_test" />
+    
 
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textView4"
+        android:layout_below="@+id/textView4"
+        android:layout_marginTop="28dp"
+        android:text="@string/info_mac" />
+    
     <TextView
         android:id="@+id/textView3"
         android:layout_width="wrap_content"

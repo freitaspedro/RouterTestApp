@@ -14,10 +14,11 @@ import java.util.Calendar;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.DhcpInfo;
+import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.util.Log;
-import br.pedrofreitas.myroutertestapp.dao.UsuarioDao;
+import br.pedrofreitas.myroutertestapp.dao.LoginDao;
 import br.pedrofreitas.myroutertestapp.manager.Dado;
 import br.pedrofreitas.myroutertestapp.manager.Login;
 
@@ -32,6 +33,8 @@ public class GetInfo extends AsyncTask<Void, String, Object> {
 	private ProgressDialog mProgress;
 	
 	private String mGateway;
+	private String mMac;
+	private String mSsid;
 	private String mData;	
 	private String mIp;		
 	private String mOperadora;
@@ -78,9 +81,9 @@ public class GetInfo extends AsyncTask<Void, String, Object> {
 		
 //		new ParamsDao(mContext).getAll();
 		
-//		new UsuarioDao(mContext).getLoginPorOperadora("oi");
-//		new UsuarioDao(mContext).getLoginPorOperadora("gvt");
-//		new UsuarioDao(mContext).getLoginPorOperadora("net");
+//		new LoginDao(mContext).getLoginPorOperadora("oi");
+//		new LoginDao(mContext).getLoginPorOperadora("gvt");
+//		new LoginDao(mContext).getLoginPorOperadora("net");
 		
 //		android.os.Debug.waitForDebugger();	
 		//Get gateway
@@ -96,6 +99,16 @@ public class GetInfo extends AsyncTask<Void, String, Object> {
 		} catch (Exception e) {
 			Log.e("ERR_GATEWAY", "Exception", e);
 		}		
+		
+		//Get mac
+		WifiInfo info = mWifiManager.getConnectionInfo();
+		mMac = info.getBSSID();
+		
+		Log.i("MAC", mMac);
+		
+		//Get ssid
+		mSsid = info.getSSID();
+		Log.i("SSID", mSsid);
 		
 		
 		//Get data		
@@ -189,12 +202,10 @@ public class GetInfo extends AsyncTask<Void, String, Object> {
 					Log.e("ERR3_OPERADORA", "IOException", e);
 				}
 			}
-		}
-
+		}		
 		
-		
-		lotaListaUsuarios();		
-		Dado mDado = new Dado(mIp, mOperadora, mGateway, mData);
+		lotaListaLogins();		
+		Dado mDado = new Dado(mIp, mGateway, mMac, mSsid, mOperadora, mData);
 						
 		return new NamedObject<Login, Dado>(mListLogin, mDado);
 	}
@@ -220,21 +231,21 @@ public class GetInfo extends AsyncTask<Void, String, Object> {
 		return mSimpleDateFormat.format(mCalendar.getTime());
 	}	
 
-	private void lotaListaUsuarios() {
+	private void lotaListaLogins() {
 		if (mOperadora != null)	{
 			switch (mOperadora) {
 				case TAG_GVT:
-					mListLogin.addAll(new UsuarioDao(mContext).getLoginPorOperadora(TAG_GVT));
+					mListLogin.addAll(new LoginDao(mContext).getLoginPorOperadora(TAG_GVT));
 					break;
 				case TAG_OI_VELOX:
-					mListLogin.addAll(new UsuarioDao(mContext).getLoginPorOperadora(TAG_OI_VELOX));
+					mListLogin.addAll(new LoginDao(mContext).getLoginPorOperadora(TAG_OI_VELOX));
 					break;
 				case TAG_NET:
-					mListLogin.addAll(new UsuarioDao(mContext).getLoginPorOperadora(TAG_NET));
+					mListLogin.addAll(new LoginDao(mContext).getLoginPorOperadora(TAG_NET));
 					break;
 			}
 		}
-		mListLogin.addAll(new UsuarioDao(mContext).getLoginPorNaoOperadora(mOperadora));
+		mListLogin.addAll(new LoginDao(mContext).getLoginPorNaoOperadora(mOperadora));
 	}	
 
 }

@@ -38,11 +38,11 @@ public class CustomListAdapter extends ArrayAdapter<String> {
         if(headlines[position] != null) {
          	text.setTextColor(Color.WHITE);
            if(details[position] != null && details[position] != "") {
-        	   text.setText(Html.fromHtml(headlines[position] + "&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;" + "<small><i> Clique aqui para mais detalhes </i></small>"));
-        	   text.setBackgroundColor(Color.parseColor("#719717")); 
+        	   text.setText(Html.fromHtml(headlines[position] + "&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;" + "<small><i> Detalhes </i></small>"));
+        	   text.setBackgroundColor(Color.parseColor("#C51212"));         	   
            } else {
         	   text.setText(headlines[position]);
-        	   text.setBackgroundColor(Color.parseColor("#C51212"));         	   
+        	   text.setBackgroundColor(Color.parseColor("#719717")); 
            }     	
         }
 

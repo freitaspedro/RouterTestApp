@@ -13,8 +13,9 @@ import android.os.AsyncTask;
 import android.util.Log;
 import br.pedrofreitas.myroutertestapp.dao.AtaqueDao;
 import br.pedrofreitas.myroutertestapp.dao.ParamsDao;
+import br.pedrofreitas.myroutertestapp.dao.ParamsProxDao;
 import br.pedrofreitas.myroutertestapp.dao.PostGetDao;
-import br.pedrofreitas.myroutertestapp.dao.UsuarioDao;
+import br.pedrofreitas.myroutertestapp.dao.LoginDao;
 import br.pedrofreitas.myroutertestapp.manager.Ataque;
 import br.pedrofreitas.myroutertestapp.manager.Login;
 import br.pedrofreitas.myroutertestapp.manager.Params;
@@ -33,16 +34,20 @@ public class GetAtaque extends AsyncTask<Void, String, Void> {
 	private String urlJsonAtaque = "http://pedrofreitas.ddns.net/selecionaataque.php";	
 	private String urlJsonPostGet = "http://pedrofreitas.ddns.net/selecionapostget.php";
 	private String urlJsonParams = "http://pedrofreitas.ddns.net/selecionaparams.php";
-	private String urlJsonUsuario = "http://pedrofreitas.ddns.net/selecionausuario.php";
+	private String urlJsonParamsProx = "http://pedrofreitas.ddns.net/selecionaparamsprox.php";
+	private String urlJsonLogin = "http://pedrofreitas.ddns.net/selecionalogin.php";
 	
 	private boolean flag_erro_download_ataque = true;
 	private boolean flag_erro_download_postget = true;	
 	private boolean flag_erro_download_params = true;
-	private boolean flag_erro_download_usuario = true;
+	private boolean flag_erro_download_paramsprox = true;
+	private boolean flag_erro_download_login = true;
 	
-	private final String[] colunasAtaque = {"id", "tipo", "operadora", "usa_cookie", "fabricante_modelo"};
+	private final String[] colunasAtaque = {"id", "tipo", "operadora", "usa_cookie", "usa_chave_sessao", "formato_chave_sessao", 
+																								"usa_so_get", "fabricante_modelo"};
 	private final String[] colunasPostGet = {"id", "id_ataque", "ordem", "tipo", "comando", "token", "usa_login"};
 	private final String[] colunasParams = {"id", "id_comando", "nome", "valor"};
+	private final String[] colunasParamsProx = {"id", "id_comando", "nome", "valor"};
 	private final String[] colunasLogin = {"id", "usuario", "senha", "operadora"};
 	
 		
@@ -84,7 +89,8 @@ public class GetAtaque extends AsyncTask<Void, String, Void> {
 					mObjJsonAtaque = mVetJsonAtaque.getJSONObject(i);
 					
 					mAtaqueDao.insert(new Ataque(mObjJsonAtaque.getLong(colunasAtaque[0]), mObjJsonAtaque.getString(colunasAtaque[1]), 
-							mObjJsonAtaque.getString(colunasAtaque[2]), mObjJsonAtaque.getInt(colunasAtaque[3]), mObjJsonAtaque.getString(colunasAtaque[4])));					
+							mObjJsonAtaque.getString(colunasAtaque[2]), mObjJsonAtaque.getInt(colunasAtaque[3]), mObjJsonAtaque.getInt(colunasAtaque[4]), 
+							mObjJsonAtaque.getString(colunasAtaque[5]), mObjJsonAtaque.getInt(colunasAtaque[6]), mObjJsonAtaque.getString(colunasAtaque[7])));					
 				}
 				flag_erro_download_ataque = false;
 			} catch(JSONException e) {
@@ -94,9 +100,9 @@ public class GetAtaque extends AsyncTask<Void, String, Void> {
 			flag_erro_download_ataque = true;
 		}		
 		
-//		mAtaqueDao.getAll();
+//		new AtaqueDao(mContext).getAll();
 		
-		if(!flag_erro_download_ataque){
+		if(!flag_erro_download_ataque) {
 			ServiceHandler sh1 = new ServiceHandler();		
 			String mJsonRecebidoPostGet = sh1.makeServiceCall(urlJsonPostGet, ServiceHandler.GET);	
 			if(mJsonRecebidoPostGet != null) {
@@ -123,9 +129,9 @@ public class GetAtaque extends AsyncTask<Void, String, Void> {
 			
 		}
 		
-//		mPostGetDao.getAll();
+//		new PostGetDao(mContext).getAll();
 		
-		if(!flag_erro_download_postget){
+		if(!flag_erro_download_postget) {
 			ServiceHandler sh2 = new ServiceHandler();		
 			String mJsonRecebidoParams = sh2.makeServiceCall(urlJsonParams, ServiceHandler.GET);	
 			if(mJsonRecebidoParams != null) {
@@ -150,35 +156,62 @@ public class GetAtaque extends AsyncTask<Void, String, Void> {
 			}
 		}
 		
-//		mParamsDao.getAll();
+//		new ParamsDao(mContext).getAll();
 		
-		ServiceHandler sh3 = new ServiceHandler();		
-		String mJsonRecebidoUsuario = sh3.makeServiceCall(urlJsonUsuario, ServiceHandler.GET);		
-		if(mJsonRecebidoUsuario != null) {
-			UsuarioDao mUsuarioDao = new UsuarioDao(mContext);
-			try {
-				 JSONObject mObjJsonUsuario = new JSONObject(mJsonRecebidoUsuario);
-				
-				JSONArray mVetJsonUsuario = mObjJsonUsuario.getJSONArray("usuarios");
-				
-				for(int i = 0; i < mVetJsonUsuario.length(); i++) {
-					mObjJsonUsuario = mVetJsonUsuario.getJSONObject(i);
+		if(!flag_erro_download_params) {
+			ServiceHandler sh3 = new ServiceHandler();		
+			String mJsonRecebidoParamsProx = sh3.makeServiceCall(urlJsonParamsProx, ServiceHandler.GET);	
+			if(mJsonRecebidoParamsProx != null) {
+				ParamsProxDao mParamsProxDao = new ParamsProxDao(mContext);
+				try {
+					JSONObject mObjJsonParamsProx = new JSONObject(mJsonRecebidoParamsProx);
 					
-					mUsuarioDao.save(new Login(mObjJsonUsuario.getLong(colunasLogin[0]), mObjJsonUsuario.getString(colunasLogin[1]), 
-							mObjJsonUsuario.getString(colunasLogin[2]), mObjJsonUsuario.getString(colunasLogin[3])));
+					JSONArray mVetJsonParamsProx = mObjJsonParamsProx.getJSONArray("paramsprox");
 					
-					flag_erro_download_usuario = false;
+					for(int i = 0; i < mVetJsonParamsProx.length(); i++) {
+						mObjJsonParamsProx = mVetJsonParamsProx.getJSONObject(i);
+						
+						mParamsProxDao.insert(new Params(mObjJsonParamsProx.getLong(colunasParamsProx[0]), mObjJsonParamsProx.getLong(colunasParamsProx[1]), 
+								mObjJsonParamsProx.getString(colunasParamsProx[2]), mObjJsonParamsProx.getString(colunasParamsProx[3])));						
+					}
+					flag_erro_download_paramsprox = false;
+				} catch(JSONException e) {
+					Log.e("PARAMSPROXJSON", "Erro no parsing do JSON paramsprox", e);
 				}
-			} catch(JSONException e) {
-				Log.e("USUARIOJSON", "Erro no parsing do JSON usuario", e);
+			} else {
+				flag_erro_download_paramsprox = true;
 			}
-		} else {
-			flag_erro_download_usuario = true;
 		}
 		
-//		mUsuarioDao.getLoginPorOperadora("oi");
-//		mUsuarioDao.getLoginPorOperadora("gvt");
-//		mUsuarioDao.getLoginPorOperadora("net");	
+//		new ParamsProxDao(mContext).getAll();		
+		
+		ServiceHandler sh4 = new ServiceHandler();		
+		String mJsonRecebidoLogin = sh4.makeServiceCall(urlJsonLogin, ServiceHandler.GET);		
+		if(mJsonRecebidoLogin != null) {
+			LoginDao mLoginDao = new LoginDao(mContext);
+			try {
+				 JSONObject mObjJsonLogin = new JSONObject(mJsonRecebidoLogin);
+				
+				JSONArray mVetJsonLogin = mObjJsonLogin.getJSONArray("logins");
+				
+				for(int i = 0; i < mVetJsonLogin.length(); i++) {
+					mObjJsonLogin = mVetJsonLogin.getJSONObject(i);
+					
+					mLoginDao.save(new Login(mObjJsonLogin.getLong(colunasLogin[0]), mObjJsonLogin.getString(colunasLogin[1]), 
+							mObjJsonLogin.getString(colunasLogin[2]), mObjJsonLogin.getString(colunasLogin[3])));
+					
+					flag_erro_download_login = false;
+				}
+			} catch(JSONException e) {
+				Log.e("USUARIOJSON", "Erro no parsing do JSON login", e);
+			}
+		} else {
+			flag_erro_download_login = true;
+		}
+		
+//		new LoginDao(mContext).getLoginPorOperadora("oi");
+//		new LoginDao(mContext).getLoginPorOperadora("gvt");
+//		new LoginDao(mContext).getLoginPorOperadora("net");	
 
 		return null;
 	}
@@ -186,7 +219,7 @@ public class GetAtaque extends AsyncTask<Void, String, Void> {
 	@Override
 	protected void onPostExecute(Void result) {
 		super.onPostExecute(result);
-		if(!flag_erro_download_usuario && !flag_erro_download_params) {
+		if(!flag_erro_download_login && !flag_erro_download_paramsprox) {
 			SharedPreferences.Editor editor = mShared.edit();
 			editor.putBoolean(TAG_INSERT_TABLES, true);
 			editor.commit();

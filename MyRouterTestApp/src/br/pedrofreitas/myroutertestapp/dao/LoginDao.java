@@ -8,13 +8,13 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-public class UsuarioDao {
+public class LoginDao {
 	
 	private SQLiteDatabase db;
 	
 	private static final String[] colunas = {"id", "usuario", "senha", "operadora"};
 	
-	public UsuarioDao(Context ctx) {
+	public LoginDao(Context ctx) {
 		db = ctx.openOrCreateDatabase("bancoProjetoFinal", Context.MODE_PRIVATE, null);
 	}
 	
@@ -23,7 +23,7 @@ public class UsuarioDao {
 		long id = login.getId();
 		
 		//Select * from ataque where id = ataq.id
-		Cursor c = db.query(true, "usuario", colunas, colunas[0] + "=" + id, null, null, null, null, null);
+		Cursor c = db.query(true, "login", colunas, colunas[0] + "=" + id, null, null, null, null, null);
 		
 		if(c.getCount() == 0){
 			insert(login);
@@ -46,7 +46,7 @@ public class UsuarioDao {
 		String where = colunas[0] + "=?";
 		String[] whereArgs = new String[] { id };
 		
-		db.update("usuario", values, where, whereArgs);
+		db.update("login", values, where, whereArgs);
 	}
 	
 	public void insert(Login login) {
@@ -57,12 +57,12 @@ public class UsuarioDao {
 		values.put(colunas[2], login.getSenha());
 		values.put(colunas[3], login.getOperadora());
 		
-		db.insert("usuario", null, values);
+		db.insert("login", null, values);
 	}
 	
 	public ArrayList<Login> getLoginPorOperadora(String operadora) {
 		ArrayList<Login> list = new ArrayList<Login>();
-		Cursor c = db.query(true, "usuario", colunas, "operadora" + "=" + "'" + operadora + "'", null, null, null, null, null);
+		Cursor c = db.query(true, "login", colunas, "operadora =" + "'" + operadora + "'", null, null, null, null, null);
 		
 		if(c.moveToFirst()) {
 			int idxId = c.getColumnIndex(colunas[0]);
@@ -79,7 +79,7 @@ public class UsuarioDao {
 	
 	public ArrayList<Login> getLoginPorNaoOperadora(String operadora) {
 		ArrayList<Login> list = new ArrayList<Login>();
-		Cursor c = db.query(true, "usuario", colunas, "operadora" + "<>" + "'" + operadora + "'", null, null, null, null, null);
+		Cursor c = db.query(true, "login", colunas, "operadora <>" + "'" + operadora + "'", null, null, null, null, null);
 		
 		if(c.moveToFirst()) {
 			int idxId = c.getColumnIndex(colunas[0]);

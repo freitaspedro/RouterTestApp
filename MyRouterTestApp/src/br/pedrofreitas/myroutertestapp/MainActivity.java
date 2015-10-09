@@ -23,8 +23,9 @@ import br.pedrofreitas.myroutertestapp.dao.DadoDao;
 import br.pedrofreitas.myroutertestapp.dao.GeneralDao;
 import br.pedrofreitas.myroutertestapp.dao.Initialize;
 import br.pedrofreitas.myroutertestapp.dao.ParamsDao;
+import br.pedrofreitas.myroutertestapp.dao.ParamsProxDao;
 import br.pedrofreitas.myroutertestapp.dao.PostGetDao;
-import br.pedrofreitas.myroutertestapp.dao.UsuarioDao;
+import br.pedrofreitas.myroutertestapp.dao.LoginDao;
 import br.pedrofreitas.myroutertestapp.manager.Ataque;
 import br.pedrofreitas.myroutertestapp.manager.Dado;
 import br.pedrofreitas.myroutertestapp.manager.Login;
@@ -53,7 +54,8 @@ public class MainActivity<T> extends ActionBarActivity implements AsyncTaskCompl
 	private AtaqueDao mAtaqueDao;
 	private PostGetDao mPostGetDao;
 	private ParamsDao mParamsDao;
-	private UsuarioDao mUsuarioDao;
+	private ParamsProxDao mParamsProxDao;
+	private LoginDao mLoginDao;
 
 	private Dado mDado;
 	
@@ -61,6 +63,7 @@ public class MainActivity<T> extends ActionBarActivity implements AsyncTaskCompl
 	
 	private TextView mIp;
 	private TextView mGateway;
+	private TextView mMac;
 	private TextView mOperadora;
 	private TextView mData;
 	
@@ -92,11 +95,10 @@ public class MainActivity<T> extends ActionBarActivity implements AsyncTaskCompl
 		
 		mShared = getSharedPreferences(TAG_APP, MODE_PRIVATE);		
 		mIsInserted = mShared.getBoolean(TAG_INSERT_TABLES, false);
-		
 
-		/*****PARA TESTE RETIRAR*******/
+		/*****RETIRAR ISSO CASO O SERVIDOR ESTIVER NO AR*******/
 		mIsInserted = true;
-		/******************************/
+		/******************************************************/
 		
 		if(NetworkUtil.isWiFiConnected(this)) {
 			mWifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);					
@@ -149,19 +151,23 @@ public class MainActivity<T> extends ActionBarActivity implements AsyncTaskCompl
 		
 		if(mDado != null) {
         	mIp  = (TextView) findViewById(R.id.textView1);
-        	CharSequence textIp = (mDado.getIp() != null) ? "IP: " + mDado.getIp() : "IP: Não identificado";
+        	CharSequence textIp = (mDado.getIp() != null) ? "IP Externo: " + mDado.getIp() : "IP Externo: Não identificado";
         	mIp.setText(textIp);
         	
         	mGateway = (TextView) findViewById(R.id.textView2);
-        	CharSequence textGateway = (mDado.getGateway() != null) ? "Gateway: " + mDado.getGateway() : "Gateway: Não identificado";
+        	CharSequence textGateway = (mDado.getGateway() != null) ? "Gateway Padrão: " + mDado.getGateway() : "Gateway Padrão: Não identificado";
         	mGateway.setText(textGateway);
         	
-        	mOperadora = (TextView) findViewById(R.id.textView3);
+        	mMac = (TextView) findViewById(R.id.textView3);
+        	CharSequence textMac = (mDado.getMac() != null) ? "Endereço MAC: " + mDado.getMac() : "Endereço MAC: Não identificado";
+        	mMac.setText(textMac);
+        	
+        	mOperadora = (TextView) findViewById(R.id.textView4);
         	CharSequence textOperadora = (mDado.getOperadora() != null) ? "Operadora: " + mDado.getOperadora().toUpperCase() : "Operadora: Não identificada";
         	mOperadora.setText(textOperadora);
         	        	
-        	mData  = (TextView) findViewById(R.id.textView4);
-        	CharSequence textData = (mDado.getData() != null) ? "Data atual: " + mDado.getData() : "Data atual: Não identificada";
+        	mData  = (TextView) findViewById(R.id.textView5);
+        	CharSequence textData = (mDado.getData() != null) ? "Data Atual: " + mDado.getData() : "Data atual: Não identificada";
         	mData.setText(textData);
     	}		
 		
@@ -197,15 +203,19 @@ public class MainActivity<T> extends ActionBarActivity implements AsyncTaskCompl
     	
 //		new ParamsDao(this).getAll();
     	
-//		new UsuarioDao(this).getLoginPorOperadora("oi");
-//		new UsuarioDao(this).getLoginPorOperadora("gvt");
-//		new UsuarioDao(this).getLoginPorOperadora("net");
+//		new LoginDao(this).getLoginPorOperadora("oi");
+//		new LoginDao(this).getLoginPorOperadora("gvt");
+//		new LoginDao(this).getLoginPorOperadora("net");
     	
     	it = new Intent(MainActivity.this, Result.class); 
     	
 		if(NetworkUtil.isWiFiConnected(this)) {			
 			mAtaqueDao = new AtaqueDao(MainActivity.this);
-			ArrayList<Ataque> mListAtaque = mAtaqueDao.getAtaquesWithOperadoraETipo(mDado.getOperadora(), "login"); 
+			ArrayList<Ataque> mListAtaque = new ArrayList<>();
+			mListAtaque.addAll(mAtaqueDao.getAtaquesWithOperadoraETipo("gvt", "login"));
+			
+			mListAtaque.addAll(mAtaqueDao.getAtaquesWithNOTOperadoraETipo("gvt", "login"));
+			
 			
 			Log.i("LISTA_ATAQUE_LOGIN", "tamanho " + mListAtaque.size());			
 			int mCountAtaques = 0;
@@ -225,8 +235,10 @@ public class MainActivity<T> extends ActionBarActivity implements AsyncTaskCompl
     protected void onStop(){
     	super.onStop();
     	
-    	if(mUsuarioDao != null)
-    		mUsuarioDao.close();
+    	if(mLoginDao != null)
+    		mLoginDao.close();
+    	if(mParamsProxDao != null)
+    		mParamsProxDao.close();    	
     	if(mParamsDao != null)
     		mParamsDao.close();
     	if(mPostGetDao != null)
@@ -243,8 +255,10 @@ public class MainActivity<T> extends ActionBarActivity implements AsyncTaskCompl
     protected void onDestroy() {
     	super.onDestroy();
     	
-    	if(mUsuarioDao != null)
-    		mUsuarioDao.close();
+    	if(mLoginDao != null)
+    		mLoginDao.close();
+    	if(mParamsProxDao != null)
+    		mParamsProxDao.close();
     	if(mParamsDao != null)
     		mParamsDao.close();
     	if(mPostGetDao != null)

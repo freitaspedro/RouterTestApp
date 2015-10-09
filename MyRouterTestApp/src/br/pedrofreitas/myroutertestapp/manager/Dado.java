@@ -12,40 +12,45 @@ public class Dado implements Serializable {
 	private long id;
 	private String ip;
 	private String gateway;
+	private String mac;
+	private String ssid;
 	private String operadora;
 	private String data;
 	private String fabricante_modelo;
+	private String usuario;
+	private String senha;
 	private int reboot_ataque;
 	private int dns_ataque;
 	private int acesso_remoto_ataque;
 	private int filtro_mac_ataque;
 	private int abrir_rede_ataque;
-	private String login;
-	private String senha;
 	
 	
-	public Dado(long id, String ip,String gateway, String operadora, String data, String fabricante_modelo,
-			int reboot_ataque, int dns_ataque,
-			int acesso_remoto_ataque, int filtro_mac_ataque, int abrir_rede_ataque, String login, String senha) {
+	public Dado(long id, String ip, String gateway, String mac, String ssid, String operadora, String data, String fabricante_modelo,
+			String usuario, String senha, int reboot_ataque, int dns_ataque, int acesso_remoto_ataque, int filtro_mac_ataque, int abrir_rede_ataque) {
 		super();
 		this.id = id;
 		this.ip = ip;
 		this.gateway = gateway;
+		this.mac = mac;
+		this.ssid = ssid;
 		this.operadora = operadora;
 		this.data = data;
 		this.fabricante_modelo = fabricante_modelo;
+		this.usuario = usuario;
+		this.senha = senha;
 		this.reboot_ataque = reboot_ataque;
 		this.dns_ataque = dns_ataque;
 		this.acesso_remoto_ataque = acesso_remoto_ataque;
 		this.filtro_mac_ataque = filtro_mac_ataque;
 		this.abrir_rede_ataque = abrir_rede_ataque;
-		this.login = login;
-		this.senha = senha;
 	}
 	
-	public Dado(String ip, String operadora, String gateway, String data){
+	public Dado(String ip, String gateway, String mac, String ssid, String operadora, String data){
 		this.ip = ip;
 		this.gateway = gateway;
+		this.mac = mac;
+		this.ssid = ssid;
 		this.operadora = operadora;
 		this.data = data;
 	}
@@ -78,6 +83,22 @@ public class Dado implements Serializable {
 		this.gateway = gateway;
 	}
 
+	public String getMac() {
+		return mac;
+	}
+	
+	public void setMac(String mac) {
+		this.mac = mac;
+	}
+
+	public String getSsid() {
+		return ssid;
+	}
+	
+	public void setSsid(String ssid) {
+		this.ssid = ssid;
+	}
+	
 	public String getOperadora() {
 		return operadora;
 	} 
@@ -100,6 +121,22 @@ public class Dado implements Serializable {
 	
 	public void setFabricante_modelo(String fabricante_modelo) {
 		this.fabricante_modelo = fabricante_modelo;
+	}
+
+	public String getUsuario() {
+		return usuario;
+	}
+	
+	public void setUsuario(String usuario) {
+		this.usuario = usuario;
+	}
+	
+	public String getSenha() {
+		return senha;
+	}
+	
+	public void setSenha(String senha) {
+		this.senha = senha;
 	}
 	
 	public int getReboot_ataque() {
@@ -142,37 +179,23 @@ public class Dado implements Serializable {
 		this.abrir_rede_ataque = abrir_rede_ataque;
 	}
 	
-	public String getLogin() {
-		return login;
-	}
-
-	public void setLogin(String login) {
-		this.login = login;
-	}
-
-	public String getSenha() {
-		return senha;
-	}
-
-	public void setSenha(String senha) {
-		this.senha = senha;
-	}
-
 	@Override
 	public String toString() {
 		return "Dado [id=" + id +
 					", ip=" + ip +
 					", gateway=" + gateway +
+					", mac=" + mac +
+					", ssid=" + ssid +
 					", operadora=" + operadora +
 					", data=" + data +
 					", fabricante_modelo=" + fabricante_modelo +
+					", usuario=" + usuario +
+					", senha=" + senha +
 					", reboot_ataque=" + reboot_ataque +
 					", dns_ataque=" + dns_ataque +
 					", acesso_remoto_ataque=" + acesso_remoto_ataque +					
 					", filtro_mac_ataque=" + filtro_mac_ataque +
-					", abrir_rede_ataque=" + abrir_rede_ataque +
-					", login=" + login +
-					", senha=" + senha + "]";
+					", abrir_rede_ataque=" + abrir_rede_ataque + "]";
 	}
 	
 }

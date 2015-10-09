@@ -6,7 +6,7 @@ import java.util.Map;
 public class Info {
 	
 	private LinkedHashMap <String, String> result;	
-	private String[] keys = {"Reboot", "DNS", "Acesso Remoto", "X", "Y"};
+	private String[] keys = {"Reboot", "DNS", "Acesso Remoto", "Filtro MAC", "Abrir Rede"};
 	
 	
 	public Info(Map<String, String> result) {

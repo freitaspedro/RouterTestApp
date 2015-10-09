@@ -51,4 +51,12 @@ public class Login {
 		return this.usuario + ":" + this.senha;
 	}
 	
+	@Override
+	public String toString() {
+		return "Login [id=" + id +
+				    ", usuario=" + usuario +
+				    ", senha=" + senha +
+				    ", operadora=" + operadora + "]";
+	}
+	
 }

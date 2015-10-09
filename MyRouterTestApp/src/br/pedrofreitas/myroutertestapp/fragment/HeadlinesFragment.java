@@ -85,7 +85,7 @@ public class HeadlinesFragment extends ListFragment {
     public void onListItemClick(ListView l, View v, int position, long id) {
         if(mInfo.getDetails()[position] != null && mInfo.getDetails()[position] != "") {
         	TextView text = (TextView) v.findViewById(android.R.id.text1);    
-        	text.setBackgroundColor(Color.parseColor("#B0D050"));
+        	text.setBackgroundColor(Color.parseColor("#F80C0C")); 
  
         	final int pos = position;        	
         	new Handler().postDelayed(new Runnable() {
@@ -100,13 +100,13 @@ public class HeadlinesFragment extends ListFragment {
         	}, 170);
         } else {
         	TextView text = (TextView) v.findViewById(android.R.id.text1);    
-        	text.setBackgroundColor(Color.parseColor("#F80C0C")); 
+        	text.setBackgroundColor(Color.parseColor("#B0D050"));
         	
         	final TextView t = text;
         	new Handler().postDelayed(new Runnable() {
         		@Override
     			public void run() {		
-        			t.setBackgroundColor(Color.parseColor("#C51212"));       
+        			t.setBackgroundColor(Color.parseColor("#719717"));       
         		}
         	}, 170);    			
         }

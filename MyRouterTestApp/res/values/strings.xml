@@ -17,6 +17,7 @@
     
     <string name="info_ip"></string>
     <string name="info_gateway"></string>
+    <string name="info_mac"></string>
     <string name="info_operadora"></string>
     <string name="info_data"></string>
    

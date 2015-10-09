@@ -6,14 +6,21 @@ public class Ataque {
 	private String tipo;
 	private String operadora;
 	private int usa_cookie;
+	private int usa_chave_sessao;
+	private String formato_chave_sessao;
+	private int usa_so_get;
 	private String fabricante_modelo;
 	
-	public Ataque(long id, String tipo, String operadora, int usa_cookie, String fabricante_modelo) {
+	public Ataque(long id, String tipo, String operadora, int usa_cookie, int usa_chave_sessao, 
+			String formato_chave_sessao, int usa_so_get, String fabricante_modelo) {
 		super();
 		this.id = id;
 		this.tipo = tipo;
 		this.operadora = operadora;
 		this.usa_cookie = usa_cookie;
+		this.usa_chave_sessao = usa_chave_sessao;
+		this.formato_chave_sessao = formato_chave_sessao;
+		this.usa_so_get = usa_so_get;
 		this.fabricante_modelo = fabricante_modelo;
 	}
 	
@@ -50,6 +57,30 @@ public class Ataque {
 		this.usa_cookie = usa_cookie;
 	}
 	
+	public int getUsa_chave_sessao() {
+		return usa_chave_sessao;
+	}
+	
+	public void setUsa_chave_sessao(int usa_chave_sessao) {
+		this.usa_chave_sessao = usa_chave_sessao;
+	}
+	
+	public String getFormato_chave_sessao() {
+		return formato_chave_sessao;
+	}
+	
+	public void setFormato_chave_sessao(String formato_chave_sessao) {
+		this.formato_chave_sessao = formato_chave_sessao;
+	}
+	
+	public int getUsa_so_get() {
+		return usa_so_get;
+	}
+	
+	public void setUsa_so_get(int usa_so_get) {
+		this.usa_so_get = usa_so_get;
+	}
+	
 	public String getFabricante_modelo() {
 		return fabricante_modelo;
 	}
@@ -64,6 +95,9 @@ public class Ataque {
 					   ", tipo=" + tipo	+
 					   ", operadora=" + operadora +
 					   ", usa_cookie=" + usa_cookie	+
+					   ", usa_chave_sessao=" + usa_chave_sessao	+
+					   ", formato_chave_sessao=" + formato_chave_sessao	+
+					   ", usa_so_get=" + usa_so_get	+
 					   ", fabricante_modelo=" + fabricante_modelo +"]";
 	}
 

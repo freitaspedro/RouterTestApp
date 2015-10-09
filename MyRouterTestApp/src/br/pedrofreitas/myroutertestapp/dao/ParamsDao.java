@@ -11,26 +11,26 @@ import android.database.sqlite.SQLiteDatabase;
 public class ParamsDao {
 
 	private SQLiteDatabase db;
-	private static final String[] colunas = {"id","id_comando","nome","valor"};
+	private static final String[] colunas = {"id", "id_comando", "nome", "valor"};
 	
 	public ParamsDao(Context ctx) {
 		db = ctx.openOrCreateDatabase("bancoProjetoFinal", Context.MODE_PRIVATE, null);
 	}
 	
-	public void insert(Params x) {
+	public void insert(Params params) {
 		ContentValues values = new ContentValues();
 		
-		values.put(colunas[0], x.getId());
-		values.put(colunas[1], x.getId_comando());
-		values.put(colunas[2], x.getNome());
-		values.put(colunas[3], x.getValor());
+		values.put(colunas[0], params.getId());
+		values.put(colunas[1], params.getId_comando());
+		values.put(colunas[2], params.getNome());
+		values.put(colunas[3], params.getValor());
 		
 		db.insert("params", null, values);
 	}
 	
-	public ArrayList<Params> getParamsWithIdComando(long id_atq) {
+	public ArrayList<Params> getParamsWithIdComando(long id_comando) {
 		ArrayList<Params> list = new ArrayList<Params>();
-		Cursor c = db.query(true, "params", colunas, "id_comando" + "=" + id_atq, null, null, null, null, null);
+		Cursor c = db.query(true, "params", colunas, "id_comando =" + id_comando, null, null, null, null, null);
 		if(c.moveToFirst()){
 			int idxId = c.getColumnIndex(colunas[0]);
 			int idxId_comando = c.getColumnIndex(colunas[1]);
