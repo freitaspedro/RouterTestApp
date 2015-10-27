@@ -17,11 +17,9 @@ public class NetworkUtil {
    public static CharSequence ALERT_DIALOG1 = "Não foi possível se conectar ao servidor"; 
     
    public static int getConnectivityStatus(Context context) {
-       ConnectivityManager cm = (ConnectivityManager) context
-               .getSystemService(Context.CONNECTIVITY_SERVICE);
- 
+       ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE); 
        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-       if (null != activeNetwork) {
+       if (activeNetwork != null) {
            if(activeNetwork.getType() == ConnectivityManager.TYPE_WIFI)
                return TYPE_WIFI;
             
@@ -50,8 +48,8 @@ public class NetworkUtil {
        return status;
    }
    
-   public static boolean existInternet(Context ctx) {
-		ConnectivityManager cm = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
+   public static boolean existInternet(Context context) {
+		ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo ni = cm.getActiveNetworkInfo();
 		if(ni == null) {
 			return false;
@@ -67,8 +65,8 @@ public class NetworkUtil {
 		}
    }
    
-   public static boolean isWiFiConnected(Context ctx) {		
-		ConnectivityManager cm = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
+   public static boolean isWiFiConnected(Context context) {		
+		ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo ni = null;
 		if(cm != null) {	
 			ni = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);

@@ -37,11 +37,11 @@ public class GetAtaque extends AsyncTask<Void, String, Void> {
 	private String urlJsonParamsProx = "http://pedrofreitas.ddns.net/selecionaparamsprox.php";
 	private String urlJsonLogin = "http://pedrofreitas.ddns.net/selecionalogin.php";
 	
-	private boolean flag_erro_download_ataque = true;
-	private boolean flag_erro_download_postget = true;	
-	private boolean flag_erro_download_params = true;
-	private boolean flag_erro_download_paramsprox = true;
-	private boolean flag_erro_download_login = true;
+	private boolean flag_erro_download_ataque;
+	private boolean flag_erro_download_postget;	
+	private boolean flag_erro_download_params;
+	private boolean flag_erro_download_paramsprox;
+	private boolean flag_erro_download_login;
 	
 	private final String[] colunasAtaque = {"id", "tipo", "operadora", "usa_cookie", "usa_chave_sessao", "formato_chave_sessao", 
 																								"usa_so_get", "fabricante_modelo"};
@@ -55,6 +55,11 @@ public class GetAtaque extends AsyncTask<Void, String, Void> {
 		this.mContext = mContext;
 		this.mShared = mShared;
 		this.asyncTask = (GetInfo) asyncTask;
+		flag_erro_download_ataque = false;
+		flag_erro_download_postget = false;	
+		flag_erro_download_params = false;
+		flag_erro_download_paramsprox = false;
+		flag_erro_download_login = false;
 	}
 	
 	@Override
@@ -92,9 +97,9 @@ public class GetAtaque extends AsyncTask<Void, String, Void> {
 							mObjJsonAtaque.getString(colunasAtaque[2]), mObjJsonAtaque.getInt(colunasAtaque[3]), mObjJsonAtaque.getInt(colunasAtaque[4]), 
 							mObjJsonAtaque.getString(colunasAtaque[5]), mObjJsonAtaque.getInt(colunasAtaque[6]), mObjJsonAtaque.getString(colunasAtaque[7])));					
 				}
-				flag_erro_download_ataque = false;
 			} catch(JSONException e) {
 				Log.e("ATAQUEJSON", "Erro no parsing do JSON ataque", e);
+				flag_erro_download_ataque = true;
 			}
 		} else {
 			flag_erro_download_ataque = true;
@@ -119,9 +124,9 @@ public class GetAtaque extends AsyncTask<Void, String, Void> {
 								mObjJsonPostGet.getInt(colunasPostGet[2]), mObjJsonPostGet.getString(colunasPostGet[3]), mObjJsonPostGet.getString(colunasPostGet[4]), 
 								mObjJsonPostGet.getString(colunasPostGet[5]), mObjJsonPostGet.getInt(colunasPostGet[6])));						
 					}
-					flag_erro_download_postget = false;
 				} catch(JSONException e) {
 					Log.e("POSTGETJSON", "Erro no parsing do JSON postget", e);
+					flag_erro_download_postget = true;
 				}
 			} else {
 				flag_erro_download_postget = true;
@@ -147,9 +152,9 @@ public class GetAtaque extends AsyncTask<Void, String, Void> {
 						mParamsDao.insert(new Params(mObjJsonParams.getLong(colunasParams[0]), mObjJsonParams.getLong(colunasParams[1]), 
 								mObjJsonParams.getString(colunasParams[2]), mObjJsonParams.getString(colunasParams[3])));						
 					}
-					flag_erro_download_params = false;
 				} catch(JSONException e) {
 					Log.e("PARAMSJSON", "Erro no parsing do JSON params", e);
+					flag_erro_download_params = true;
 				}
 			} else {
 				flag_erro_download_params = true;
@@ -174,9 +179,9 @@ public class GetAtaque extends AsyncTask<Void, String, Void> {
 						mParamsProxDao.insert(new Params(mObjJsonParamsProx.getLong(colunasParamsProx[0]), mObjJsonParamsProx.getLong(colunasParamsProx[1]), 
 								mObjJsonParamsProx.getString(colunasParamsProx[2]), mObjJsonParamsProx.getString(colunasParamsProx[3])));						
 					}
-					flag_erro_download_paramsprox = false;
 				} catch(JSONException e) {
 					Log.e("PARAMSPROXJSON", "Erro no parsing do JSON paramsprox", e);
+					flag_erro_download_paramsprox = true;
 				}
 			} else {
 				flag_erro_download_paramsprox = true;
@@ -200,10 +205,10 @@ public class GetAtaque extends AsyncTask<Void, String, Void> {
 					mLoginDao.save(new Login(mObjJsonLogin.getLong(colunasLogin[0]), mObjJsonLogin.getString(colunasLogin[1]), 
 							mObjJsonLogin.getString(colunasLogin[2]), mObjJsonLogin.getString(colunasLogin[3])));
 					
-					flag_erro_download_login = false;
 				}
 			} catch(JSONException e) {
 				Log.e("USUARIOJSON", "Erro no parsing do JSON login", e);
+				flag_erro_download_login = true;
 			}
 		} else {
 			flag_erro_download_login = true;

@@ -11,12 +11,14 @@ import android.content.SharedPreferences;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.provider.Settings;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.TextView;
 import br.pedrofreitas.myroutertestapp.dao.AtaqueDao;
 import br.pedrofreitas.myroutertestapp.dao.DadoDao;
@@ -63,7 +65,7 @@ public class MainActivity<T> extends ActionBarActivity implements AsyncTaskCompl
 	
 	private TextView mIp;
 	private TextView mGateway;
-	private TextView mMac;
+	private TextView mSSID;
 	private TextView mOperadora;
 	private TextView mData;
 	
@@ -79,7 +81,9 @@ public class MainActivity<T> extends ActionBarActivity implements AsyncTaskCompl
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);        
 
-		mShared = getSharedPreferences(TAG_APP, MODE_PRIVATE);		
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        mShared = getSharedPreferences(TAG_APP, MODE_PRIVATE);		
 		mIsCreated = mShared.getBoolean(TAG_CREATE_TABLES, false);
 		
 		//Cria o banco e as tabelas na memoria
@@ -91,7 +95,7 @@ public class MainActivity<T> extends ActionBarActivity implements AsyncTaskCompl
 	@Override
 	protected void onStart() {
 		super.onStart();
-		setContentView(R.layout.activity_main);  	
+		setContentView(R.layout.activity_main);  		
 		
 		mShared = getSharedPreferences(TAG_APP, MODE_PRIVATE);		
 		mIsInserted = mShared.getBoolean(TAG_INSERT_TABLES, false);
@@ -115,8 +119,7 @@ public class MainActivity<T> extends ActionBarActivity implements AsyncTaskCompl
 		}
 		else {        	
 			showDialog(ALERT_DIALOG1);			
-		}
-        
+		}     
 	}	
 	
 	@Override
@@ -158,9 +161,9 @@ public class MainActivity<T> extends ActionBarActivity implements AsyncTaskCompl
         	CharSequence textGateway = (mDado.getGateway() != null) ? "Gateway Padrão: " + mDado.getGateway() : "Gateway Padrão: Não identificado";
         	mGateway.setText(textGateway);
         	
-        	mMac = (TextView) findViewById(R.id.textView3);
-        	CharSequence textMac = (mDado.getMac() != null) ? "Endereço MAC: " + mDado.getMac() : "Endereço MAC: Não identificado";
-        	mMac.setText(textMac);
+        	mSSID = (TextView) findViewById(R.id.textView3);
+        	CharSequence textMac = (mDado.getSsid() != null) ? "SSID: " + mDado.getSsid() : "SSID: Não identificado";
+        	mSSID.setText(textMac);
         	
         	mOperadora = (TextView) findViewById(R.id.textView4);
         	CharSequence textOperadora = (mDado.getOperadora() != null) ? "Operadora: " + mDado.getOperadora().toUpperCase() : "Operadora: Não identificada";
@@ -212,23 +215,20 @@ public class MainActivity<T> extends ActionBarActivity implements AsyncTaskCompl
 		if(NetworkUtil.isWiFiConnected(this)) {			
 			mAtaqueDao = new AtaqueDao(MainActivity.this);
 			ArrayList<Ataque> mListAtaque = new ArrayList<>();
-			mListAtaque.addAll(mAtaqueDao.getAtaquesWithOperadoraETipo("gvt", "login"));
+			mListAtaque.addAll(mAtaqueDao.getAtaquesWithOperadoraETipo(mDado.getOperadora(), "login"));
 			
-			mListAtaque.addAll(mAtaqueDao.getAtaquesWithNOTOperadoraETipo("gvt", "login"));
+			mListAtaque.addAll(mAtaqueDao.getAtaquesWithNOTOperadoraETipo(mDado.getOperadora(), "login"));
 			
 			
 			Log.i("LISTA_ATAQUE_LOGIN", "tamanho " + mListAtaque.size());			
 			int mCountAtaques = 0;
 			
 	    	doAtaqueTask = new StartAtaque(MainActivity.this, mDado, mListLogin, mListAtaque, mCountAtaques, it);
-	    	doAtaqueTask.execute();	     
-			
-//			startActivity(it);
+	    	doAtaqueTask.execute();	 
     	}
     	else {        	
 			showDialog(ALERT_DIALOG1);			
-    	}  
-    	
+    	}     	
     }
     
     @Override
@@ -249,6 +249,8 @@ public class MainActivity<T> extends ActionBarActivity implements AsyncTaskCompl
     		mDadoDao.close();
     	if(mGeneralDao != null)
     		mGeneralDao.close();
+    	
+//    	finish();
     }
 
     @Override
@@ -269,5 +271,7 @@ public class MainActivity<T> extends ActionBarActivity implements AsyncTaskCompl
     		mDadoDao.close();
     	if(mGeneralDao != null)
     		mGeneralDao.close();
+    	
+//    	finish();
     }
 }

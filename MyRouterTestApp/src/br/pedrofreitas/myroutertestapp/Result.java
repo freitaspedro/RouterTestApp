@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.WindowManager;
 import br.pedrofreitas.myroutertestapp.dao.AtaqueDao;
 import br.pedrofreitas.myroutertestapp.fragment.HeadlinesFragment;
 import br.pedrofreitas.myroutertestapp.fragment.Info;
@@ -27,15 +28,17 @@ public class Result extends ActionBarActivity
 	private static final String[] headlines = {"Reboot", "DNS", "Acesso Remoto", "Filtro MAC", "Abrir Rede"};
 	
 	/** Called when the activity is first created. */
-	 @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.new_result); 
+        setContentView(R.layout.new_result);         
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         
         String breakline = System.getProperty("line.separator");
         
         dado = (Dado) getIntent().getSerializableExtra("Dado");
-                
+        
+        
         String operadora = (dado.getOperadora() != null) 
 											 ? "Roteador testado é da operadora " + dado.getOperadora() + "." + breakline
 											 : "Não foi possível identificar a operadora do roteador testado." + breakline;
@@ -75,23 +78,23 @@ public class Result extends ActionBarActivity
         		switch(ataques[i]) {
         			case "Reboot":
         				espc = "Durante o teste foi realizado um reboot em seu roteador com sucesso. " + 
-        					   "Abaixo são apresentadas algumas informações e discutidas falhas na segurança de seu roteador que permitiram o sucesso nesse procedimento:" + breakline + breakline;
+        					   "Abaixo são apresentadas algumas informações e discutidas falhas na segurança de seu roteador que permitiram a execução desse procedimento:" + breakline + breakline;
         				break;
         			case "Dns":
         				espc = "Durante o teste foram alterados os dns primário e secundário de seu roteador para os do Google (8.8.8.8 e 8.8.4.4). " + 
-        					   "Abaixo são apresentadas algumas informações e discutidas falhas na segurança de seu roteador que permitiram o sucesso nesse procedimento:" + breakline + breakline;
+        					   "Abaixo são apresentadas algumas informações e discutidas falhas na segurança de seu roteador que permitiram a execução desse procedimento:" + breakline + breakline;
         				break;
         			case "Acesso_remoto":
         				espc = "Durante o teste foi possível liberar o acesso remoto à administração de seu roteador. " + 
-         					   "Abaixo são apresentadas algumas informações e discutidas falhas na segurança de seu roteador que permitiram o sucesso nesse procedimento:" + breakline + breakline;
+         					   "Abaixo são apresentadas algumas informações e discutidas falhas na segurança de seu roteador que permitiram a execução desse procedimento:" + breakline + breakline;
         				break;
         			case "Filtro_mac":
         				espc = "Durante o teste foi habilitado o filtro por endereço MAC da rede sem fio, permitindo acesso à rede sem fio apenas pelo dispositivo em uso. " + 
-         					   "Abaixo são apresentadas algumas informações e discutidas falhas na segurança de seu roteador que permitiram o sucesso nesse procedimento:" + breakline + breakline;
+         					   "Abaixo são apresentadas algumas informações e discutidas falhas na segurança de seu roteador que permitiram a execução desse procedimento:" + breakline + breakline;
         				break;
         			case "Abrir_rede":
         				espc = "Durante o teste, a segurança usada em sua rede sem fio foi removida, tornando a rede aberta. " + 
-         					   "Abaixo são apresentadas algumas informações e discutidas falhas na segurança de seu roteador que permitiram o sucesso nesse procedimento:" + breakline + breakline;
+         					   "Abaixo são apresentadas algumas informações e discutidas falhas na segurança de seu roteador que permitiram a execução desse procedimento:" + breakline + breakline;
         				break;
         			default:
     					Log.e("ERR_TIPO", "Tipo de ataque nao identificado");
@@ -125,7 +128,7 @@ public class Result extends ActionBarActivity
         															 "na URL como acontece no método GET." + breakline 
         														   : breakline;
         	
-        		finalResult.put(headlines[i], espc + operadora + fabricante_modelo + usa_cookie + usa_chave_sessao_formato + usa_so_get);
+        		finalResult.put(headlines[i], espc + operadora + fabricante_modelo + usuario_senha + usa_cookie + usa_chave_sessao_formato + usa_so_get);
         	} else {
         		finalResult.put(headlines[i], null);
         	}           

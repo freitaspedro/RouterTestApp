@@ -3,6 +3,7 @@ package br.pedrofreitas.myroutertestapp;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.method.LinkMovementMethod;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 public class About extends ActionBarActivity {
@@ -12,7 +13,9 @@ public class About extends ActionBarActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_about);
+		setContentView(R.layout.activity_about);		
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		
 		textViewComments = (TextView) findViewById(R.id.textView3);
 		textViewComments.setMovementMethod(LinkMovementMethod.getInstance());
