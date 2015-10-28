@@ -60,17 +60,20 @@ public class StartAtaque extends AsyncTask<Void, String, Integer> {
 	private boolean mConectou;
 	
 	private int mCountAtaques; 
+	
+	private ArrayList<String> mListAtaqueTipo;
 
 	private CookieStore cookieStore;
 	private List<Cookie> cookies;
 	
 	
-	public StartAtaque(Context mContext, Dado mDado, ArrayList<Login> mListLogin, ArrayList<Ataque> mListAtaque, int mCountAtaques, Intent it) {
+	public StartAtaque(Context mContext, Dado mDado, ArrayList<Login> mListLogin, ArrayList<Ataque> mListAtaque, int mCountAtaques, ArrayList<String> mListAtaqueTipo, Intent it) {
 		this.mContext = mContext;
 		this.mDado = mDado;
 		this.mListLogin = mListLogin;
 		this.mListAtaque = mListAtaque;
 		this.mCountAtaques = mCountAtaques;
+		this.mListAtaqueTipo = mListAtaqueTipo;
 		this.mConectou = false;
 		this.it = it;
 	}
@@ -365,7 +368,7 @@ public class StartAtaque extends AsyncTask<Void, String, Integer> {
 			
 			Log.i("LISTA_REBOOT", "tamanho " + mListAtaque.size());
 			
-			new FinishAtaque(mContext, mIdDadoAtaque, mListAtaque, mCountTipoAtaques, it).execute();	
+			new FinishAtaque(mContext, mIdDadoAtaque, mListAtaque, mCountTipoAtaques, mListAtaqueTipo, it).execute();	
 		} else {
 			//A lista de ataques terminou e nao foi possivel logar 
 			if(mCountAtaques == mListAtaque.size() - 1) {
@@ -398,7 +401,7 @@ public class StartAtaque extends AsyncTask<Void, String, Integer> {
 //					mDadoDao.getAll();
 					
 					mCountAtaques++;
-					new StartAtaque(mContext, mDado, mListLogin, mListAtaque, mCountAtaques, it).execute();
+					new StartAtaque(mContext, mDado, mListLogin, mListAtaque, mCountAtaques, mListAtaqueTipo, it).execute();
 				}
 			}
 		}			

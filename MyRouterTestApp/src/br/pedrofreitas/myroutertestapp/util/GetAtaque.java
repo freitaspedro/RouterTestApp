@@ -236,7 +236,7 @@ public class GetAtaque extends AsyncTask<Void, String, Void> {
 			asyncTask.execute();
 		} else {
 			new AlertDialog.Builder(mContext)
-		    .setMessage(NetworkUtil.ALERT_DIALOG1)
+		    .setMessage(NetworkUtil.ALERT_DIALOG_SERVER)
 		    .setCancelable(false)
 		    .setPositiveButton("Tentar novamente", new DialogInterface.OnClickListener() {
 			    public void onClick(DialogInterface dialog, int which) { 

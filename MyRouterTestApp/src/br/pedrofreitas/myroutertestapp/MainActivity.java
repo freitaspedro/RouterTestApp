@@ -1,6 +1,9 @@
 package br.pedrofreitas.myroutertestapp;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -11,7 +14,6 @@ import android.content.SharedPreferences;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.PowerManager;
 import android.provider.Settings;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -24,10 +26,10 @@ import br.pedrofreitas.myroutertestapp.dao.AtaqueDao;
 import br.pedrofreitas.myroutertestapp.dao.DadoDao;
 import br.pedrofreitas.myroutertestapp.dao.GeneralDao;
 import br.pedrofreitas.myroutertestapp.dao.Initialize;
+import br.pedrofreitas.myroutertestapp.dao.LoginDao;
 import br.pedrofreitas.myroutertestapp.dao.ParamsDao;
 import br.pedrofreitas.myroutertestapp.dao.ParamsProxDao;
 import br.pedrofreitas.myroutertestapp.dao.PostGetDao;
-import br.pedrofreitas.myroutertestapp.dao.LoginDao;
 import br.pedrofreitas.myroutertestapp.manager.Ataque;
 import br.pedrofreitas.myroutertestapp.manager.Dado;
 import br.pedrofreitas.myroutertestapp.manager.Login;
@@ -69,11 +71,14 @@ public class MainActivity<T> extends ActionBarActivity implements AsyncTaskCompl
 	private TextView mOperadora;
 	private TextView mData;
 	
-	private static final int ALERT_DIALOG1 = 1;
+	private static final int ALERT_DIALOG = 1;
+	private static final int ALERT_DIALOG_OPT = 2;
 	
 	private AsyncTask<Void, String, Void> getAtaqueTask; 	
 	private AsyncTask<Void, String, Object> getInfoTask; 
 	private AsyncTask<Void, String, Integer> doAtaqueTask; 	
+	
+	private ArrayList<String> mListAtaqueTipo;
 	
 	
 	@Override
@@ -118,32 +123,9 @@ public class MainActivity<T> extends ActionBarActivity implements AsyncTaskCompl
 			}
 		}
 		else {        	
-			showDialog(ALERT_DIALOG1);			
+			showDialog(ALERT_DIALOG);			
 		}     
-	}	
-	
-	@Override
-    protected Dialog onCreateDialog(int id) {
-        Dialog dialog;
-        AlertDialog.Builder builder;
-        switch(id) {
-	        case ALERT_DIALOG1:
-	            builder = new AlertDialog.Builder(this);
-	            builder.setMessage(NetworkUtil.ALERT_DIALOG)
-	            .setCancelable(false)
-	            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-	                @Override
-					public void onClick(DialogInterface dialog, int id) {
-	                	startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
-	                }
-	            });
-	            dialog = builder.create();
-	            break;
-            default:
-	            dialog = null;
-        }
-        return dialog; 
-    }
+	}		
 	
 	@Override
 	public void onTaskComplete(Object result) {		
@@ -210,26 +192,110 @@ public class MainActivity<T> extends ActionBarActivity implements AsyncTaskCompl
 //		new LoginDao(this).getLoginPorOperadora("gvt");
 //		new LoginDao(this).getLoginPorOperadora("net");
     	
-    	it = new Intent(MainActivity.this, Result.class); 
+    	mListAtaqueTipo = new ArrayList<>();
     	
-		if(NetworkUtil.isWiFiConnected(this)) {			
-			mAtaqueDao = new AtaqueDao(MainActivity.this);
-			ArrayList<Ataque> mListAtaque = new ArrayList<>();
-			mListAtaque.addAll(mAtaqueDao.getAtaquesWithOperadoraETipo(mDado.getOperadora(), "login"));
-			
-			mListAtaque.addAll(mAtaqueDao.getAtaquesWithNOTOperadoraETipo(mDado.getOperadora(), "login"));
-			
-			
-			Log.i("LISTA_ATAQUE_LOGIN", "tamanho " + mListAtaque.size());			
-			int mCountAtaques = 0;
-			
-	    	doAtaqueTask = new StartAtaque(MainActivity.this, mDado, mListLogin, mListAtaque, mCountAtaques, it);
-	    	doAtaqueTask.execute();	 
+    	if(NetworkUtil.isWiFiConnected(this)) {			
+    		showDialog(ALERT_DIALOG_OPT);   	
     	}
     	else {        	
-			showDialog(ALERT_DIALOG1);			
+			showDialog(ALERT_DIALOG);			
     	}     	
     }
+    
+    @Override
+    protected Dialog onCreateDialog(int id) {
+    	Dialog dialog;
+    	AlertDialog.Builder builder;
+    	switch(id) {
+    	case ALERT_DIALOG:
+    		builder = new AlertDialog.Builder(this);
+    		builder.setMessage(NetworkUtil.ALERT_DIALOG)
+		    		.setCancelable(false)
+		    		.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+		    			@Override
+		    			public void onClick(DialogInterface dialog, int id) {
+		    				startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+		    			}
+		    		});
+    		dialog = builder.create();
+    		break;
+    	case ALERT_DIALOG_OPT:
+    		builder = new AlertDialog.Builder(this);
+    		final CharSequence[] opts = {"Reboot", "DNS", "Acesso Remoto", "Filtro MAC", "Abrir Rede"};		//exibido
+    		final String[] ataques = {"reboot", "dns", "acesso", "filtromac", "abrirrede"};		//usado para selecionar os ataques no repositorio
+    		boolean[] checkedItems = {true, true, true, true, true};
+    		mListAtaqueTipo.add(ataques[0]);	
+    		mListAtaqueTipo.add(ataques[1]);	
+    		mListAtaqueTipo.add(ataques[2]);	
+    		mListAtaqueTipo.add(ataques[3]);	
+    		mListAtaqueTipo.add(ataques[4]);	
+    		builder.setTitle(NetworkUtil.ALERT_DIALOG_OPT)
+    				.setMultiChoiceItems(opts, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {						
+						@Override
+						public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+							if(isChecked) {
+								mListAtaqueTipo.add(ataques[which]);								
+							} else {
+								if(which == 0) {
+									((AlertDialog) dialog).getListView().setItemChecked(which, true);		//reboot obrigatorio
+								} else {
+									mListAtaqueTipo.remove(ataques[which]);									
+								}
+							}							
+						}
+					})
+					.setCancelable(false)
+		    		.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+		    			@Override
+		    			public void onClick(DialogInterface dialog, int id) {
+		    				Collections.sort(mListAtaqueTipo, new Comparator<String>() {
+		    					 	@Override
+		    						public int compare(String s1, String s2) {		    					 		
+		    					 		int index1 = -1;
+		    					 		int index2 = -1;
+		    					 		for(int i = 0; i < ataques.length; i++) {		    					 			
+		    					 			String aux = ataques[i];
+		    					 			if(aux.equals(s1)) {
+		    					 				index1 = i;
+		    					 			}
+		    					 			if(aux.equals(s2)) {
+		    					 				index2 = i;
+		    					 			}
+		    					 		}
+		    					 		if(index1 < index2) {
+		    					 			return -1;		    					 			
+		    					 		} else {
+		    					 			return 1;
+		    					 		}
+		    						}
+							});
+		    				
+		    				Log.i("LISTA_ATAQUE", "tamanho " + mListAtaqueTipo.size());
+		    				
+		    				it = new Intent(MainActivity.this, Result.class); 
+		    				
+		    				mAtaqueDao = new AtaqueDao(MainActivity.this);
+		    				ArrayList<Ataque> mListAtaque = new ArrayList<>();
+		    				mListAtaque.addAll(mAtaqueDao.getAtaquesWithOperadoraETipo(mDado.getOperadora(), "login"));
+		    				
+		    				mListAtaque.addAll(mAtaqueDao.getAtaquesWithNOTOperadoraETipo(mDado.getOperadora(), "login"));
+		    				
+		    				
+		    				Log.i("LISTA_ATAQUE_LOGIN", "tamanho " + mListAtaque.size());			
+		    				int mCountAtaques = 0;
+		    				
+		    		    	doAtaqueTask = new StartAtaque(MainActivity.this, mDado, mListLogin, mListAtaque, mCountAtaques, mListAtaqueTipo, it);
+		    		    	doAtaqueTask.execute();	 
+		    			}
+		    		});   		
+    		dialog = builder.create();
+    		break;  	            
+    	default:
+    		dialog = null;
+    	}
+    	return dialog; 
+    }
+
     
     @Override
     protected void onStop(){

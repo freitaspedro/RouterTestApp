@@ -14,7 +14,8 @@ public class NetworkUtil {
    public static int SLEEP_TIME_OUT = 4250;
    public static CharSequence ALERT = "Need Wifi enabled";
    public static CharSequence ALERT_DIALOG = "Tentar uma nova conexão"; 
-   public static CharSequence ALERT_DIALOG1 = "Não foi possível se conectar ao servidor"; 
+   public static CharSequence ALERT_DIALOG_OPT = "Escolha as opções"; 
+   public static CharSequence ALERT_DIALOG_SERVER = "Não foi possível se conectar ao servidor"; 
     
    public static int getConnectivityStatus(Context context) {
        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE); 

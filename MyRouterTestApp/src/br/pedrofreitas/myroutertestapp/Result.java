@@ -24,8 +24,8 @@ public class Result extends ActionBarActivity
 	private Info mInfo = null; 
 	
 	private Dado dado;
-	private static final String[] ataques = {"Reboot", "Dns", "Acesso_remoto", "Filtro_mac", "Abrir_rede"};
-	private static final String[] headlines = {"Reboot", "DNS", "Acesso Remoto", "Filtro MAC", "Abrir Rede"};
+	private static final String[] ataques = {"Reboot", "Dns", "Acesso_remoto", "Filtro_mac", "Abrir_rede"};		//usado para identificar os metodos
+	private static final String[] headlines = {"Reboot", "DNS", "Acesso Remoto", "Filtro MAC", "Abrir Rede"};		//exibido
 	
 	/** Called when the activity is first created. */
     public void onCreate(Bundle savedInstanceState) {

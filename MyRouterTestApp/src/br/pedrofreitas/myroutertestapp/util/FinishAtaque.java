@@ -65,8 +65,9 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 
 	private boolean mAtacou;
 
+	private ArrayList<String> mListAtaqueTipo;
+
 	private int mCountTipoAtaques;
-	private static final String[] ataques = {"reboot", "dns", "acesso", "filtromac", "abrirrede"};
 			
 	private CookieStore cookieStore;
 	private List<Cookie> cookies;
@@ -77,11 +78,12 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 	private AsyncTask<Void, String, Void> salvaBancoTask; 
 	
 	
-	public FinishAtaque(Context mContext, long mIdDadoAtaque, ArrayList<Ataque> mListAtaque, int mCountTipoAtaques, Intent it) {
+	public FinishAtaque(Context mContext, long mIdDadoAtaque, ArrayList<Ataque> mListAtaque, int mCountTipoAtaques, ArrayList<String> mListAtaqueTipo, Intent it) {
 		this.mContext = mContext;
 		this.mIdDadoAtaque = mIdDadoAtaque;
 		this.mListAtaque = mListAtaque;
 		this.mCountTipoAtaques = mCountTipoAtaques;
+		this.mListAtaqueTipo = mListAtaqueTipo;
 		this.mAtacou = false;
 		this.it = it;
 	}
@@ -167,12 +169,12 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 					
 						HttpGet httpGet = new HttpGet("http://" + auxDado.getGateway() + comando);
 						
-						Log.i("URL_" + ataques[mCountTipoAtaques].toUpperCase() + "_" + mCountAtaques + "_" + mCountPostGet, "http://" + auxDado.getGateway() + comando);
+						Log.i("URL_" + mListAtaqueTipo.get(mCountTipoAtaques).toUpperCase() + "_" + mCountAtaques + "_" + mCountPostGet, "http://" + auxDado.getGateway() + comando);
 						
 						if(auxPostGet.getUsa_login() == 1) {
 							byte[] encodedBytes = Base64.encodeBase64((auxDado.getUsuario() + ":" + auxDado.getSenha()).getBytes());
 							String encoding = new String(encodedBytes);
-							Log.i("ENCODING_" + ataques[mCountTipoAtaques].toUpperCase() + "_" + mCountAtaques, encoding + "(" + auxDado.getUsuario() + ":" + auxDado.getSenha() + ")");
+							Log.i("ENCODING_" + mListAtaqueTipo.get(mCountTipoAtaques).toUpperCase() + "_" + mCountAtaques, encoding + "(" + auxDado.getUsuario() + ":" + auxDado.getSenha() + ")");
 							httpGet.setHeader("Authorization", "Basic " + encoding);
 						}
 						
@@ -226,7 +228,7 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 								List<Params> mListParamsProx = mParamsProxDao.getParamsWithIdComando(auxPostGet.getId());	
 																
 								while((line = in.readLine()) != null) {
-									Log.i("CONEXAO_" + ataques[mCountTipoAtaques].toUpperCase() + "_" + mCountAtaques + "_" + mCountPostGet, line);																
+									Log.i("CONEXAO_" + mListAtaqueTipo.get(mCountTipoAtaques).toUpperCase() + "_" + mCountAtaques + "_" + mCountPostGet, line);																
 									
 									if(line.contains(auxPostGet.getToken())) {
 										erro = false;
@@ -266,11 +268,11 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 							}					
 							
 						} catch (ClientProtocolException e) {
-							Log.e("ERR_" + ataques[mCountTipoAtaques].toUpperCase() + "_" + mCountAtaques + "_" + mCountPostGet, "ClientProtocolException", e);
+							Log.e("ERR_" + mListAtaqueTipo.get(mCountTipoAtaques).toUpperCase() + "_" + mCountAtaques + "_" + mCountPostGet, "ClientProtocolException", e);
 							erro = true;
 							mCountAtaques++;
 						} catch (IOException e) {
-							Log.e("ERR_" + ataques[mCountTipoAtaques].toUpperCase() + "_" + mCountAtaques  + "_" + mCountPostGet, "IOException", e);
+							Log.e("ERR_" + mListAtaqueTipo.get(mCountTipoAtaques).toUpperCase() + "_" + mCountAtaques  + "_" + mCountPostGet, "IOException", e);
 							erro = true;
 							//Condicao por causa do ataque abrir rede da sagemcom F@ast 2704N e acesso aremoto no motorola surfboard SVG6583
 							if(auxPostGet.getOrdem() == mListPostGet.size() && (auxPostGet.getComando().equals("/wancfg.cmd?action=refresh") ||	
@@ -288,13 +290,13 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 							
 							HttpPost httpPost = new HttpPost("http://" + auxDado.getGateway() + comando);
 					
-							Log.i("URL_" + ataques[mCountTipoAtaques].toUpperCase() + "_" + mCountAtaques + "_" + mCountPostGet, "http://" + auxDado.getGateway() + comando);
+							Log.i("URL_" + mListAtaqueTipo.get(mCountTipoAtaques).toUpperCase() + "_" + mCountAtaques + "_" + mCountPostGet, "http://" + auxDado.getGateway() + comando);
 							
 							//Usa o login no post para auteticacao
 							if(auxPostGet.getUsa_login() == 2) {
 								byte[] encodedBytes = Base64.encodeBase64((auxDado.getUsuario() + ":" + auxDado.getSenha()).getBytes());
 								String encoding = new String(encodedBytes);
-								Log.i("ENCODING_" + ataques[mCountTipoAtaques].toUpperCase() + "_" + mCountAtaques, encoding + "(" + auxDado.getUsuario() + ":" + auxDado.getSenha() + ")");
+								Log.i("ENCODING_" + mListAtaqueTipo.get(mCountTipoAtaques).toUpperCase() + "_" + mCountAtaques, encoding + "(" + auxDado.getUsuario() + ":" + auxDado.getSenha() + ")");
 								httpPost.setHeader("Authorization", "Basic " + encoding);
 							}
 							
@@ -353,7 +355,7 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 								try {
 									httpPost.setEntity(new UrlEncodedFormEntity(auxParams, "UTF-8"));							
 								} catch(UnsupportedEncodingException e) {
-									Log.e(ataques[mCountTipoAtaques].toUpperCase() + "_" + mCountAtaques, "UnsupportedEncodingException", e);
+									Log.e(mListAtaqueTipo.get(mCountTipoAtaques).toUpperCase() + "_" + mCountAtaques, "UnsupportedEncodingException", e);
 								}						
 							}
 								
@@ -408,7 +410,7 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 							        List<Params> mListParamProx = mParamsProxDao.getParamsWithIdComando(auxPostGet.getId());	
 
 							        while((line = in.readLine()) != null) {
-										Log.i("CONEXAO_" + ataques[mCountTipoAtaques].toUpperCase() + "_" + mCountAtaques + "_" + mCountPostGet, line);		
+										Log.i("CONEXAO_" + mListAtaqueTipo.get(mCountTipoAtaques).toUpperCase() + "_" + mCountAtaques + "_" + mCountPostGet, line);		
 										
 										if(line.contains(auxPostGet.getToken())) {
 											erro = false;
@@ -454,11 +456,11 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 								}
 								
 							} catch (ClientProtocolException e) {
-								Log.e("ERR_" + ataques[mCountTipoAtaques].toUpperCase() +"_" + mCountAtaques  + "_" + mCountPostGet, "ClientProtocolException", e);
+								Log.e("ERR_" + mListAtaqueTipo.get(mCountTipoAtaques).toUpperCase() +"_" + mCountAtaques  + "_" + mCountPostGet, "ClientProtocolException", e);
 								erro = true;
 								mCountAtaques++;
 							} catch (IOException e) {
-								Log.e("ERR_" + ataques[mCountTipoAtaques].toUpperCase() + "_" + mCountAtaques  + "_" + mCountPostGet, "IOException", e);
+								Log.e("ERR_" + mListAtaqueTipo.get(mCountTipoAtaques).toUpperCase() + "_" + mCountAtaques  + "_" + mCountPostGet, "IOException", e);
 								erro = true;
 								//Condicao por causa do ataque reboot e abrir rede da technicolor, abrir rede da zyXEL, e abrir rede sagemcom powerbox f@st2764
 								if(auxPostGet.getOrdem() == mListPostGet.size() && (auxPostGet.getComando().equals("/reboot.cgi") || 
@@ -474,7 +476,7 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 							}						
 							
 						} else {
-							Log.e("ERR_" + ataques[mCountTipoAtaques].toUpperCase() + "_" + mCountAtaques, "Comando HTTP nao identificado");
+							Log.e("ERR_" + mListAtaqueTipo.get(mCountTipoAtaques).toUpperCase() + "_" + mCountAtaques, "Comando HTTP nao identificado");
 							mAtacou = false;
 							break;						
 						}
@@ -500,9 +502,9 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 		Dado auxDado = mDadoDao.getDadoWithId(mIdDadoAtaque);					
 		
 		if(mAtacou) {		
-			Log.i(ataques[mCountTipoAtaques].toUpperCase() + "_SUCESSO", mListAtaque.get(mCountAtaques).toString());	
+			Log.i(mListAtaqueTipo.get(mCountTipoAtaques).toUpperCase() + "_SUCESSO", mListAtaque.get(mCountAtaques).toString());	
 			int id = (int) mListAtaque.get(mCountAtaques).getId();
-			switch (ataques[mCountTipoAtaques]) {
+			switch (mListAtaqueTipo.get(mCountTipoAtaques)) {
 				case "reboot":
 					auxDado.setReboot_ataque(id);
 					break;
@@ -524,14 +526,14 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 			}
 			mDadoDao.update(auxDado);
 			
-			Log.i("STATUS", "Ataque tipo '" + ataques[mCountTipoAtaques] + "' encerrado com sucesso");	
+			Log.i("STATUS", "Ataque tipo '" + mListAtaqueTipo.get(mCountTipoAtaques) + "' encerrado com sucesso");	
 			try {
 				Thread.sleep(150000);		//2m30s
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		} else {
-			Log.i("STATUS", "Ataque tipo '" + ataques[mCountTipoAtaques] + "' encerrado sem sucesso");	
+			Log.i("STATUS", "Ataque tipo '" + mListAtaqueTipo.get(mCountTipoAtaques) + "' encerrado sem sucesso");	
 			try {
 				Thread.sleep(20000);		//20s
 			} catch (InterruptedException e) {
@@ -541,7 +543,7 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 		
 		Log.i("DADO_TEMP", auxDado.toString());
 
-		if(mCountTipoAtaques == ataques.length - 1) {
+		if(mCountTipoAtaques == mListAtaqueTipo.size() - 1) {
 			
 			salvaBancoTask = new SalvaBanco(mContext, auxDado, it);
 			
@@ -555,18 +557,18 @@ public class FinishAtaque extends AsyncTask<Void, String, Integer> {
 			mProgress.dismiss();
 		} else {						
 			mCountTipoAtaques++;
-			Log.i("STATUS", "Proximo ataque tipo '" + ataques[mCountTipoAtaques] + "' iniciando...");
+			Log.i("STATUS", "Proximo ataque tipo '" + mListAtaqueTipo.get(mCountTipoAtaques) + "' iniciando...");
 			
 			AtaqueDao mAtaqueDao = new AtaqueDao(mContext);		
-			ArrayList<Ataque> mListAtaque = mAtaqueDao.getAtaquesWithOperadoraETipoEFabricanteModelo(null, ataques[mCountTipoAtaques], auxDado.getFabricante_modelo());
+			ArrayList<Ataque> mListAtaque = mAtaqueDao.getAtaquesWithOperadoraETipoEFabricanteModelo(null, mListAtaqueTipo.get(mCountTipoAtaques), auxDado.getFabricante_modelo());
 			
 			if(mListAtaque != null) {
-				Log.i("LISTA_" + ataques[mCountTipoAtaques].toUpperCase(), "tamanho " + mListAtaque.size());				
+				Log.i("LISTA_" + mListAtaqueTipo.get(mCountTipoAtaques).toUpperCase(), "tamanho " + mListAtaque.size());				
 			} else {
-				Log.i("LISTA_" + ataques[mCountTipoAtaques].toUpperCase(), "Lista vazia");
+				Log.i("LISTA_" + mListAtaqueTipo.get(mCountTipoAtaques).toUpperCase(), "Lista vazia");
 			}	
 						
-			new FinishAtaque(mContext, mIdDadoAtaque, mListAtaque, mCountTipoAtaques, it).execute();					
+			new FinishAtaque(mContext, mIdDadoAtaque, mListAtaque, mCountTipoAtaques, mListAtaqueTipo, it).execute();					
 		}	
 	}
 	
